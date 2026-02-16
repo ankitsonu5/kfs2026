@@ -8,14 +8,10 @@ const {
   getAllOrders,
   updateOrderStatus,
   deleteOrder,
-  cancelOrder,
 } = require("../Controllers/orderController");
 
 // user place order
 router.post("/place-order", auth, placeOrder);
-
-// user cancel order
-router.put("/cancel-order/:id", auth, cancelOrder);
 
 // user own orders
 router.get("/my-orders", auth, getMyOrders);

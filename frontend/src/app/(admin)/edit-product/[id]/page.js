@@ -3,7 +3,6 @@
 import axios from "axios";
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { IoArrowBack, IoCreateOutline } from "react-icons/io5";
 
 export default function EditProduct() {
   const router = useRouter();
@@ -17,7 +16,7 @@ export default function EditProduct() {
     price: "",
     description: "",
     category: "",
-    stock: 0,
+    stock: "",
   });
 
   useEffect(() => {
@@ -34,7 +33,7 @@ export default function EditProduct() {
             price: p.price,
             description: p.description,
             category: p.category?.[0] || "",
-            stock: p.stock || 0,
+            stock: p.stock,
           });
           if (p.image) {
             setPreview(`http://localhost:8080/uploads/${p.image}`);
@@ -116,204 +115,128 @@ export default function EditProduct() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-950 flex shadow-inner items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-blue-500/30 border-t-blue-500 rounded-full animate-spin" />
-          <p className="text-slate-400 font-medium animate-pulse">
-            Loading product details...
-          </p>
-        </div>
+      <div className="min-h-screen bg-[#0b1a2b] text-white flex items-center justify-center">
+        <p className="text-xl">Loading product...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-900/20 via-slate-950 to-slate-950 p-6 md:p-10 text-white font-sans">
-      <div className="max-w-4xl mx-auto">
-        {/* Header & Back Button */}
-        <div className="flex items-center justify-between mb-8">
+    <div className="min-h-screen bg-[#0b1a2b] text-white p-6 md:p-10">
+      <div className="max-w-3xl mx-auto bg-[#111827] p-6 md:p-8 rounded-xl border border-gray-700">
+        <h1 className="text-2xl md:text-3xl font-bold mb-6">Edit Product</h1>
+
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div>
+            <label className="block text-sm text-gray-300 mb-1">
+              Product Title
+            </label>
+            <input
+              type="text"
+              name="title"
+              value={form.title}
+              onChange={handleChange}
+              required
+              placeholder="Enter product title"
+              className="w-full px-3 py-2 bg-[#1f2937] border border-gray-600 rounded-md 
+              text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm text-gray-300 mb-1">
+              Price (₹)
+            </label>
+            <input
+              type="number"
+              name="price"
+              value={form.price}
+              onChange={handleChange}
+              required
+              placeholder="Enter price"
+              className="w-full px-3 py-2 bg-[#1f2937] border border-gray-600 rounded-md 
+              text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm text-gray-300 mb-1">
+              Description
+            </label>
+            <textarea
+              rows="4"
+              name="description"
+              value={form.description}
+              onChange={handleChange}
+              required
+              placeholder="Product description..."
+              className="w-full px-3 py-2 bg-[#1f2937] border border-gray-600 rounded-md 
+              text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+          </div>
+
+          <div>
+            <label className="block text-sm text-gray-300 mb-1">Category</label>
+            <select
+              name="category"
+              value={form.category}
+              onChange={handleChange}
+              required
+              className="w-full px-3 py-2 bg-[#1f2937] border border-gray-600 rounded-md 
+              text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="">Select Category</option>
+              {categories.map((cat) => (
+                <option key={cat._id} value={cat._id}>
+                  {cat.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm text-gray-300 mb-1">Stock</label>
+            <input
+              type="text"
+              name="stock"
+              value={form.stock}
+              onChange={handleChange}
+              required
+              placeholder="Enter stock"
+              className="w-full px-3 py-2 bg-[#1f2937] border border-gray-600 rounded-md 
+              text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm text-gray-300 mb-2">
+              Product Image
+            </label>
+
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImage}
+              className="w-full text-gray-300 bg-[#1f2937] border border-gray-600 
+              rounded-md p-2 file:bg-blue-600 file:border-0 file:text-white 
+              file:px-4 file:py-1 file:rounded"
+              style={{ cursor: "pointer" }}
+            />
+
+            {preview && (
+              <img
+                src={preview}
+                alt="preview"
+                className="mt-4 w-40 rounded-lg border border-gray-700"
+              />
+            )}
+          </div>
+
           <button
-            onClick={() => router.push("/admindashboard")}
-            className="group flex items-center gap-2 px-4 py-2 bg-slate-900/50 hover:bg-blue-600/20 border border-slate-800 hover:border-blue-500/50 rounded-xl transition-all duration-300 text-slate-400 hover:text-blue-400"
+            type="submit"
+            className="w-full bg-blue-600 hover:bg-blue-700 py-2 rounded-md font-semibold"
             style={{ cursor: "pointer" }}>
-            <IoArrowBack className="text-xl group-hover:-translate-x-1 transition-transform" />
-            <span className="font-medium">Back to Dashboard</span>
+            Save Changes
           </button>
-
-          <div className="flex items-center gap-3 bg-blue-500/10 px-4 py-2 rounded-2xl border border-blue-500/20">
-            <IoCreateOutline className="text-2xl text-blue-400" />
-            <span className="font-semibold text-blue-400 tracking-wide uppercase text-xs">
-              Editor Mode
-            </span>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main Form Area */}
-          <div className="lg:col-span-2">
-            <div className="bg-slate-900/40 backdrop-blur-xl border border-slate-800 p-8 rounded-3xl shadow-2xl relative overflow-hidden group">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-full -translate-y-16 translate-x-16 blur-3xl group-hover:bg-blue-500/10 transition-colors duration-500" />
-
-              <h1 className="text-3xl font-bold mb-8 text-white tracking-tight">
-                Modify <span className="text-blue-500">Product</span>
-              </h1>
-
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-slate-400 ml-1">
-                      Product Title
-                    </label>
-                    <input
-                      type="text"
-                      name="title"
-                      value={form.title}
-                      onChange={handleChange}
-                      required
-                      placeholder="e.g. Organic Avocados"
-                      className="w-full px-4 py-3 bg-slate-950/50 border border-slate-800 rounded-2xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/50 transition-all"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-slate-400 ml-1">
-                      Price (₹)
-                    </label>
-                    <input
-                      type="number"
-                      name="price"
-                      value={form.price}
-                      onChange={handleChange}
-                      required
-                      placeholder="0.00"
-                      className="w-full px-4 py-3 bg-slate-950/50 border border-slate-800 rounded-2xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/50 transition-all"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-400 ml-1">
-                    Description
-                  </label>
-                  <textarea
-                    rows="4"
-                    name="description"
-                    value={form.description}
-                    onChange={handleChange}
-                    required
-                    placeholder="Provide a detailed description of the product..."
-                    className="w-full px-4 py-3 bg-slate-950/50 border border-slate-800 rounded-2xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/50 transition-all resize-none"></textarea>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-slate-400 ml-1">
-                      Category
-                    </label>
-                    <select
-                      name="category"
-                      value={form.category}
-                      onChange={handleChange}
-                      required
-                      className="w-full px-4 py-3 bg-slate-950/50 border border-slate-800 rounded-2xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/50 transition-all appearance-none cursor-pointer">
-                      <option value="" className="bg-slate-900">
-                        Select Category
-                      </option>
-                      {categories.map((cat) => (
-                        <option
-                          key={cat._id}
-                          value={cat._id}
-                          className="bg-slate-900">
-                          {cat.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-slate-400 ml-1">
-                      Stock Availability
-                    </label>
-                    <select
-                      name="stock"
-                      value={form.stock}
-                      onChange={handleChange}
-                      required
-                      className="w-full px-4 py-3 bg-slate-950/50 border border-slate-800 rounded-2xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/50 transition-all appearance-none cursor-pointer">
-                      {[0, 1, 2, 3, 4, 5, 10, 15, 20, 25, 30, 40, 50, 100].map(
-                        (num) => (
-                          <option
-                            key={num}
-                            value={num}
-                            className="bg-slate-900">
-                            {num === 0 ? "0 (Out of Stock)" : `${num} Units`}
-                          </option>
-                        ),
-                      )}
-                    </select>
-                  </div>
-                </div>
-
-                <button
-                  type="submit"
-                  className="w-full bg-blue-600 hover:bg-blue-500 text-white py-4 rounded-2xl font-bold text-lg shadow-lg shadow-blue-600/20 hover:shadow-blue-600/40 hover:-translate-y-0.5 transition-all duration-300 mt-4 active:scale-95"
-                  style={{ cursor: "pointer" }}>
-                  Update Product
-                </button>
-              </form>
-            </div>
-          </div>
-
-          {/* Image Sidebar */}
-          <div className="lg:col-span-1">
-            <div className="bg-slate-900/40 backdrop-blur-xl border border-slate-800 p-6 rounded-3xl shadow-2xl h-full flex flex-col items-center justify-center relative group overflow-hidden">
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-blue-500/50 to-transparent" />
-
-              <h3 className="text-lg font-semibold mb-6 text-slate-200">
-                Product Image
-              </h3>
-
-              <div className="w-full aspect-square bg-slate-950/50 border-2 border-dashed border-slate-800 rounded-2xl flex flex-col items-center justify-center p-4 relative group/img overflow-hidden">
-                {preview ? (
-                  <>
-                    <img
-                      src={preview}
-                      alt="preview"
-                      className="w-full h-full object-cover rounded-xl shadow-lg"
-                    />
-                    <div className="absolute inset-0 bg-blue-600/40 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center">
-                      <p className="text-white text-sm font-bold">
-                        Change Image
-                      </p>
-                    </div>
-                  </>
-                ) : (
-                  <div className="text-center space-y-3">
-                    <div className="w-16 h-16 bg-blue-500/10 rounded-full flex items-center justify-center mx-auto">
-                      <span className="text-3xl text-blue-400">🖼️</span>
-                    </div>
-                    <p className="text-sm text-slate-500 font-medium">
-                      Click to upload product photo
-                    </p>
-                  </div>
-                )}
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImage}
-                  className="absolute inset-0 opacity-0 cursor-pointer z-10"
-                />
-              </div>
-
-              <div className="mt-8 p-4 bg-blue-500/5 border border-blue-500/10 rounded-2xl w-full">
-                <p className="text-xs text-blue-300 leading-relaxed text-center italic">
-                  "Keep your product visuals fresh and relevant to maintain
-                  customer trust."
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
+        </form>
       </div>
     </div>
   );

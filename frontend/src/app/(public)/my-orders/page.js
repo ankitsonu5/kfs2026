@@ -36,40 +36,6 @@ export default function MyOrders() {
     }
   };
 
-  const handleCancelOrder = async (orderId) => {
-    if (
-      !confirm(
-        "Are you sure you want to cancel this order? This action cannot be undone.",
-      )
-    )
-      return;
-
-    try {
-      const token = localStorage.getItem("token");
-      const res = await axios.put(
-        `http://localhost:8080/cancel-order/${orderId}`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
-
-      if (res.data.success) {
-        alert("Order cancelled successfully");
-        fetchOrders();
-      } else {
-        alert(res.data.message || "Error cancelling order");
-      }
-    } catch (error) {
-      alert(
-        error.response?.data?.message || "Server error while cancelling order",
-      );
-      console.error("Cancel order error:", error);
-    }
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center text-black">
@@ -178,23 +144,13 @@ export default function MyOrders() {
                   </div>
 
                   <div className="mt-6 pt-6 border-t border-gray-50 flex justify-between items-end">
-                    <div className="flex flex-col gap-3">
-                      <div>
-                        <p className="text-xs text-gray-400 uppercase font-bold tracking-widest mb-1">
-                          Payment
-                        </p>
-                        <p className="text-sm font-medium text-gray-600 uppercase italic">
-                          {o.paymentMethod}
-                        </p>
-                      </div>
-
-                      {["Placed", "Confirmed"].includes(o.orderStatus) && (
-                        <button
-                          onClick={() => handleCancelOrder(o._id)}
-                          className="text-xs text-red-500 font-bold uppercase tracking-wider hover:text-red-700 transition flex items-center gap-1 border border-red-100 px-3 py-1.5 rounded-lg hover:bg-red-50 cursor-pointer">
-                          ✕ Cancel Order
-                        </button>
-                      )}
+                    <div>
+                      <p className="text-xs text-gray-400 uppercase font-bold tracking-widest mb-1">
+                        Payment
+                      </p>
+                      <p className="text-sm font-medium text-gray-600 uppercase italic">
+                        {o.paymentMethod}
+                      </p>
                     </div>
                     <div className="text-right">
                       <p className="text-sm text-gray-400">Grand Total</p>
