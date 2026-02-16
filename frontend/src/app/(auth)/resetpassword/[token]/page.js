@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import axios from "axios";
+import api from "@/utils/api";
 
 export default function ResetPassword() {
   const { token } = useParams();
@@ -22,17 +22,17 @@ export default function ResetPassword() {
 
     setLoading(true);
     try {
-      const res = await axios.post("http://localhost:8080/reset-password", {
+      const { data } = await api.post("/reset-password", {
         token,
         password: formData.password,
       });
 
-      if (res.data.success) {
+      if (data.success) {
         alert("Password reset successful! You can now login.");
         router.push("/login");
       }
     } catch (error) {
-      alert(error.response?.data?.message || "Failed to reset password");
+      alert(error.message || "Failed to reset password");
     } finally {
       setLoading(false);
     }

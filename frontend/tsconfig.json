@@ -30,7 +30,7 @@
     "**/*.mts",
     "**/*.ts",
     "**/*.tsx"
-, "src/app/(public)/shop/page.js"  ],
+  ],
   "exclude": [
     "node_modules"
   ]

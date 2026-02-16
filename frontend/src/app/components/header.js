@@ -23,7 +23,7 @@ export default function Header() {
                     <Link href="/bulk-order" className="text-sm font-medium hover:text-[var(--primary)] transition-colors">
                         Bulk Orders
                     </Link>
-                    <Link href="/about-us" className="text-sm font-medium hover:text-[var(--primary)] transition-colors">
+                    <Link href="/aboutus" className="text-sm font-medium hover:text-[var(--primary)] transition-colors">
                         About Us
                     </Link>
                     <Link href="/contact" className="text-sm font-medium hover:text-[var(--primary)] transition-colors">
