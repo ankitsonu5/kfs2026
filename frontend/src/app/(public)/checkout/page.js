@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import axios from "axios";
 
 export default function Checkout() {
   const router = useRouter();
@@ -25,12 +26,11 @@ export default function Checkout() {
           router.push("/login");
           return;
         }
-        const res = await fetch("http://localhost:8080/cart", {
+        const res = await axios.get("http://localhost:8080/cart", {
           headers: { Authorization: token },
         });
-        const data = await res.json();
-        setCart(data);
-        if (!data || data.items.length === 0) {
+        setCart(res.data);
+        if (!res.data || res.data.items.length === 0) {
           alert("Cart is empty! Add items first.");
           router.push("/");
         }
@@ -51,19 +51,16 @@ export default function Checkout() {
         if (!token) return;
 
         const [profileRes, settingsRes] = await Promise.all([
-          fetch("http://localhost:8080/profile", {
+          axios.get("http://localhost:8080/profile", {
             headers: { Authorization: token },
           }),
-          fetch("http://localhost:8080/user-settings", {
+          axios.get("http://localhost:8080/user-settings", {
             headers: { Authorization: token },
           }),
         ]);
 
-        const profileData = await profileRes.json();
-        const settingsData = await settingsRes.json();
-
-        const user = profileData.user;
-        const saved = settingsData.settings;
+        const user = profileRes.data.user;
+        const saved = settingsRes.data.settings;
 
         setForm((prev) => ({
           ...prev,
@@ -85,7 +82,7 @@ export default function Checkout() {
   };
 
   const handlePlaceOrder = async (e) => {
-    if (e) e.preventDefault();
+    e.preventDefault();
 
     if (
       !form.fullName ||
@@ -102,13 +99,9 @@ export default function Checkout() {
 
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch("http://localhost:8080/place-order", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: token,
-        },
-        body: JSON.stringify({
+      const res = await axios.post(
+        "http://localhost:8080/place-order",
+        {
           shippingAddress: {
             fullName: form.fullName,
             phone: form.phone,
@@ -117,18 +110,22 @@ export default function Checkout() {
             pincode: form.pincode,
           },
           paymentMethod: form.paymentMethod,
-        }),
-      });
+        },
+        {
+          headers: { Authorization: token },
+        },
+      );
 
-      const data = await res.json();
-
-      if (data.success) {
+      if (res.data.success) {
         alert("🎉 Order placed successfully! Thank you for shopping with us.");
         router.push("/my-orders");
       }
     } catch (error) {
       console.error("Order placement error:", error);
-      alert("Failed to place order. Please try again.");
+      alert(
+        error.response?.data?.message ||
+          "Failed to place order. Please try again.",
+      );
     } finally {
       setPlacing(false);
     }

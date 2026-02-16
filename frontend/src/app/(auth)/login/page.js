@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import api from "@/utils/api";
+import axios from "axios";
 
 export default function Login() {
   const router = useRouter();
@@ -31,24 +31,24 @@ export default function Login() {
     e.preventDefault();
 
     try {
-      const { data } = await api.post("/login", {
+      const res = await axios.post("http://localhost:8080/login", {
         ...formData,
       });
 
-      if (data.success) {
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("role", data.role);
-        document.cookie = `token=${data.token}; path=/`;
-        document.cookie = `role=${data.role}; path=/`;
+      if (res.data.success) {
+        localStorage.setItem("token", res.data.token);
+        localStorage.setItem("role", res.data.role);
+        document.cookie = `token=${res.data.token}; path=/`;
+        document.cookie = `role=${res.data.role}; path=/`;
 
-        if (data.role === "admin") {
+        if (res.data.role === "admin") {
           router.push("/admindashboard");
         } else {
           router.push("/");
         }
       }
     } catch (error) {
-      alert(error.message || "Login failed");
+      alert(error.response?.data?.message || "Login failed");
       console.log(error);
     }
   };

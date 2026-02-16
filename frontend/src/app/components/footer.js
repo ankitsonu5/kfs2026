@@ -23,7 +23,7 @@ export default function Footer() {
                     <div>
                         <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider">Company</h3>
                         <ul className="space-y-2 text-sm text-[var(--muted)]">
-                            <li><Link href="/aboutus" className="hover:text-[var(--foreground)] transition-colors">About Us</Link></li>
+                            <li><Link href="/about-us" className="hover:text-[var(--foreground)] transition-colors">About Us</Link></li>
                             <li><Link href="#" className="hover:text-[var(--foreground)] transition-colors">Careers</Link></li>
                             <li><Link href="#" className="hover:text-[var(--foreground)] transition-colors">Terms & Conditions</Link></li>
                             <li><Link href="#" className="hover:text-[var(--foreground)] transition-colors">Privacy Policy</Link></li>

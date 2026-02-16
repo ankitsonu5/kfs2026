@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import api from "@/utils/api";
+import axios from "axios";
 
 export default function Signup() {
   const router = useRouter();
@@ -28,11 +28,11 @@ export default function Signup() {
     setLoading(true);
 
     try {
-      const { status } = await api.post("/signup", {
+      const res = await axios.post("http://localhost:8080/signup", {
         ...formData,
       });
 
-      if (status === 201) {
+      if (res.status === 201) {
         alert("Registration successful! Please login.");
         setFormData({
           fullName: "",
@@ -43,7 +43,7 @@ export default function Signup() {
         router.push("/login");
       }
     } catch (err) {
-      setError(err.message);
+      setError(err.response?.data?.message || err.message);
     } finally {
       setLoading(false);
     }

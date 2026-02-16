@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import api from "@/utils/api";
+import axios from "axios";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
@@ -13,15 +13,15 @@ export default function ForgotPassword() {
     e.preventDefault();
     setLoading(true);
     try {
-      const { data } = await api.post("/forgot-password", {
+      const res = await axios.post("http://localhost:8080/forgot-password", {
         email,
       });
-      if (data.success) {
+      if (res.data.success) {
         setEmailSent(true);
-        setResetToken(data.resetToken);
+        setResetToken(res.data.resetToken);
       }
     } catch (error) {
-      alert(error.message || "Failed to send reset link");
+      alert(error.response?.data?.message || "Failed to send reset link");
     } finally {
       setLoading(false);
     }

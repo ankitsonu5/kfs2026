@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import axios from "axios";
 
 export default function Cart() {
   const router = useRouter();
@@ -19,11 +20,10 @@ export default function Cart() {
         router.push("/login");
         return;
       }
-      const res = await fetch("http://localhost:8080/cart", {
+      const res = await axios.get("http://localhost:8080/cart", {
         headers: { Authorization: token },
       });
-      const data = await res.json();
-      setCart(data);
+      setCart(res.data);
     } catch (error) {
       console.log("Cart fetch error:", error);
     } finally {
@@ -34,19 +34,16 @@ export default function Cart() {
   const handleIncrement = async (item) => {
     try {
       const token = localStorage.getItem("token");
-      await fetch("http://localhost:8080/add-cart", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: token,
-        },
-        body: JSON.stringify({
+      await axios.post(
+        "http://localhost:8080/add-cart",
+        {
           productId: item.productId,
           title: item.title,
           price: item.price,
           image: item.image,
-        }),
-      });
+        },
+        { headers: { Authorization: token } },
+      );
 
       const updatedItems = cart.items.map((i) =>
         i.productId === item.productId ? { ...i, quantity: i.quantity + 1 } : i,
@@ -72,10 +69,11 @@ export default function Cart() {
         return;
       }
 
-      await fetch(`http://localhost:8080/cart/decrement/${productId}`, {
-        method: "PUT",
-        headers: { Authorization: token },
-      });
+      await axios.put(
+        `http://localhost:8080/cart/decrement/${productId}`,
+        {},
+        { headers: { Authorization: token } },
+      );
 
       const updatedItems = cart.items.map((i) =>
         i.productId === productId ? { ...i, quantity: i.quantity - 1 } : i,
@@ -93,8 +91,7 @@ export default function Cart() {
   const handleRemove = async (productId) => {
     try {
       const token = localStorage.getItem("token");
-      await fetch(`http://localhost:8080/cart/${productId}`, {
-        method: "DELETE",
+      await axios.delete(`http://localhost:8080/cart/${productId}`, {
         headers: { Authorization: token },
       });
       const updatedItems = cart.items.filter(

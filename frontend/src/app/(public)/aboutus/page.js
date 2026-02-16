@@ -1,74 +1,74 @@
-export default function AboutUs() {
+import Navbar from '../../components/redesign/Navbar';
+import Hero from '../../components/redesign/Hero';
+import FeatureCard from '../../components/redesign/FeatureCard';
+import SpecialOffer from '../../components/redesign/SpecialOffer';
+import FarmerCard from '../../components/redesign/FarmerCard';
+import StatCard from '../../components/redesign/StatCard';
+import Footer from '../../components/redesign/Footer';
+
+export default function RedesignPage() {
     return (
-        <div className="container mx-auto px-4 py-12">
-            <h1 className="mb-6 text-3xl font-bold text-[var(--foreground)]">About Us</h1>
+        <div className="font-sans antialiased text-gray-900 bg-white">
+            <Navbar />
+            <Hero />
 
-            <div className="grid gap-12 md:grid-cols-2">
-                <div className="space-y-6">
-                    <p className="text-[var(--muted)] leading-relaxed">
-                        Welcome to <strong className="text-[var(--foreground)]">GroceryApp</strong> — your trusted destination for fresh, high-quality groceries delivered right to your doorstep.
-                    </p>
-                    <p className="text-[var(--muted)] leading-relaxed">
-                        We work directly with local farmers and trusted suppliers to bring you the freshest produce, dairy, and pantry essentials at competitive prices. Our mission is to make grocery shopping convenient, affordable, and enjoyable for everyone.
-                    </p>
-                    <p className="text-[var(--muted)] leading-relaxed">
-                        Founded in 2021, we have grown from a small local delivery service to serving thousands of happy customers. We believe in quality, transparency, and exceptional customer service.
-                    </p>
+            {/* Features Section */}
+            <section className="container mx-auto px-4 -mt-32 lg:-mt-16 relative z-20 mb-20">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <FeatureCard
+                        title="Best Discounts"
+                        description="There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form."
+                        linkText="Shop Now"
+                    />
+                    <FeatureCard
+                        title="Great Daily Deal"
+                        description="And is completely undo sent. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+                        linkText="Read More"
+                    />
+                    <FeatureCard
+                        title="Free Delivery"
+                        description="There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form."
+                        linkText="Contact"
+                    />
+                </div>
+            </section>
 
-                    <div className="grid grid-cols-2 gap-6 pt-4">
-                        <div className="text-center p-4 rounded-lg bg-green-50 border border-green-100">
-                            <p className="text-3xl font-bold text-[var(--primary)]">5+</p>
-                            <p className="text-sm text-[var(--muted)] mt-1">Years of Service</p>
-                        </div>
-                        <div className="text-center p-4 rounded-lg bg-green-50 border border-green-100">
-                            <p className="text-3xl font-bold text-[var(--primary)]">10K+</p>
-                            <p className="text-sm text-[var(--muted)] mt-1">Happy Customers</p>
-                        </div>
-                        <div className="text-center p-4 rounded-lg bg-green-50 border border-green-100">
-                            <p className="text-3xl font-bold text-[var(--primary)]">500+</p>
-                            <p className="text-sm text-[var(--muted)] mt-1">Products</p>
-                        </div>
-                        <div className="text-center p-4 rounded-lg bg-green-50 border border-green-100">
-                            <p className="text-3xl font-bold text-[var(--primary)]">50+</p>
-                            <p className="text-sm text-[var(--muted)] mt-1">Local Farmers</p>
-                        </div>
+            <SpecialOffer />
+
+            {/* Farmers Section */}
+            <section className="py-20 bg-gray-50">
+                <div className="container mx-auto px-4">
+                    <div className="text-center mb-16">
+                        <span className="text-orange-500 font-semibold uppercase tracking-wide text-sm">Our Team</span>
+                        <h2 className="text-4xl font-bold text-gray-900 mt-2">Our Farm Land Farmers</h2>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                        <FarmerCard name="Alex Maxwell" role="CEO & Founder" email="support@xstore.com" />
+                        <FarmerCard name="Justin Roberto" role="Manager" email="support@xstore.com" />
+                        <FarmerCard name="Louis Agassiz" role="Organic Farmer" email="support@xstore.com" />
+                        <FarmerCard name="Carl Anderson" role="Agricultural" email="support@xstore.com" />
                     </div>
                 </div>
+            </section>
 
-                <div className="space-y-6">
-                    <div className="rounded-lg border border-[var(--border)] bg-gray-50 p-6">
-                        <h3 className="mb-4 text-xl font-semibold text-[var(--foreground)]">Our Mission</h3>
-                        <p className="text-[var(--muted)] leading-relaxed">
-                            To provide fresh, healthy, and affordable groceries to every household while supporting local farmers and sustainable farming practices.
-                        </p>
-                    </div>
+            {/* Stats Section with Parallax/Background */}
+            <section className="relative py-24 bg-fixed bg-cover bg-center" style={{ backgroundImage: 'url("https://placehold.co/1920x600/111827/1f2937?text=Farm+Background")' }}>
+                <div className="absolute inset-0 bg-black/70"></div>
+                <div className="container mx-auto px-4 relative z-10 text-center">
+                    <span className="text-green-400 font-semibold uppercase tracking-wide text-sm mb-2 block">Our Numbers</span>
+                    <h2 className="text-4xl font-bold text-white mb-16">Convincing Facts</h2>
 
-                    <div className="rounded-lg border border-[var(--border)] bg-gray-50 p-6">
-                        <h3 className="mb-4 text-xl font-semibold text-[var(--foreground)]">Our Vision</h3>
-                        <p className="text-[var(--muted)] leading-relaxed">
-                            To become India&apos;s most trusted online grocery platform, known for quality, freshness, and customer satisfaction.
-                        </p>
-                    </div>
-
-                    <div className="rounded-lg border border-[var(--border)] bg-gray-50 p-6">
-                        <h3 className="mb-4 text-xl font-semibold text-[var(--foreground)]">Why Choose Us?</h3>
-                        <ul className="space-y-2 text-[var(--muted)]">
-                            <li className="flex items-center gap-2">
-                                <span className="text-[var(--primary)]">✓</span> Farm-fresh produce delivered daily
-                            </li>
-                            <li className="flex items-center gap-2">
-                                <span className="text-[var(--primary)]">✓</span> Best prices with exciting offers
-                            </li>
-                            <li className="flex items-center gap-2">
-                                <span className="text-[var(--primary)]">✓</span> Free delivery on orders above ₹500
-                            </li>
-                            <li className="flex items-center gap-2">
-                                <span className="text-[var(--primary)]">✓</span> 100% quality guarantee
-                            </li>
-                        </ul>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+                        <StatCard number="5" suffix="+" label="Glorious Years" />
+                        <StatCard number="35" suffix="+" label="Happy Clients" />
+                        <StatCard number="25" suffix="+" label="Projects Complete" />
+                        <StatCard number="10" suffix="+" label="Team Advisor" />
                     </div>
                 </div>
-            </div>
+            </section>
+
+            <Footer />
         </div>
     );
 }
