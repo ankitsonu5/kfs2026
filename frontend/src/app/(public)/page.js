@@ -415,8 +415,17 @@ export default function GroceryRedesign() {
           {products.map((product) => (
             <div
               key={product._id}
-              className="border border-gray-100 rounded-xl p-4 hover:shadow-lg transition bg-white relative group">
-              <div className="h-48 flex items-center justify-center bg-gray-50 rounded-lg mb-4 overflow-hidden">
+              className={`border border-gray-100 rounded-xl p-4 hover:shadow-lg transition bg-white relative group ${product.stock === 0 ? "opacity-75" : ""}`}>
+              {product.stock === 0 && (
+                <div className="absolute top-3 right-3 z-10">
+                  <span className="bg-red-600 text-white text-[10px] font-black px-2 py-1 rounded-md shadow-xl tracking-tighter">
+                    OUT OF STOCK
+                  </span>
+                </div>
+              )}
+
+              <div
+                className={`h-48 flex items-center justify-center bg-gray-50 rounded-lg mb-4 overflow-hidden ${product.stock === 0 ? "grayscale" : ""}`}>
                 {product.image ? (
                   <img
                     src={`http://localhost:8080/uploads/${product.image}`}
@@ -427,24 +436,36 @@ export default function GroceryRedesign() {
                   <span className="text-6xl">📦</span>
                 )}
               </div>
-              <h3 className="font-semibold text-gray-800 mb-1">
+              <h3 className="font-semibold text-gray-800 mb-1 truncate">
                 {product.title}
               </h3>
               <div className="flex items-baseline gap-2 mb-4">
                 <span className="font-bold text-lg text-gray-900">
                   ₹{product.price}
                 </span>
+                {product.stock > 0 && product.stock <= 5 && (
+                  <span className="text-[10px] text-orange-600 font-bold ml-auto">
+                    Only {product.stock} left!
+                  </span>
+                )}
               </div>
 
               <button
-                onClick={() => openMiniCart(product)}
-                className={`w-full py-2 border-2 font-semibold rounded-lg transition flex items-center justify-center gap-2 ${
-                  cartItems[product._id]
-                    ? "bg-green-600 border-green-600 text-white hover:bg-green-700"
-                    : "border-green-600 text-green-600 hover:bg-green-600 hover:text-white"
+                onClick={() => product.stock > 0 && openMiniCart(product)}
+                disabled={product.stock === 0}
+                className={`w-full py-2 border-2 font-bold rounded-lg transition flex items-center justify-center gap-2 ${
+                  product.stock === 0
+                    ? "bg-gray-100 border-gray-100 text-gray-400 cursor-not-allowed"
+                    : cartItems[product._id]
+                      ? "bg-green-600 border-green-600 text-white hover:bg-green-700 shadow-md shadow-green-600/20"
+                      : "border-green-600 text-green-600 hover:bg-green-600 hover:text-white"
                 }`}
-                style={{ cursor: "pointer" }}>
-                {cartItems[product._id] ? (
+                style={{
+                  cursor: product.stock === 0 ? "not-allowed" : "pointer",
+                }}>
+                {product.stock === 0 ? (
+                  "Sold Out"
+                ) : cartItems[product._id] ? (
                   <>
                     <span>Add to Cart</span>
                     <span className="bg-white/20 px-2 py-0.5 rounded-full text-[10px] font-bold">
@@ -523,7 +544,7 @@ export default function GroceryRedesign() {
         </div>
       </section>
 
-      {/* Daily Staples Section */}
+      {/* Daily Staples Section (Dynamic Filtering Example) */}
       <section className="container mx-auto px-4 py-8">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold text-gray-800">Daily Staples</h2>
@@ -532,30 +553,55 @@ export default function GroceryRedesign() {
           </button>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
-          {[
-            { name: "Fortune Oil", price: "₹145", image: "🛢️" },
-            { name: "Aashirvaad Atta", price: "₹340", image: "🌾" },
-            { name: "Basmati Rice", price: "₹850", image: "🍚" },
-            { name: "Toor Dal", price: "₹120", image: "🥣" },
-            { name: "Sugar", price: "₹45", image: "⬜" },
-          ].map((item, idx) => (
-            <div
-              key={idx}
-              className="bg-white border border-gray-100 rounded-xl p-4 hover:shadow-lg transition group">
-              <div className="h-32 bg-gray-50 rounded-lg flex items-center justify-center text-5xl mb-4 group-hover:scale-105 transition">
-                {item.image}
+          {products
+            .filter(
+              (p) =>
+                categories
+                  .find((c) => c._id === p.category?.[0])
+                  ?.name?.toLowerCase()
+                  .includes("staple") ||
+                p.title.toLowerCase().includes("atta") ||
+                p.title.toLowerCase().includes("rice") ||
+                p.title.toLowerCase().includes("oil"),
+            )
+            .slice(0, 5)
+            .map((product) => (
+              <div
+                key={product._id}
+                className="bg-white border border-gray-100 rounded-xl p-4 hover:shadow-lg transition group relative">
+                {product.stock === 0 && (
+                  <span className="absolute top-2 right-2 bg-red-600 text-[8px] text-white px-1.5 py-0.5 rounded font-bold z-10">
+                    SO
+                  </span>
+                )}
+                <div
+                  className={`h-32 bg-gray-50 rounded-lg flex items-center justify-center mb-4 overflow-hidden ${product.stock === 0 ? "grayscale" : ""}`}>
+                  {product.image ? (
+                    <img
+                      src={`http://localhost:8080/uploads/${product.image}`}
+                      alt={product.title}
+                      className="w-full h-full object-contain p-2 group-hover:scale-105 transition"
+                    />
+                  ) : (
+                    <span className="text-4xl text-gray-300">📦</span>
+                  )}
+                </div>
+                <h3 className="font-semibold text-gray-800 mb-1 text-sm truncate">
+                  {product.title}
+                </h3>
+                <div className="flex justify-between items-center">
+                  <span className="font-bold text-md text-green-700">
+                    ₹{product.price}
+                  </span>
+                  <button
+                    disabled={product.stock === 0}
+                    onClick={() => openMiniCart(product)}
+                    className={`w-8 h-8 rounded-full flex items-center justify-center transition ${product.stock === 0 ? "bg-gray-100 text-gray-300 cursor-not-allowed" : "bg-green-100 text-green-600 hover:bg-green-600 hover:text-white pointer-cursor"}`}>
+                    +
+                  </button>
+                </div>
               </div>
-              <h3 className="font-semibold text-gray-800 mb-1">{item.name}</h3>
-              <div className="flex justify-between items-center">
-                <span className="font-bold text-lg text-green-700">
-                  {item.price}
-                </span>
-                <button className="w-8 h-8 rounded-full bg-green-100 text-green-600 flex items-center justify-center hover:bg-green-600 hover:text-white transition">
-                  +
-                </button>
-              </div>
-            </div>
-          ))}
+            ))}
         </div>
       </section>
 
@@ -570,29 +616,55 @@ export default function GroceryRedesign() {
           </button>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {[
-            { name: "Potato Chips", price: "₹20", image: "🥔" },
-            { name: "Orange Juice", price: "₹110", image: "🍊" },
-            { name: "Cola Can", price: "₹40", image: "🥤" },
-            { name: "Chocolate Cookies", price: "₹60", image: "🍪" },
-          ].map((item, idx) => (
-            <div
-              key={idx}
-              className="bg-white border border-gray-100 rounded-xl p-4 hover:shadow-lg transition group">
-              <div className="h-32 bg-red-50 rounded-lg flex items-center justify-center text-5xl mb-4 group-hover:scale-105 transition">
-                {item.image}
+          {products
+            .filter(
+              (p) =>
+                categories
+                  .find((c) => c._id === p.category?.[0])
+                  ?.name?.toLowerCase()
+                  .includes("snack") ||
+                p.title.toLowerCase().includes("chips") ||
+                p.title.toLowerCase().includes("juice") ||
+                p.title.toLowerCase().includes("cola"),
+            )
+            .slice(0, 4)
+            .map((product) => (
+              <div
+                key={product._id}
+                className="bg-white border border-gray-100 rounded-xl p-4 hover:shadow-lg transition group relative">
+                {product.stock === 0 && (
+                  <span className="absolute top-2 right-2 bg-red-600 text-[8px] text-white px-1.5 py-0.5 rounded font-bold z-10">
+                    SO
+                  </span>
+                )}
+                <div
+                  className={`h-32 bg-red-50 rounded-lg flex items-center justify-center mb-4 overflow-hidden ${product.stock === 0 ? "grayscale" : ""}`}>
+                  {product.image ? (
+                    <img
+                      src={`http://localhost:8080/uploads/${product.image}`}
+                      alt={product.title}
+                      className="w-full h-full object-contain p-2 group-hover:scale-105 transition"
+                    />
+                  ) : (
+                    <span className="text-4xl text-gray-300">📦</span>
+                  )}
+                </div>
+                <h3 className="font-semibold text-gray-800 mb-1 text-sm truncate">
+                  {product.title}
+                </h3>
+                <div className="flex justify-between items-center">
+                  <span className="font-bold text-md text-green-700">
+                    ₹{product.price}
+                  </span>
+                  <button
+                    disabled={product.stock === 0}
+                    onClick={() => openMiniCart(product)}
+                    className={`w-8 h-8 rounded-full flex items-center justify-center transition ${product.stock === 0 ? "bg-gray-100 text-gray-300 cursor-not-allowed" : "bg-green-100 text-green-600 hover:bg-green-600 hover:text-white pointer-cursor"}`}>
+                    +
+                  </button>
+                </div>
               </div>
-              <h3 className="font-semibold text-gray-800 mb-1">{item.name}</h3>
-              <div className="flex justify-between items-center">
-                <span className="font-bold text-lg text-green-700">
-                  {item.price}
-                </span>
-                <button className="w-8 h-8 rounded-full bg-green-100 text-green-600 flex items-center justify-center hover:bg-green-600 hover:text-white transition">
-                  +
-                </button>
-              </div>
-            </div>
-          ))}
+            ))}
         </div>
       </section>
 
