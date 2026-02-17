@@ -2,10 +2,23 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Menu, User } from "lucide-react";
-import { BsThreeDotsVertical } from "react-icons/bs";
-import { MdPhonelinkSetup, MdOutlineManageAccounts } from "react-icons/md";
-import { IoSettingsOutline } from "react-icons/io5";
+import {
+  Menu,
+  User,
+  LayoutDashboard,
+  ShoppingBag,
+  Package,
+  Users,
+  FolderTree,
+  LogOut,
+  Pencil,
+  Trash2,
+  Settings,
+  UserCircle,
+  MoreVertical,
+  Plus,
+  ArrowRight,
+} from "lucide-react";
 import { AreaChart, Area, ResponsiveContainer, Tooltip, XAxis } from "recharts";
 
 import axios from "axios";
@@ -179,40 +192,40 @@ export default function AdminDashboard() {
                 setActive("dashboard");
                 setOpen(false);
               }}
-              className="cursor-pointer hover:text-blue-400">
-              📊 Dashboard
+              className={`cursor-pointer flex items-center gap-3 py-2 px-3 rounded-lg transition ${active === "dashboard" ? "bg-blue-600 text-white" : "text-gray-400 hover:text-white hover:bg-white/5"}`}>
+              <LayoutDashboard size={20} /> Dashboard
             </li>
             <li
               onClick={() => {
                 setActive("products");
                 setOpen(false);
               }}
-              className="cursor-pointer hover:text-blue-400">
-              🛒 Products
+              className={`cursor-pointer flex items-center gap-3 py-2 px-3 rounded-lg transition ${active === "products" ? "bg-blue-600 text-white" : "text-gray-400 hover:text-white hover:bg-white/5"}`}>
+              <ShoppingBag size={20} /> Products
             </li>
             <li
               onClick={() => {
                 setActive("orders");
                 setOpen(false);
               }}
-              className="cursor-pointer hover:text-blue-400">
-              📦 Orders
+              className={`cursor-pointer flex items-center gap-3 py-2 px-3 rounded-lg transition ${active === "orders" ? "bg-blue-600 text-white" : "text-gray-400 hover:text-white hover:bg-white/5"}`}>
+              <Package size={20} /> Orders
             </li>
             <li
               onClick={() => {
                 setActive("users");
                 setOpen(false);
               }}
-              className="cursor-pointer hover:text-blue-400">
-              👥 Users
+              className={`cursor-pointer flex items-center gap-3 py-2 px-3 rounded-lg transition ${active === "users" ? "bg-blue-600 text-white" : "text-gray-400 hover:text-white hover:bg-white/5"}`}>
+              <Users size={20} /> Users
             </li>
 
             <li className="cursor-pointer">
               <div
-                className="flex items-center gap-1 hover:text-blue-400"
+                className="flex items-center gap-3 py-2 px-3 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition"
                 onClick={() => setMasterSetupOpen(!masterSetupOpen)}>
-                <MdPhonelinkSetup size={20} />
-                <span className="text-sm font-medium">MasterSetup</span>
+                <Settings size={20} />
+                <span className="text-sm font-medium flex-1">Master Setup</span>
                 <svg
                   viewBox="0 0 20 20"
                   fill="currentColor"
@@ -239,12 +252,12 @@ export default function AdminDashboard() {
                     🛒 Products
                   </li> */}
                   <li
-                    className="text-sm text-gray-300 hover:text-blue-400 cursor-pointer py-1"
+                    className={`text-sm py-1.5 px-3 rounded-md transition flex items-center gap-2 ${active === "category" ? "text-blue-400" : "text-gray-400 hover:text-white hover:bg-white/5"}`}
                     onClick={() => {
                       setActive("category");
                       setOpen(false);
                     }}>
-                    📂 Category
+                    <FolderTree size={16} /> Category
                   </li>
                   {/* <li
                     className="text-sm text-gray-300 hover:text-blue-400 cursor-pointer py-1"
@@ -270,8 +283,8 @@ export default function AdminDashboard() {
                 router.push("/admin-profile");
                 setOpen(false);
               }}
-              className="cursor-pointer hover:text-blue-400 flex items-center gap-2">
-              <MdOutlineManageAccounts size={20} />
+              className="cursor-pointer text-gray-400 hover:text-white hover:bg-white/5 py-2 px-3 rounded-lg transition flex items-center gap-3">
+              <UserCircle size={20} />
               Profile
             </li>
             <li
@@ -279,8 +292,8 @@ export default function AdminDashboard() {
                 router.push("/admin-settings");
                 setOpen(false);
               }}
-              className="cursor-pointer hover:text-blue-400 flex items-center gap-2">
-              <IoSettingsOutline size={20} />
+              className="cursor-pointer text-gray-400 hover:text-white hover:bg-white/5 py-2 px-3 rounded-lg transition flex items-center gap-3">
+              <Settings size={20} />
               Settings
             </li>
             <li
@@ -294,8 +307,8 @@ export default function AdminDashboard() {
                 router.push("/login");
                 setOpen(false);
               }}
-              className="cursor-pointer hover:text-red-400">
-              🚪 Logout
+              className="cursor-pointer text-gray-400 hover:text-red-400 hover:bg-white/5 py-2 px-3 rounded-lg transition flex items-center gap-3">
+              <LogOut size={20} /> Logout
             </li>
           </ul>
         </div>
@@ -443,157 +456,250 @@ export default function AdminDashboard() {
         )}
 
         {active === "products" && (
-          <Section title="Products">
-            <button
-              onClick={() => {
-                router.push("/add-products");
-                setOpen(false);
-              }}
-              className="bg-blue-600 px-4 py-2 rounded mb-4"
-              style={{ cursor: "pointer" }}>
-              + Add Product
-            </button>
-            <p className="text-gray-400">Products list yaha ayegi</p>
+          <Section title="Product Management">
+            <div className="flex justify-between items-center mb-6">
+              <p className="text-gray-400 text-sm">
+                Manage your store's inventory and products
+              </p>
+              <button
+                onClick={() => {
+                  router.push("/add-products");
+                  setOpen(false);
+                }}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg flex items-center gap-2 font-semibold shadow-lg shadow-blue-600/20 transition-all active:scale-95 cursor-pointer">
+                <Plus size={18} /> Add Product
+              </button>
+            </div>
 
-            <div className="bg-[#111827] p-4 md:p-6 rounded-xl border border-gray-700 overflow-x-auto no-scrollbar">
-              <h3 className="text-xl mb-4 font-semibold">Products List</h3>
-
-              <table className="w-full text-sm">
-                <thead className="text-gray-400 border-b border-gray-800">
-                  <tr>
-                    <th className="py-3 text-left">Product</th>
-                    <th className="py-3 text-right">Price</th>
-                    <th className="py-3 text-center hidden sm:table-cell">
-                      Stock
-                    </th>
-                    <th className="py-3 text-right">Actions</th>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  {products.map((product) => (
-                    <tr
-                      key={product._id}
-                      className="border-t border-gray-800 hover:bg-white/5 transition">
-                      <td className="py-3 text-left max-w-[150px] truncate">
-                        {product.title}
-                      </td>
-                      <td className="py-3 text-right">₹{product.price}</td>
-                      <td className="py-3 text-center hidden sm:table-cell">
-                        {product.stock}
-                      </td>
-                      <td className="py-3 text-right relative">
-                        <div className="flex justify-end">
-                          <BsThreeDotsVertical
-                            className="cursor-pointer"
-                            onClick={() =>
-                              setOpenMenuId(
-                                openMenuId === product._id ? null : product._id,
-                              )
-                            }
-                          />
-                        </div>
-
-                        {openMenuId === product._id && (
-                          <div className="absolute bottom-10 right-0 w-32 bg-[#1f2937] border border-gray-700 rounded-lg shadow-2xl z-50 overflow-hidden animate-in fade-in zoom-in duration-200">
-                            <p
-                              className="px-4 py-2 hover:bg-blue-600 cursor-pointer text-center text-sm font-medium"
-                              onClick={() =>
-                                router.push(`/edit-product/${product._id}`)
-                              }>
-                              Edit
-                            </p>
-
-                            <div className="border-t border-gray-600"></div>
-
-                            <p
-                              className="px-4 py-2 hover:bg-red-600 cursor-pointer text-center text-sm font-medium text-red-400 hover:text-white"
-                              onClick={() => handleDelete(product._id)}>
-                              Delete
-                            </p>
-                          </div>
-                        )}
-                      </td>
+            <div className="bg-[#111827] rounded-xl border border-gray-700 overflow-hidden shadow-2xl">
+              <div className="overflow-x-auto no-scrollbar">
+                <table className="w-full text-sm">
+                  <thead className="text-gray-400 bg-white/5 uppercase tracking-wider text-[11px] font-bold">
+                    <tr>
+                      <th className="py-4 text-left px-6">
+                        Product Information
+                      </th>
+                      <th className="py-4 text-right px-6">Price</th>
+                      <th className="py-4 text-center px-6 hidden sm:table-cell">
+                        Stock Status
+                      </th>
+                      <th className="py-4 text-right px-6">Actions</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+
+                  <tbody className="divide-y divide-gray-800">
+                    {products.length === 0 ? (
+                      <tr>
+                        <td
+                          colSpan="4"
+                          className="py-12 text-center text-gray-500 italic">
+                          No products found. Start by adding one!
+                        </td>
+                      </tr>
+                    ) : (
+                      products.map((product) => (
+                        <tr
+                          key={product._id}
+                          className="hover:bg-white/[0.03] transition-colors group">
+                          <td className="py-4 px-6 text-left">
+                            <div className="flex items-center gap-4">
+                              <div className="w-12 h-12 rounded-lg bg-gray-800 flex items-center justify-center overflow-hidden border border-gray-700 group-hover:border-blue-500/50 transition-colors">
+                                {product.image ? (
+                                  <img
+                                    src={`http://localhost:8080/uploads/${product.image}`}
+                                    alt={product.title}
+                                    className="w-full h-full object-cover"
+                                  />
+                                ) : (
+                                  <Package className="w-6 h-6 text-gray-500" />
+                                )}
+                              </div>
+                              <div className="max-w-[180px]">
+                                <p className="font-bold text-gray-100 truncate group-hover:text-blue-400 transition-colors">
+                                  {product.title}
+                                </p>
+                                <p className="text-[10px] text-gray-500 font-mono">
+                                  ID: {product._id.slice(-6).toUpperCase()}
+                                </p>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="py-4 px-6 text-right font-bold text-gray-100 italic">
+                            ₹{product.price.toLocaleString("en-IN")}
+                          </td>
+                          <td className="py-4 px-6 text-center hidden sm:table-cell">
+                            <span
+                              className={`px-3 py-1 rounded-full text-[10px] font-bold ${
+                                product.stock > 10
+                                  ? "bg-green-500/10 text-green-500"
+                                  : product.stock > 0
+                                    ? "bg-yellow-500/10 text-yellow-500"
+                                    : "bg-red-500/10 text-red-500"
+                              }`}>
+                              {product.stock > 0
+                                ? `${product.stock} IN STOCK`
+                                : "OUT OF STOCK"}
+                            </span>
+                          </td>
+                          <td className="py-4 px-6 text-right relative">
+                            <div className="flex justify-end">
+                              <button
+                                onClick={() =>
+                                  setOpenMenuId(
+                                    openMenuId === product._id
+                                      ? null
+                                      : product._id,
+                                  )
+                                }
+                                className="p-2 hover:bg-gray-700 rounded-full transition-colors text-gray-400 hover:text-white">
+                                <MoreVertical />
+                              </button>
+                            </div>
+
+                            {openMenuId === product._id && (
+                              <div className="absolute top-0 right-16 w-36 bg-[#1f2937] border border-gray-700 rounded-xl shadow-2xl z-[100] overflow-hidden animate-in fade-in slide-in-from-right-1 duration-200">
+                                <button
+                                  className="w-full px-4 py-2.5 hover:bg-blue-600 flex items-center gap-3 text-left text-xs font-semibold cursor-pointer"
+                                  onClick={() =>
+                                    router.push(`/edit-product/${product._id}`)
+                                  }>
+                                  <Pencil size={14} /> Edit
+                                </button>
+                                <div className="border-t border-gray-700"></div>
+                                <button
+                                  className="w-full px-4 py-2.5 hover:bg-red-600 flex items-center gap-3 text-left text-xs font-semibold text-red-400 hover:text-white cursor-pointer"
+                                  onClick={() => handleDelete(product._id)}>
+                                  <Trash2 size={14} /> Delete
+                                </button>
+                              </div>
+                            )}
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </Section>
         )}
 
         {active === "category" && (
-          <Section title="Category">
-            <button
-              onClick={() => {
-                router.push("/add-category");
-                setOpen(false);
-              }}
-              className="bg-blue-600 px-4 py-2 rounded mb-4"
-              style={{ cursor: "pointer" }}>
-              + Add Category
-            </button>
-            <p className="text-gray-400">Category list yaha ayegi</p>
+          <Section title="Category Management">
+            <div className="flex justify-between items-center mb-6">
+              <p className="text-gray-400 text-sm">
+                Organize products into distinct collections
+              </p>
+              <button
+                onClick={() => {
+                  router.push("/add-category");
+                  setOpen(false);
+                }}
+                className="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-lg flex items-center gap-2 font-semibold shadow-lg shadow-emerald-600/20 transition-all active:scale-95"
+                style={{ cursor: "pointer" }}>
+                <span className="text-xl">+</span> Add Category
+              </button>
+            </div>
 
-            <div className="bg-[#111827] p-4 md:p-6 rounded-xl border border-gray-700 overflow-x-auto no-scrollbar">
-              <h3 className="text-xl mb-4 font-semibold">Category List</h3>
-
-              <table className="w-full text-sm">
-                <thead className="text-gray-400 border-b border-gray-800">
-                  <tr>
-                    <th className="py-3 text-left">Category</th>
-                    <th className="py-3 text-right">Actions</th>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  {categories.map((category) => (
-                    <tr
-                      key={category._id}
-                      className="border-t border-gray-800 hover:bg-white/5 transition">
-                      <td className="py-3 text-left font-medium">
-                        {category.name}
-                      </td>
-                      <td className="py-3 text-right relative">
-                        <div className="flex justify-end pr-2">
-                          <BsThreeDotsVertical
-                            className="cursor-pointer"
-                            onClick={() =>
-                              setOpenMenuId(
-                                openMenuId === category._id
-                                  ? null
-                                  : category._id,
-                              )
-                            }
-                          />
-                        </div>
-
-                        {openMenuId === category._id && (
-                          <div className="absolute bottom-10 right-0 w-32 bg-[#1f2937] border border-gray-700 rounded-lg shadow-2xl z-50 overflow-hidden animate-in fade-in zoom-in duration-200">
-                            <p
-                              className="px-4 py-2 hover:bg-blue-600 cursor-pointer text-center text-sm font-medium"
-                              onClick={() =>
-                                router.push(`/edit-category/${category._id}`)
-                              }>
-                              Edit
-                            </p>
-
-                            <div className="border-t border-gray-600"></div>
-
-                            <p
-                              className="px-4 py-2 hover:bg-red-600 cursor-pointer text-center text-sm font-medium text-red-400 hover:text-white"
-                              onClick={() =>
-                                handleDeleteCategory(category._id)
-                              }>
-                              Delete
-                            </p>
-                          </div>
-                        )}
-                      </td>
+            <div className="bg-[#111827] rounded-xl border border-gray-700 overflow-hidden shadow-2xl">
+              <div className="overflow-x-auto no-scrollbar">
+                <table className="w-full text-sm">
+                  <thead className="text-gray-400 bg-white/5 uppercase tracking-wider text-[11px] font-bold">
+                    <tr>
+                      <th className="py-4 text-left px-6">Collection</th>
+                      <th className="py-4 text-center px-6">Visibility</th>
+                      <th className="py-4 text-right px-6">Actions</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+
+                  <tbody className="divide-y divide-gray-800">
+                    {categories.length === 0 ? (
+                      <tr>
+                        <td
+                          colSpan="3"
+                          className="py-12 text-center text-gray-500 italic">
+                          No categories found. Start organizing your shop!
+                        </td>
+                      </tr>
+                    ) : (
+                      categories.map((category) => (
+                        <tr
+                          key={category._id}
+                          className="hover:bg-white/[0.03] transition-colors group">
+                          <td className="py-4 px-6 text-left">
+                            <div className="flex items-center gap-4">
+                              <div className="w-10 h-10 rounded-xl bg-gray-800 flex items-center justify-center overflow-hidden border border-gray-700 group-hover:border-emerald-500/50 transition-colors">
+                                {category.image ? (
+                                  <img
+                                    src={`http://localhost:8080/uploads/${category.image}`}
+                                    alt={category.name}
+                                    className="w-full h-full object-cover"
+                                  />
+                                ) : (
+                                  <FolderTree
+                                    className="text-gray-600"
+                                    size={20}
+                                  />
+                                )}
+                              </div>
+                              <span className="font-bold text-gray-100 group-hover:text-emerald-400 transition-colors">
+                                {category.name}
+                              </span>
+                            </div>
+                          </td>
+                          <td className="py-4 px-6 text-center">
+                            <span
+                              className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                                category.status === "active"
+                                  ? "bg-green-500/10 text-green-500"
+                                  : "bg-red-500/10 text-red-500"
+                              }`}>
+                              {category.status || "active"}
+                            </span>
+                          </td>
+                          <td className="py-4 px-6 text-right relative">
+                            <div className="flex justify-end">
+                              <button
+                                onClick={() =>
+                                  setOpenMenuId(
+                                    openMenuId === category._id
+                                      ? null
+                                      : category._id,
+                                  )
+                                }
+                                className="p-2 hover:bg-gray-700 rounded-full transition-colors text-gray-400 hover:text-white">
+                                <MoreVertical />
+                              </button>
+                            </div>
+
+                            {openMenuId === category._id && (
+                              <div className="absolute top-0 right-16 w-36 bg-[#1f2937] border border-gray-700 rounded-xl shadow-2xl z-[100] overflow-hidden animate-in fade-in slide-in-from-right-1 duration-200">
+                                <button
+                                  className="w-full px-4 py-2.5 hover:bg-blue-600 flex items-center gap-3 text-left text-xs font-semibold"
+                                  onClick={() =>
+                                    router.push(
+                                      `/edit-category/${category._id}`,
+                                    )
+                                  }>
+                                  ✏️ Edit
+                                </button>
+                                <div className="border-t border-gray-700"></div>
+                                <button
+                                  className="w-full px-4 py-2.5 hover:bg-red-600 flex items-center gap-3 text-left text-xs font-semibold text-red-400 hover:text-white"
+                                  onClick={() =>
+                                    handleDeleteCategory(category._id)
+                                  }>
+                                  🗑️ Delete
+                                </button>
+                              </div>
+                            )}
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </Section>
         )}
@@ -754,7 +860,7 @@ export default function AdminDashboard() {
                                   onClick={() => handleDeleteUser(u._id)}
                                   className="p-1.5 text-rose-500 hover:bg-rose-500/10 rounded-lg transition"
                                   title="Delete User">
-                                  🗑️
+                                  <Trash2 size={16} />
                                 </button>
                               )}
                             </div>

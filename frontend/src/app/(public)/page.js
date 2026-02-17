@@ -1,18 +1,37 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { MdOutlineLogin } from "react-icons/md";
-import { SiGnuprivacyguard } from "react-icons/si";
-import { FaUserCircle } from "react-icons/fa";
+import {
+  ShoppingCart,
+  UserCircle,
+  Package,
+  Search,
+  X,
+  Tag,
+  Truck,
+  RotateCcw,
+  Sparkles,
+  ChevronRight,
+  ShieldCheck,
+  Soup,
+  Plus,
+  Minus,
+  GlassWater,
+  Droplets,
+  Sprout,
+  Box,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
+import Header from "../components/header";
+import Navbar from "../components/redesign/Navbar";
+import Footer from "../components/redesign/Footer";
 import axios from "axios";
+import Image from "next/image";
 
 export default function GroceryRedesign() {
   const [cartCount, setCartCount] = useState(0);
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [user, setUser] = useState(null);
-  const [profileOpen, setProfileOpen] = useState(false);
   const [cartItems, setCartItems] = useState({});
   const [miniCart, setMiniCart] = useState(null);
   const router = useRouter();
@@ -22,7 +41,21 @@ export default function GroceryRedesign() {
     const fetchCart = async () => {
       try {
         const token = localStorage.getItem("token");
-        if (!token) return;
+        if (!token) {
+          // Load from guest cart
+          const guestCart = JSON.parse(
+            localStorage.getItem("guestCart") || '{"items":[]}',
+          );
+          const qtyMap = {};
+          let total = 0;
+          guestCart.items.forEach((item) => {
+            qtyMap[item.productId] = item.quantity;
+            total += item.quantity;
+          });
+          setCartItems(qtyMap);
+          setCartCount(total);
+          return;
+        }
         const res = await axios.get("http://localhost:8080/cart", {
           headers: { Authorization: token },
         });
@@ -43,44 +76,34 @@ export default function GroceryRedesign() {
     fetchCart();
   }, []);
 
-  // Check if user is logged in
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        if (!token) return;
-        const res = await axios.get("http://localhost:8080/profile", {
-          headers: { Authorization: token },
-        });
-        setUser(res.data.user);
-      } catch (error) {
-        console.log("User fetch error:", error);
-      }
-    };
-    fetchUser();
-  }, []);
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    setUser(null);
-    setProfileOpen(false);
-    router.push("/");
-  };
-
-  const handleLogin = () => {
-    router.push("/login");
-  };
-
-  const handleSignup = () => {
-    router.push("/signup");
-  };
-
   const handleAddToCart = async (product) => {
     try {
       const token = localStorage.getItem("token");
       if (!token) {
-        alert("Please login first!");
-        router.push("/login");
+        // Guest Add to Cart
+        let guestCart = JSON.parse(
+          localStorage.getItem("guestCart") || '{"items":[]}',
+        );
+        const index = guestCart.items.findIndex(
+          (i) => i.productId === product._id,
+        );
+        if (index > -1) {
+          guestCart.items[index].quantity += 1;
+        } else {
+          guestCart.items.push({
+            productId: product._id,
+            title: product.title,
+            price: product.price,
+            image: product.image,
+            quantity: 1,
+          });
+        }
+        localStorage.setItem("guestCart", JSON.stringify(guestCart));
+        setCartItems((prev) => ({
+          ...prev,
+          [product._id]: (prev[product._id] || 0) + 1,
+        }));
+        setCartCount((c) => c + 1);
         return;
       }
       await axios.post(
@@ -109,6 +132,35 @@ export default function GroceryRedesign() {
   const handleDecrement = async (product) => {
     try {
       const token = localStorage.getItem("token");
+      if (!token) {
+        // Guest Decrement
+        let guestCart = JSON.parse(
+          localStorage.getItem("guestCart") || '{"items":[]}',
+        );
+        const index = guestCart.items.findIndex(
+          (i) => i.productId === product._id,
+        );
+        if (index > -1) {
+          if (guestCart.items[index].quantity > 1) {
+            guestCart.items[index].quantity -= 1;
+          } else {
+            guestCart.items.splice(index, 1);
+          }
+          localStorage.setItem("guestCart", JSON.stringify(guestCart));
+          setCartItems((prev) => {
+            const newQty = (prev[product._id] || 1) - 1;
+            const updated = { ...prev };
+            if (newQty <= 0) {
+              delete updated[product._id];
+            } else {
+              updated[product._id] = newQty;
+            }
+            return updated;
+          });
+          setCartCount((c) => Math.max(0, c - 1));
+        }
+        return;
+      }
       await axios.put(
         `http://localhost:8080/cart/decrement/${product._id}`,
         {},
@@ -132,12 +184,6 @@ export default function GroceryRedesign() {
 
   // Open mini cart popup
   const openMiniCart = (product) => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      alert("Please login first!");
-      router.push("/login");
-      return;
-    }
     setMiniCart({ product, qty: 1 });
   };
 
@@ -146,6 +192,35 @@ export default function GroceryRedesign() {
     if (!miniCart) return;
     try {
       const token = localStorage.getItem("token");
+      if (!token) {
+        // Guest Confirm Mini Cart
+        let guestCart = JSON.parse(
+          localStorage.getItem("guestCart") || '{"items":[]}',
+        );
+        const index = guestCart.items.findIndex(
+          (i) => i.productId === miniCart.product._id,
+        );
+        if (index > -1) {
+          guestCart.items[index].quantity += miniCart.qty;
+        } else {
+          guestCart.items.push({
+            productId: miniCart.product._id,
+            title: miniCart.product.title,
+            price: miniCart.product.price,
+            image: miniCart.product.image,
+            quantity: miniCart.qty,
+          });
+        }
+        localStorage.setItem("guestCart", JSON.stringify(guestCart));
+        setCartItems((prev) => ({
+          ...prev,
+          [miniCart.product._id]:
+            (prev[miniCart.product._id] || 0) + miniCart.qty,
+        }));
+        setCartCount((c) => c + miniCart.qty);
+        setMiniCart(null);
+        return;
+      }
       for (let i = 0; i < miniCart.qty; i++) {
         await axios.post(
           "http://localhost:8080/add-cart",
@@ -197,181 +272,40 @@ export default function GroceryRedesign() {
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans">
-      {/* Header */}
-      <header className="sticky top-0 z-50 bg-white shadow-sm">
-        <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <a
-              href="/"
-              className="text-gray-500 hover:text-green-600 transition-colors"
-              title="Back to Home">
-              ←
-            </a>
-            <span className="text-2xl font-bold text-green-600">
-              GroceryStore
-            </span>
-          </div>
-
-          <div className="hidden md:flex flex-1 max-w-xl mx-8 relative">
-            <input
-              type="text"
-              placeholder="Search for products..."
-              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 bg-gray-50"
-            />
-            <button className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-green-600">
-              🔍
-            </button>
-          </div>
-
-          <div className="flex items-center gap-6">
-            {!user ? (
-              /* Guest - show Login & Signup */
-              <>
-                <button
-                  className="flex flex-col items-center text-gray-600 hover:text-green-600"
-                  onClick={handleSignup}
-                  style={{ cursor: "pointer" }}>
-                  <span className="text-xl">
-                    <SiGnuprivacyguard />
-                  </span>
-                  <span className="text-xs">Signup</span>
-                </button>
-                <button
-                  className="flex flex-col items-center text-gray-600 hover:text-green-600"
-                  onClick={handleLogin}
-                  style={{ cursor: "pointer" }}>
-                  <span className="text-xl">
-                    <MdOutlineLogin />
-                  </span>
-                  <span className="text-xs">Login</span>
-                </button>
-              </>
-            ) : (
-              /* Logged in - show name */
-              <span className="text-sm font-medium text-gray-700 hidden sm:inline">
-                Hi, {user.fullName}
-              </span>
-            )}
-
-            {/* Cart - always visible */}
-            <button
-              className="flex flex-col items-center text-gray-600 hover:text-green-600 relative"
-              onClick={() => router.push("/cart")}
-              style={{ cursor: "pointer" }}>
-              <span className="text-xl">🛒</span>
-              <span className="text-xs">Cart</span>
-              {cartCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-4 h-4 flex items-center justify-center rounded-full">
-                  {cartCount}
-                </span>
-              )}
-            </button>
-
-            {/* Profile dropdown - only when logged in */}
-            {user && (
-              <div className="relative">
-                <button
-                  onClick={() => setProfileOpen(!profileOpen)}
-                  className="flex flex-col items-center text-gray-600 hover:text-green-600"
-                  style={{ cursor: "pointer" }}>
-                  <FaUserCircle className="text-2xl" />
-                  <span className="text-xs">Profile</span>
-                </button>
-
-                {profileOpen && (
-                  <div className="absolute right-0 top-12 w-44 bg-white border border-gray-200 rounded-lg shadow-xl z-50 overflow-hidden">
-                    <p
-                      onClick={() => {
-                        router.push("/user-profile");
-                        setProfileOpen(false);
-                      }}
-                      className="px-4 py-3 hover:bg-green-50 cursor-pointer text-gray-700 text-sm font-medium border-b border-gray-100">
-                      ✏️ Edit Profile
-                    </p>
-                    <p
-                      onClick={() => {
-                        router.push("/user-settings");
-                        setProfileOpen(false);
-                      }}
-                      className="px-4 py-3 hover:bg-green-50 cursor-pointer text-gray-700 text-sm font-medium border-b border-gray-100">
-                      ⚙️ Settings
-                    </p>
-                    <p
-                      onClick={() => {
-                        router.push("/my-orders");
-                        setProfileOpen(false);
-                      }}
-                      className="px-4 py-3 hover:bg-green-50 cursor-pointer text-gray-700 text-sm font-medium border-b border-gray-100">
-                      🛍️ My Orders
-                    </p>
-                    <p
-                      onClick={handleLogout}
-                      className="px-4 py-3 hover:bg-red-50 cursor-pointer text-red-500 text-sm font-medium">
-                      🚪 Logout
-                    </p>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Navigation Bar */}
-        <nav className="bg-green-600 text-white overflow-x-auto">
-          <div className="container mx-auto px-4">
-            <ul className="flex items-center gap-8 py-3 text-sm font-medium whitespace-nowrap">
-              <li className="hover:text-green-100 cursor-pointer">Shop All</li>
-              <li className="hover:text-green-100 cursor-pointer">
-                Fruits & Vegetables
-              </li>
-              <li className="hover:text-green-100 cursor-pointer">
-                Dairy & Bakery
-              </li>
-              <li className="hover:text-green-100 cursor-pointer">
-                Atta, Rice & Dal
-              </li>
-              <li className="hover:text-green-100 cursor-pointer">
-                Snacks & Biscuits
-              </li>
-              <li className="ml-auto bg-green-700 px-3 py-1 rounded text-xs font-bold uppercase tracking-wider">
-                Lowest Prices
-              </li>
-            </ul>
-          </div>
-        </nav>
-      </header>
+      <Header cartCount={cartCount} />
+      <Navbar />
 
       {/* Hero Section */}
-      <section className="container mx-auto px-4 py-6">
-        <div className="rounded-2xl overflow-hidden shadow-lg relative h-[300px] bg-gradient-to-r from-green-100 to-emerald-50 flex items-center">
-          <div className="w-1/2 px-12 z-10">
-            <span className="inline-block px-3 py-1 bg-green-200 text-green-800 text-xs font-bold rounded-full mb-4">
+      <section className="container mx-auto px-4 py-3 md:py-6">
+        <div className="rounded-2xl overflow-hidden shadow-lg relative h-[190px] md:h-[230px] bg-gradient-to-r from-green-100 to-emerald-50 flex items-center">
+          <div className="w-full md:w-1/2 px-6 md:px-12 z-10">
+            <span className="inline-block px-3 py-0.5 bg-green-200 text-green-800 text-[10px] md:text-xs font-bold rounded-full mb-2">
               WEEKEND SALE
             </span>
-            <h1 className="text-5xl font-bold text-gray-800 mb-4 leading-tight">
-              Fresh Organic <br />{" "}
+            <h1 className="text-2xl md:text-4xl font-bold text-gray-800 mb-2 leading-tight">
+              Fresh Organic <br className="hidden md:block" />{" "}
               <span className="text-green-600">Grocery Delivery</span>
             </h1>
-            <p className="text-gray-600 mb-8 text-lg">
-              Get flat 30% off on your first order. Use code: FRESH30
+            <p className="text-sm md:text-base text-gray-600 mb-4 opacity-90">
+              Flat 30% off. Use code:{" "}
+              <span className="font-bold text-green-700">FRESH30</span>
             </p>
-            <button className="bg-green-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-green-700 transition shadow-lg hover:shadow-green-500/30">
+            <button className="bg-green-600 text-white px-6 py-2 rounded-lg text-sm font-semibold hover:bg-green-700 transition shadow-lg hover:shadow-green-500/30">
               Shop Now
             </button>
           </div>
-          <div className="absolute right-0 bottom-0 h-full w-1/2 bg-[url('https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=1000')] bg-cover bg-center opacity-80 mask-image-linear-to-l">
-            {/* Image Placeholder */}
+          <div className="hidden md:block absolute right-0 bottom-0 h-full w-1/2 bg-[url('https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=1000')] bg-cover bg-center opacity-80">
             <div className="w-full h-full bg-gradient-to-l from-transparent to-green-100/50"></div>
           </div>
         </div>
       </section>
 
       {/* Categories */}
-      <section className="container mx-auto px-4 py-8">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6">
+      <section className="container mx-auto px-4 py-4 md:py-6">
+        <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-4">
           Shop by Category
         </h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-4">
           {categories.map((category, idx) => {
             const colors = [
               "bg-green-100",
@@ -385,7 +319,17 @@ export default function GroceryRedesign() {
               <div
                 key={category._id}
                 className={`${colors[idx % colors.length]} p-6 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:shadow-md transition transform hover:-translate-y-1 gap-3 border border-transparent hover:border-gray-200`}>
-                <span className="text-4xl">📦</span>
+                <div className="w-16 h-16 flex items-center justify-center overflow-hidden">
+                  {category.image ? (
+                    <img
+                      src={`http://localhost:8080/uploads/${category.image}`}
+                      alt={category.name}
+                      className="w-full h-full object-contain"
+                    />
+                  ) : (
+                    <Package className="w-10 h-10 text-gray-400" />
+                  )}
+                </div>
                 <h3 className="font-semibold text-gray-800 mb-1">
                   {category.name}
                 </h3>
@@ -411,7 +355,7 @@ export default function GroceryRedesign() {
           </button>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
           {products.map((product) => (
             <div
               key={product._id}
@@ -424,7 +368,7 @@ export default function GroceryRedesign() {
                     className="w-full h-full object-contain p-2 group-hover:scale-105 transition duration-300"
                   />
                 ) : (
-                  <span className="text-6xl">📦</span>
+                  <Package className="w-16 h-16 text-gray-300" />
                 )}
               </div>
               <h3 className="font-semibold text-gray-800 mb-1">
@@ -487,32 +431,36 @@ export default function GroceryRedesign() {
         <div className="grid grid-cols-2 md:grid-cols-5 gap-6 bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
           {[
             {
-              icon: "🏷️",
-              title: "Best Prices & Offers",
-              desc: "Cheaper than market",
+              icon: Tag,
+              title: "Best Prices",
+              desc: "Save more every day",
             },
             {
-              icon: "🚛",
+              icon: Truck,
               title: "Free Delivery",
-              desc: "On orders above ₹500",
+              desc: "On orders ₹500+",
             },
-            { icon: "↩️", title: "Easy Returns", desc: "No questions asked" },
             {
-              icon: "🛡️",
-              title: "100% Satisfaction",
+              icon: RotateCcw,
+              title: "Easy Returns",
+              desc: "7 days policy",
+            },
+            {
+              icon: ShieldCheck,
+              title: "100% Quality",
               desc: "Quality guarantee",
             },
             {
-              icon: "🥣",
-              title: "Wide Assortment",
-              desc: "Choose from 5000+ products",
+              icon: Soup,
+              title: "Great Choice",
+              desc: "5000+ products",
             },
           ].map((feature, idx) => (
             <div
               key={idx}
               className="flex flex-col items-center text-center gap-2 group cursor-default">
-              <div className="w-16 h-16 bg-green-50 text-3xl flex items-center justify-center rounded-full mb-2 group-hover:bg-green-100 transition">
-                {feature.icon}
+              <div className="w-16 h-16 bg-green-50 text-green-600 flex items-center justify-center rounded-full mb-2 group-hover:bg-green-100 transition">
+                <feature.icon className="w-8 h-8" />
               </div>
               <h3 className="font-bold text-gray-800 text-sm">
                 {feature.title}
@@ -531,19 +479,19 @@ export default function GroceryRedesign() {
             View All &rarr;
           </button>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6">
           {[
-            { name: "Fortune Oil", price: "₹145", image: "🛢️" },
-            { name: "Aashirvaad Atta", price: "₹340", image: "🌾" },
-            { name: "Basmati Rice", price: "₹850", image: "🍚" },
-            { name: "Toor Dal", price: "₹120", image: "🥣" },
-            { name: "Sugar", price: "₹45", image: "⬜" },
+            { name: "Oil", price: "₹145", icon: Droplets },
+            { name: "Atta", price: "₹340", icon: Sprout },
+            { name: "Rice", price: "₹850", icon: Sprout },
+            { name: "Dal", price: "₹120", icon: Soup },
+            { name: "Sugar", price: "₹45", icon: Box },
           ].map((item, idx) => (
             <div
               key={idx}
               className="bg-white border border-gray-100 rounded-xl p-4 hover:shadow-lg transition group">
-              <div className="h-32 bg-gray-50 rounded-lg flex items-center justify-center text-5xl mb-4 group-hover:scale-105 transition">
-                {item.image}
+              <div className="h-32 bg-gray-50 rounded-lg flex items-center justify-center mb-4 group-hover:scale-105 transition">
+                <item.icon className="w-12 h-12 text-green-600" />
               </div>
               <h3 className="font-semibold text-gray-800 mb-1">{item.name}</h3>
               <div className="flex justify-between items-center">
@@ -551,7 +499,7 @@ export default function GroceryRedesign() {
                   {item.price}
                 </span>
                 <button className="w-8 h-8 rounded-full bg-green-100 text-green-600 flex items-center justify-center hover:bg-green-600 hover:text-white transition">
-                  +
+                  <Plus className="w-4 h-4" />
                 </button>
               </div>
             </div>
@@ -569,18 +517,18 @@ export default function GroceryRedesign() {
             View All &rarr;
           </button>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
           {[
-            { name: "Potato Chips", price: "₹20", image: "🥔" },
-            { name: "Orange Juice", price: "₹110", image: "🍊" },
-            { name: "Cola Can", price: "₹40", image: "🥤" },
-            { name: "Chocolate Cookies", price: "₹60", image: "🍪" },
+            { name: "Chips", price: "₹20", icon: Package },
+            { name: "Juice", price: "₹110", icon: GlassWater },
+            { name: "Cola", price: "₹40", icon: GlassWater },
+            { name: "Cookies", price: "₹60", icon: Sparkles },
           ].map((item, idx) => (
             <div
               key={idx}
               className="bg-white border border-gray-100 rounded-xl p-4 hover:shadow-lg transition group">
-              <div className="h-32 bg-red-50 rounded-lg flex items-center justify-center text-5xl mb-4 group-hover:scale-105 transition">
-                {item.image}
+              <div className="h-32 bg-orange-50 rounded-lg flex items-center justify-center mb-4 group-hover:scale-105 transition">
+                <item.icon className="w-12 h-12 text-orange-600" />
               </div>
               <h3 className="font-semibold text-gray-800 mb-1">{item.name}</h3>
               <div className="flex justify-between items-center">
@@ -588,7 +536,7 @@ export default function GroceryRedesign() {
                   {item.price}
                 </span>
                 <button className="w-8 h-8 rounded-full bg-green-100 text-green-600 flex items-center justify-center hover:bg-green-600 hover:text-white transition">
-                  +
+                  <Plus className="w-4 h-4" />
                 </button>
               </div>
             </div>
@@ -597,59 +545,8 @@ export default function GroceryRedesign() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white pt-16 pb-8 mt-12">
-        <div className="container mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
-          <div>
-            <div className="text-2xl font-bold text-green-500 mb-4">
-              GroceryStore
-            </div>
-            <p className="text-gray-400 mb-4">
-              Fresh quality products delivered directly to your doorstep with
-              love and care.
-            </p>
-          </div>
-          <div>
-            <h4 className="font-bold mb-4">Quick Links</h4>
-            <ul className="space-y-2 text-gray-400">
-              <li className="hover:text-white cursor-pointer">About Us</li>
-              <li className="hover:text-white cursor-pointer">Contact</li>
-              <li className="hover:text-white cursor-pointer">FAQ</li>
-              <li className="hover:text-white cursor-pointer">
-                Terms & Conditions
-              </li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="font-bold mb-4">Categories</h4>
-            <ul className="space-y-2 text-gray-400">
-              <li className="hover:text-white cursor-pointer">
-                Fruits & Vegetables
-              </li>
-              <li className="hover:text-white cursor-pointer">
-                Dairy & Bakery
-              </li>
-              <li className="hover:text-white cursor-pointer">Staples</li>
-              <li className="hover:text-white cursor-pointer">Snacks</li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="font-bold mb-4">Newsletter</h4>
-            <div className="flex gap-2">
-              <input
-                type="email"
-                placeholder="Enter your email"
-                className="bg-gray-800 text-white px-4 py-2 rounded-lg focus:outline-none w-full border border-gray-700 focus:border-green-500"
-              />
-              <button className="bg-green-600 px-4 py-2 rounded-lg font-bold hover:bg-green-700">
-                Go
-              </button>
-            </div>
-          </div>
-        </div>
-        <div className="container mx-auto px-4 border-t border-gray-800 pt-8 text-center text-gray-500 text-sm">
-          &copy; 2026 GroceryStore. All rights reserved.
-        </div>
-      </footer>
+
+      <Footer />
 
       {/* Mini Cart Popup */}
       {miniCart && (
@@ -663,11 +560,14 @@ export default function GroceryRedesign() {
           <div className="fixed top-4 right-4 w-80 bg-white rounded-2xl shadow-2xl z-50 overflow-hidden border border-gray-200 animate-in">
             {/* Header */}
             <div className="bg-green-600 text-white px-4 py-3 flex items-center justify-between">
-              <span className="font-bold text-sm">🛒 Add to Cart</span>
+              <div className="flex items-center gap-2">
+                <ShoppingCart className="w-4 h-4" />
+                <span className="font-bold text-sm">Add to Cart</span>
+              </div>
               <button
                 onClick={() => setMiniCart(null)}
-                className="text-white hover:text-green-200 text-lg cursor-pointer font-bold">
-                ✕
+                className="text-white hover:text-green-200 transition-colors cursor-pointer">
+                <X className="w-5 h-5" />
               </button>
             </div>
 
@@ -682,7 +582,7 @@ export default function GroceryRedesign() {
                       className="w-full h-full object-contain p-1"
                     />
                   ) : (
-                    <span className="text-3xl">📦</span>
+                    <Package className="w-8 h-8 text-gray-300" />
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
@@ -702,6 +602,7 @@ export default function GroceryRedesign() {
                 </span>
                 <div className="flex items-center gap-3">
                   <button
+                    type="button"
                     onClick={() =>
                       setMiniCart((prev) => ({
                         ...prev,
@@ -709,17 +610,18 @@ export default function GroceryRedesign() {
                       }))
                     }
                     className="w-8 h-8 rounded-full bg-green-100 text-green-700 font-bold flex items-center justify-center hover:bg-green-200 transition cursor-pointer">
-                    −
+                    <Minus className="w-4 h-4" />
                   </button>
                   <span className="font-bold text-lg text-gray-800 w-8 text-center">
                     {miniCart.qty}
                   </span>
                   <button
+                    type="button"
                     onClick={() =>
                       setMiniCart((prev) => ({ ...prev, qty: prev.qty + 1 }))
                     }
                     className="w-8 h-8 rounded-full bg-green-100 text-green-700 font-bold flex items-center justify-center hover:bg-green-200 transition cursor-pointer">
-                    +
+                    <Plus className="w-4 h-4" />
                   </button>
                 </div>
               </div>
@@ -735,8 +637,8 @@ export default function GroceryRedesign() {
               {/* Add to Cart Button */}
               <button
                 onClick={confirmMiniCart}
-                className="w-full bg-green-600 text-white py-3 rounded-xl font-bold hover:bg-green-700 transition shadow-lg cursor-pointer">
-                🛒 Add to Cart
+                className="w-full bg-green-600 text-white py-3 rounded-xl font-bold hover:bg-green-700 transition shadow-lg cursor-pointer flex items-center justify-center gap-2">
+                <ShoppingCart className="w-5 h-5" /> Add to Cart
               </button>
             </div>
           </div>

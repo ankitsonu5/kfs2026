@@ -2,12 +2,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-import {
-  FaChevronLeft,
-  FaUserShield,
-  FaEnvelope,
-  FaLock,
-} from "react-icons/fa";
+import { ArrowLeft, ShieldCheck, Mail, Lock, User } from "lucide-react";
 
 export default function AdminProfile() {
   const router = useRouter();
@@ -75,9 +70,9 @@ export default function AdminProfile() {
         {/* Back Button */}
         <button
           onClick={() => router.push("/admindashboard")}
-          className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-8 group">
+          className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-8 group cursor-pointer">
           <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-white/10 border border-white/10 transition-all">
-            <FaChevronLeft size={12} />
+            <ArrowLeft size={14} />
           </div>
           <span className="text-sm font-medium">Back to Dashboard</span>
         </button>
@@ -88,7 +83,7 @@ export default function AdminProfile() {
 
           <div className="flex flex-col items-center mb-10 text-center">
             <div className="w-20 h-20 bg-gradient-to-br from-blue-600 to-purple-600 rounded-3xl flex items-center justify-center shadow-2xl shadow-blue-500/20 mb-4 transform rotate-3 hover:rotate-0 transition-transform duration-500">
-              <FaUserShield size={36} className="text-white" />
+              <ShieldCheck size={36} className="text-white" />
             </div>
             <h1 className="text-3xl font-black tracking-tight">
               Admin Profile
@@ -104,7 +99,7 @@ export default function AdminProfile() {
                 Full Name
               </label>
               <div className="relative group">
-                <FaUserShield className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-blue-400 transition-colors" />
+                <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-blue-400 transition-colors w-5 h-5" />
                 <input
                   type="text"
                   value={admin.name}
@@ -120,7 +115,7 @@ export default function AdminProfile() {
                 Email Address
               </label>
               <div className="relative group">
-                <FaEnvelope className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-purple-400 transition-colors" />
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-purple-400 transition-colors w-5 h-5" />
                 <input
                   type="email"
                   value={admin.email}
@@ -138,7 +133,7 @@ export default function AdminProfile() {
                 New Password (Optional)
               </label>
               <div className="relative group">
-                <FaLock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-pink-400 transition-colors" />
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-pink-400 transition-colors w-5 h-5" />
                 <input
                   type="password"
                   value={password}
@@ -166,8 +161,8 @@ export default function AdminProfile() {
           </form>
         </div>
 
-        <p className="text-center mt-8 text-[10px] text-gray-600 font-bold uppercase tracking-widest">
-          Secured with end-to-end encryption 🔒
+        <p className="text-center mt-8 text-[10px] text-gray-600 font-bold uppercase tracking-widest flex items-center justify-center gap-1">
+          Secured with end-to-end encryption <Lock className="w-3 h-3" />
         </p>
       </div>
 

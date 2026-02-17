@@ -2,13 +2,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-import {
-  FaChevronLeft,
-  FaGlobe,
-  FaHeadset,
-  FaTruckLoading,
-  FaSave,
-} from "react-icons/fa";
+import { ArrowLeft, Globe, Headset, Truck, Save } from "lucide-react";
 
 export default function Settings() {
   const router = useRouter();
@@ -75,9 +69,9 @@ export default function Settings() {
         {/* Back Button */}
         <button
           onClick={() => router.push("/admindashboard")}
-          className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-8 group">
+          className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-8 group cursor-pointer">
           <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-white/10 border border-white/10 transition-all">
-            <FaChevronLeft size={12} />
+            <ArrowLeft size={14} />
           </div>
           <span className="text-sm font-medium">Back to Dashboard</span>
         </button>
@@ -88,7 +82,7 @@ export default function Settings() {
 
           <div className="flex items-center gap-6 mb-12">
             <div className="w-16 h-16 bg-gradient-to-tr from-emerald-600 to-emerald-400 rounded-2xl flex items-center justify-center shadow-emerald-500/20 shadow-2xl transform -rotate-6 group-hover:rotate-0 transition-transform">
-              <FaGlobe size={32} className="text-white" />
+              <Globe size={32} className="text-white" />
             </div>
             <div>
               <h1 className="text-3xl font-black text-white tracking-tight">
@@ -107,7 +101,7 @@ export default function Settings() {
                   Site Title
                 </label>
                 <div className="relative group">
-                  <FaGlobe className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 transition-colors group-focus-within:text-emerald-400" />
+                  <Globe className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 transition-colors group-focus-within:text-emerald-400 w-5 h-5" />
                   <input
                     type="text"
                     placeholder="KFS Grocery"
@@ -125,7 +119,7 @@ export default function Settings() {
                   Support Email
                 </label>
                 <div className="relative group">
-                  <FaHeadset className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 transition-colors group-focus-within:text-blue-400" />
+                  <Headset className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 transition-colors group-focus-within:text-blue-400 w-5 h-5" />
                   <input
                     type="email"
                     placeholder="support@kfs.com"
@@ -144,7 +138,7 @@ export default function Settings() {
                 Default Delivery Charge (₹)
               </label>
               <div className="relative group max-w-xs">
-                <FaTruckLoading className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 transition-colors group-focus-within:text-orange-400" />
+                <Truck className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 transition-colors group-focus-within:text-orange-400 w-5 h-5" />
                 <input
                   type="number"
                   placeholder="0"
@@ -173,7 +167,7 @@ export default function Settings() {
                   <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
                 ) : (
                   <>
-                    <FaSave size={16} /> Save Configuration
+                    <Save size={16} /> Save Configuration
                   </>
                 )}
               </button>

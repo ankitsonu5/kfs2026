@@ -2,7 +2,15 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { FaUserCircle } from "react-icons/fa";
+import {
+  ArrowLeft,
+  User,
+  Mail,
+  Calendar,
+  UserPen,
+  Save,
+  UserCircle,
+} from "lucide-react";
 import axios from "axios";
 
 export default function UserProfile() {
@@ -55,8 +63,8 @@ export default function UserProfile() {
         <div className="container mx-auto px-4 py-4 flex items-center gap-4">
           <button
             onClick={() => router.back()}
-            className="text-gray-500 hover:text-green-600 transition text-xl cursor-pointer">
-            ←
+            className="text-gray-500 hover:text-green-600 transition p-2 hover:bg-gray-100 rounded-full cursor-pointer">
+            <ArrowLeft className="w-6 h-6" />
           </button>
           <h1 className="text-2xl font-bold text-green-600">My Profile</h1>
         </div>
@@ -68,7 +76,7 @@ export default function UserProfile() {
           {/* Avatar Section */}
           <div className="flex flex-col items-center mb-6">
             <div className="w-24 h-24 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center shadow-lg mb-3">
-              <FaUserCircle className="text-white text-6xl" />
+              <UserCircle className="text-white w-14 h-14" />
             </div>
             <p className="text-lg font-bold text-gray-800">{user.fullName}</p>
             <span className="inline-block mt-1 px-3 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded-full uppercase tracking-wide">
@@ -83,7 +91,7 @@ export default function UserProfile() {
               <div className="p-6">
                 <div className="space-y-4">
                   <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
-                    <span className="text-lg">👤</span>
+                    <User className="w-5 h-5 text-green-600" />
                     <div>
                       <p className="text-xs text-gray-500 font-medium">
                         Full Name
@@ -95,7 +103,7 @@ export default function UserProfile() {
                   </div>
 
                   <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
-                    <span className="text-lg">📧</span>
+                    <Mail className="w-5 h-5 text-green-600" />
                     <div>
                       <p className="text-xs text-gray-500 font-medium">
                         Email Address
@@ -107,7 +115,7 @@ export default function UserProfile() {
                   </div>
 
                   <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
-                    <span className="text-lg">📅</span>
+                    <Calendar className="w-5 h-5 text-green-600" />
                     <div>
                       <p className="text-xs text-gray-500 font-medium">
                         Member Since
@@ -130,8 +138,8 @@ export default function UserProfile() {
 
                 <button
                   onClick={() => setEditing(true)}
-                  className="mt-6 w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white py-3 rounded-xl font-semibold hover:from-green-600 hover:to-emerald-700 transition shadow-md cursor-pointer">
-                  ✏️ Edit Profile
+                  className="mt-6 w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white py-3 rounded-xl font-semibold hover:from-green-600 hover:to-emerald-700 transition shadow-md cursor-pointer flex items-center justify-center gap-2">
+                  <UserPen className="w-5 h-5" /> Edit Profile
                 </button>
               </div>
             ) : (
@@ -174,8 +182,8 @@ export default function UserProfile() {
                 <div className="flex gap-3 mt-6">
                   <button
                     onClick={handleUpdate}
-                    className="flex-1 bg-gradient-to-r from-green-500 to-emerald-600 text-white py-3 rounded-xl font-semibold hover:from-green-600 hover:to-emerald-700 transition shadow-md cursor-pointer">
-                    💾 Save Changes
+                    className="flex-1 bg-gradient-to-r from-green-500 to-emerald-600 text-white py-3 rounded-xl font-semibold hover:from-green-600 hover:to-emerald-700 transition shadow-md cursor-pointer flex items-center justify-center gap-2">
+                    <Save className="w-5 h-5" /> Save Changes
                   </button>
                   <button
                     onClick={() => {

@@ -1,8 +1,18 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import {
+  ArrowLeft,
+  ClipboardList,
+  MapPin,
+  CreditCard,
+  ReceiptText,
+  Package,
+  Lock,
+  ChevronRight,
+} from "lucide-react";
 
 export default function Checkout() {
   const router = useRouter();
@@ -150,10 +160,13 @@ export default function Checkout() {
           <div className="flex items-center gap-4">
             <button
               onClick={() => router.back()}
-              className="text-gray-500 hover:text-green-600 transition text-xl cursor-pointer">
-              ←
+              className="text-gray-500 hover:text-green-600 transition p-2 hover:bg-gray-100 rounded-full cursor-pointer">
+              <ArrowLeft className="w-6 h-6" />
             </button>
-            <h1 className="text-2xl font-bold text-green-600">📋 Checkout</h1>
+            <div className="flex items-center gap-2">
+              <ClipboardList className="w-6 h-6 text-green-600" />
+              <h1 className="text-2xl font-bold text-gray-800">Checkout</h1>
+            </div>
           </div>
         </div>
       </header>
@@ -166,7 +179,7 @@ export default function Checkout() {
               {/* Delivery Address */}
               <div className="bg-white rounded-xl border border-gray-200 p-6">
                 <h2 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                  📍 Delivery Address
+                  <MapPin className="w-5 h-5 text-green-600" /> Delivery Address
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
@@ -240,7 +253,8 @@ export default function Checkout() {
               {/* Payment Method */}
               <div className="bg-white rounded-xl border border-gray-200 p-6">
                 <h2 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                  💳 Payment Method
+                  <CreditCard className="w-5 h-5 text-green-600" /> Payment
+                  Method
                 </h2>
                 <div className="space-y-3">
                   <label className="flex items-center gap-3 p-4 border border-gray-200 rounded-lg cursor-pointer hover:border-green-500 transition">
@@ -313,8 +327,8 @@ export default function Checkout() {
           {/* Order Summary Sidebar */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-xl border border-gray-200 p-6 sticky top-24">
-              <h3 className="text-lg font-bold text-gray-800 mb-4">
-                🧾 Order Summary
+              <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                <ReceiptText className="w-5 h-5 text-green-600" /> Order Summary
               </h3>
 
               {/* Items list */}
@@ -331,7 +345,7 @@ export default function Checkout() {
                           className="w-full h-full object-cover"
                         />
                       ) : (
-                        <span className="text-2xl">📦</span>
+                        <Package className="w-6 h-6 text-gray-300" />
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
@@ -373,8 +387,8 @@ export default function Checkout() {
                 {placing ? "Placing Order..." : "Place Order"}
               </button>
 
-              <p className="text-center text-gray-400 text-xs mt-3">
-                🔒 100% Secure Checkout
+              <p className="text-center text-gray-400 text-xs mt-3 flex items-center justify-center gap-1">
+                <Lock className="w-3 h-3" /> 100% Secure Checkout
               </p>
             </div>
           </div>

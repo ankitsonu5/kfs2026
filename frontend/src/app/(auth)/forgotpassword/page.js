@@ -28,7 +28,7 @@ export default function ForgotPassword() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#0b1a2b]">
+    <div className="min-h-screen flex items-center justify-center dark:bg-green-100">
       <div className="bg-[#111827] p-8 rounded-xl shadow-lg w-full max-w-md border border-gray-700">
         <h2 className="text-2xl font-bold text-center mb-2 text-white">
           Forgot Password?

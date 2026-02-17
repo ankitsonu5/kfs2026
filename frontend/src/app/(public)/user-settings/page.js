@@ -2,6 +2,15 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import {
+  ArrowLeft,
+  Settings,
+  MapPin,
+  Bell,
+  Lock,
+  AlertTriangle,
+  ChevronRight,
+} from "lucide-react";
 import axios from "axios";
 
 export default function UserSettings() {
@@ -85,7 +94,7 @@ export default function UserSettings() {
   const deleteAccount = async () => {
     if (
       !confirm(
-        "⚠️ Are you sure? This will permanently delete your account and all data. This cannot be undone!",
+        "Are you sure? This will permanently delete your account and all data. This cannot be undone!",
       )
     )
       return;
@@ -95,7 +104,7 @@ export default function UserSettings() {
         headers: { Authorization: token },
       });
       localStorage.removeItem("token");
-      alert("Account deleted. Sorry to see you go! 😢");
+      alert("Account deleted. Sorry to see you go!");
       router.push("/");
     } catch (error) {
       alert("Error deleting account");
@@ -103,10 +112,10 @@ export default function UserSettings() {
   };
 
   const tabs = [
-    { id: "address", label: "📍 Delivery Address", icon: "📍" },
-    { id: "notifications", label: "🔔 Notifications", icon: "🔔" },
-    { id: "password", label: "🔒 Password", icon: "🔒" },
-    { id: "danger", label: "⚠️ Account", icon: "⚠️" },
+    { id: "address", label: "Delivery Address", icon: MapPin },
+    { id: "notifications", label: "Notifications", icon: Bell },
+    { id: "password", label: "Password", icon: Lock },
+    { id: "danger", label: "Account", icon: AlertTriangle },
   ];
 
   return (
@@ -116,10 +125,13 @@ export default function UserSettings() {
         <div className="container mx-auto px-4 py-4 flex items-center gap-4">
           <button
             onClick={() => router.back()}
-            className="text-gray-500 hover:text-green-600 transition text-xl cursor-pointer">
-            ←
+            className="text-gray-500 hover:text-green-600 transition p-2 hover:bg-gray-100 rounded-full cursor-pointer">
+            <ArrowLeft className="w-6 h-6" />
           </button>
-          <h1 className="text-2xl font-bold text-green-600">⚙️ Settings</h1>
+          <div className="flex items-center gap-2">
+            <Settings className="w-6 h-6 text-green-600" />
+            <h1 className="text-2xl font-bold text-gray-800">Settings</h1>
+          </div>
         </div>
       </header>
 
@@ -132,11 +144,12 @@ export default function UserSettings() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`w-full text-left px-4 py-3 text-sm font-medium transition cursor-pointer ${
+                  className={`w-full text-left px-4 py-3 text-sm font-medium transition cursor-pointer flex items-center gap-3 ${
                     activeTab === tab.id
                       ? "bg-green-50 text-green-600 border-l-4 border-green-600"
                       : "text-gray-600 hover:bg-gray-50 border-l-4 border-transparent"
                   }`}>
+                  <tab.icon className="w-4 h-4" />
                   {tab.label}
                 </button>
               ))}
@@ -148,8 +161,9 @@ export default function UserSettings() {
             {/* Delivery Address */}
             {activeTab === "address" && (
               <div className="bg-white rounded-xl border border-gray-200 p-6">
-                <h2 className="text-lg font-bold text-gray-800 mb-4">
-                  📍 Default Delivery Address
+                <h2 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                  <MapPin className="w-5 h-5 text-green-600" /> Default Delivery
+                  Address
                 </h2>
                 <p className="text-sm text-gray-500 mb-4">
                   This address will be auto-filled during checkout.
@@ -223,8 +237,9 @@ export default function UserSettings() {
             {/* Notifications */}
             {activeTab === "notifications" && (
               <div className="bg-white rounded-xl border border-gray-200 p-6">
-                <h2 className="text-lg font-bold text-gray-800 mb-4">
-                  🔔 Notification Preferences
+                <h2 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                  <Bell className="w-5 h-5 text-green-600" /> Notification
+                  Preferences
                 </h2>
                 <p className="text-sm text-gray-500 mb-4">
                   Choose what updates you want to receive.
@@ -288,8 +303,8 @@ export default function UserSettings() {
             {/* Password */}
             {activeTab === "password" && (
               <div className="bg-white rounded-xl border border-gray-200 p-6">
-                <h2 className="text-lg font-bold text-gray-800 mb-4">
-                  🔒 Change Password
+                <h2 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                  <Lock className="w-5 h-5 text-green-600" /> Change Password
                 </h2>
                 <p className="text-sm text-gray-500 mb-4">
                   Password must be at least 6 characters long.
@@ -312,8 +327,8 @@ export default function UserSettings() {
             {/* Danger Zone */}
             {activeTab === "danger" && (
               <div className="bg-white rounded-xl border border-red-200 p-6">
-                <h2 className="text-lg font-bold text-red-600 mb-4">
-                  ⚠️ Danger Zone
+                <h2 className="text-lg font-bold text-red-600 mb-4 flex items-center gap-2">
+                  <AlertTriangle className="w-5 h-5" /> Danger Zone
                 </h2>
                 <p className="text-sm text-gray-500 mb-4">
                   Once you delete your account, there is no going back. All your
