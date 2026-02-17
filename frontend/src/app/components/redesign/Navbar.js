@@ -6,8 +6,8 @@ export default function Navbar() {
         <header className="bg-white shadow sticky top-0 z-50">
             <div className="container mx-auto px-4 py-3 flex items-center justify-between">
                 {/* Logo */}
-                <Link href="/redesign" className="text-2xl font-bold text-green-600">
-                    XStore
+                <Link href="/" className="text-2xl font-bold text-green-600">
+                    KFS Store
                 </Link>
 
                 {/* Search Bar - Hidden on mobile, visible on md+ */}
@@ -47,11 +47,11 @@ export default function Navbar() {
                 <div className="container mx-auto px-4">
                     <ul className="flex items-center gap-8 py-3 text-sm font-medium text-gray-600">
                         <li><Link href="#" className="text-green-600">ALL DEPARTMENTS</Link></li>
-                        <li><Link href="#" className="hover:text-green-600">HOME</Link></li>
-                        <li><Link href="#" className="hover:text-green-600">ABOUT US</Link></li>
+                        <li><Link href="/" className="hover:text-green-600">HOME</Link></li>
+                        <li><Link href="/aboutus" className="hover:text-green-600">ABOUT US</Link></li>
                         <li><Link href="#" className="hover:text-green-600">COLLECTION</Link></li>
                         <li><Link href="#" className="hover:text-green-600">SHOP</Link></li>
-                        <li><Link href="#" className="hover:text-green-600">CONTACT</Link></li>
+                        <li><Link href="/contact" className="hover:text-green-600">CONTACT</Link></li>
                     </ul>
                 </div>
             </nav>
