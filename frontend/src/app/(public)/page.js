@@ -34,6 +34,8 @@ export default function GroceryRedesign() {
   const [categories, setCategories] = useState([]);
   const [cartItems, setCartItems] = useState({});
   const [miniCart, setMiniCart] = useState(null);
+  const [banners, setBanners] = useState([]);
+  const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
   const router = useRouter();
 
   // Fetch cart items on load (to show quantities)
@@ -270,6 +272,29 @@ export default function GroceryRedesign() {
     fetchCategories();
   }, []);
 
+  useEffect(() => {
+    const fetchBanners = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:8080/banners/active",
+        );
+        setBanners(response.data);
+      } catch (error) {
+        console.log("Fetch banners error:", error);
+      }
+    };
+    fetchBanners();
+  }, []);
+
+  // Simple auto-slider for banners
+  useEffect(() => {
+    if (banners.length <= 1) return;
+    const interval = setInterval(() => {
+      setCurrentBannerIndex((prev) => (prev + 1) % banners.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [banners]);
+
   return (
     <div className="min-h-screen bg-gray-50 font-sans">
       <Header cartCount={cartCount} />
@@ -277,27 +302,71 @@ export default function GroceryRedesign() {
 
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-3 md:py-6">
-        <div className="rounded-2xl overflow-hidden shadow-lg relative h-[190px] md:h-[230px] bg-gradient-to-r from-green-100 to-emerald-50 flex items-center">
-          <div className="w-full md:w-1/2 px-6 md:px-12 z-10">
-            <span className="inline-block px-3 py-0.5 bg-green-200 text-green-800 text-[10px] md:text-xs font-bold rounded-full mb-2">
-              WEEKEND SALE
-            </span>
-            <h1 className="text-2xl md:text-4xl font-bold text-gray-800 mb-2 leading-tight">
-              Fresh Organic <br className="hidden md:block" />{" "}
-              <span className="text-green-600">Grocery Delivery</span>
-            </h1>
-            <p className="text-sm md:text-base text-gray-600 mb-4 opacity-90">
-              Flat 30% off. Use code:{" "}
-              <span className="font-bold text-green-700">FRESH30</span>
-            </p>
-            <button className="bg-green-600 text-white px-6 py-2 rounded-lg text-sm font-semibold hover:bg-green-700 transition shadow-lg hover:shadow-green-500/30">
-              Shop Now
-            </button>
+        {banners.length > 0 ? (
+          <div className="rounded-2xl overflow-hidden shadow-lg relative h-[220px] md:h-[350px] bg-gradient-to-r from-green-100 to-emerald-50 flex items-center transition-all duration-700">
+            <div className="w-full md:w-1/2 px-6 md:px-12 z-10 animate-in fade-in slide-in-from-left duration-700">
+              <span className="inline-block px-3 py-0.5 bg-green-200 text-green-800 text-[10px] md:text-xs font-bold rounded-full mb-2 uppercase tracking-wider">
+                Special Offer
+              </span>
+              <h1 className="text-2xl md:text-5xl font-extrabold text-gray-800 mb-2 leading-tight">
+                {banners[currentBannerIndex].title}
+              </h1>
+              <p className="text-sm md:text-lg text-gray-600 mb-6 opacity-90 font-medium">
+                {banners[currentBannerIndex].subtitle}
+              </p>
+              {banners[currentBannerIndex].link && (
+                <button
+                  onClick={() => router.push(banners[currentBannerIndex].link)}
+                  className="bg-green-600 text-white px-8 py-3 rounded-xl text-sm md:text-base font-bold hover:bg-green-700 transition shadow-xl hover:shadow-green-500/30 active:scale-95">
+                  Shop Now
+                </button>
+              )}
+            </div>
+            <div className="absolute right-0 bottom-0 h-full w-full md:w-[60%] overflow-hidden">
+              <img
+                src={`http://localhost:8080/uploads/${banners[currentBannerIndex].image}`}
+                alt={banners[currentBannerIndex].title}
+                className="w-full h-full object-cover md:object-center animate-in fade-in zoom-in duration-1000"
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-green-100 via-green-100/40 to-transparent md:block hidden"></div>
+            </div>
+
+            {/* Banner Dots */}
+            {banners.length > 1 && (
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-20">
+                {banners.map((_, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setCurrentBannerIndex(idx)}
+                    className={`h-1.5 rounded-full transition-all duration-300 ${idx === currentBannerIndex ? "w-8 bg-green-600" : "w-2 bg-green-300"}`}
+                  />
+                ))}
+              </div>
+            )}
           </div>
-          <div className="hidden md:block absolute right-0 bottom-0 h-full w-1/2 bg-[url('https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=1000')] bg-cover bg-center opacity-80">
-            <div className="w-full h-full bg-gradient-to-l from-transparent to-green-100/50"></div>
+        ) : (
+          <div className="rounded-2xl overflow-hidden shadow-lg relative h-[190px] md:h-[230px] bg-gradient-to-r from-green-100 to-emerald-50 flex items-center">
+            <div className="w-full md:w-1/2 px-6 md:px-12 z-10">
+              <span className="inline-block px-3 py-0.5 bg-green-200 text-green-800 text-[10px] md:text-xs font-bold rounded-full mb-2">
+                WEEKEND SALE
+              </span>
+              <h1 className="text-2xl md:text-4xl font-bold text-gray-800 mb-2 leading-tight">
+                Fresh Organic <br className="hidden md:block" />{" "}
+                <span className="text-green-600">Grocery Delivery</span>
+              </h1>
+              <p className="text-sm md:text-base text-gray-600 mb-4 opacity-90">
+                Flat 30% off. Use code:{" "}
+                <span className="font-bold text-green-700">FRESH30</span>
+              </p>
+              <button className="bg-green-600 text-white px-6 py-2 rounded-lg text-sm font-semibold hover:bg-green-700 transition shadow-lg hover:shadow-green-500/30">
+                Shop Now
+              </button>
+            </div>
+            <div className="hidden md:block absolute right-0 bottom-0 h-full w-1/2 bg-[url('https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=1000')] bg-cover bg-center opacity-80">
+              <div className="w-full h-full bg-gradient-to-l from-transparent to-green-100/50"></div>
+            </div>
           </div>
-        </div>
+        )}
       </section>
 
       {/* Categories */}

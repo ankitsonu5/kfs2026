@@ -18,6 +18,7 @@ import {
   MoreVertical,
   Plus,
   ArrowRight,
+  Image as ImageIcon,
 } from "lucide-react";
 import { AreaChart, Area, ResponsiveContainer, Tooltip, XAxis } from "recharts";
 
@@ -43,6 +44,16 @@ export default function AdminDashboard() {
   });
   const [allUsers, setAllUsers] = useState([]);
   const [userSearchTerm, setUserSearchTerm] = useState("");
+  const [banners, setBanners] = useState([]);
+  const [bannerForm, setBannerForm] = useState({
+    title: "",
+    subtitle: "",
+    link: "",
+    order: 0,
+    image: null,
+  });
+  const [showBannerForm, setShowBannerForm] = useState(false);
+  const [editingBannerId, setEditingBannerId] = useState(null);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -170,6 +181,107 @@ export default function AdminDashboard() {
     }
   };
 
+  useEffect(() => {
+    const fetchBanners = async () => {
+      try {
+        const response = await axios.get("http://localhost:8080/banners");
+        setBanners(response.data);
+      } catch (error) {
+        console.log("Fetch banners error:", error);
+      }
+    };
+    fetchBanners();
+  }, [active]);
+
+  const handleBannerSubmit = async (e) => {
+    e.preventDefault();
+    const token = localStorage.getItem("token");
+    const formData = new FormData();
+    formData.append("title", bannerForm.title);
+    formData.append("subtitle", bannerForm.subtitle);
+    formData.append("link", bannerForm.link);
+    formData.append("order", bannerForm.order);
+    if (bannerForm.image) {
+      formData.append("image", bannerForm.image);
+    }
+
+    try {
+      if (editingBannerId) {
+        await axios.put(
+          `http://localhost:8080/banners/${editingBannerId}`,
+          formData,
+          {
+            headers: {
+              Authorization: token,
+              "Content-Type": "multipart/form-data",
+            },
+          },
+        );
+        alert("Banner updated successfully");
+      } else {
+        await axios.post("http://localhost:8080/add-banner", formData, {
+          headers: {
+            Authorization: token,
+            "Content-Type": "multipart/form-data",
+          },
+        });
+        alert("Banner added successfully");
+      }
+      setShowBannerForm(false);
+      setEditingBannerId(null);
+      setBannerForm({
+        title: "",
+        subtitle: "",
+        link: "",
+        order: 0,
+        image: null,
+      });
+      // Refresh banners
+      const response = await axios.get("http://localhost:8080/banners");
+      setBanners(response.data);
+    } catch (error) {
+      console.log("Banner submit error:", error);
+      alert("Failed to save banner");
+    }
+  };
+
+  const handleDeleteBanner = async (id) => {
+    if (!confirm("Are you sure you want to delete this banner?")) return;
+    const token = localStorage.getItem("token");
+    try {
+      await axios.delete(`http://localhost:8080/banners/${id}`, {
+        headers: { Authorization: token },
+      });
+      setBanners(banners.filter((b) => b._id !== id));
+      alert("Banner deleted");
+    } catch (error) {
+      console.log("Delete banner error:", error);
+      alert("Failed to delete banner");
+    }
+  };
+
+  const handleToggleBanner = async (id) => {
+    const token = localStorage.getItem("token");
+    try {
+      await axios.patch(
+        `http://localhost:8080/banners/${id}/toggle`,
+        {},
+        {
+          headers: { Authorization: token },
+        },
+      );
+      setBanners(
+        banners.map((b) =>
+          b._id === id
+            ? { ...b, status: b.status === "active" ? "inactive" : "active" }
+            : b,
+        ),
+      );
+    } catch (error) {
+      console.log("Toggle banner error:", error);
+    }
+  };
+
   return (
     <div className="min-h-screen flex bg-[#0b1a2b] text-white overflow-x-hidden">
       <style
@@ -258,6 +370,14 @@ export default function AdminDashboard() {
                       setOpen(false);
                     }}>
                     <FolderTree size={16} /> Category
+                  </li>
+                  <li
+                    className={`text-sm py-1.5 px-3 rounded-md transition flex items-center gap-2 ${active === "banners" ? "text-blue-400" : "text-gray-400 hover:text-white hover:bg-white/5"}`}
+                    onClick={() => {
+                      setActive("banners");
+                      setOpen(false);
+                    }}>
+                    <ImageIcon size={16} /> Banners
                   </li>
                   {/* <li
                     className="text-sm text-gray-300 hover:text-blue-400 cursor-pointer py-1"
@@ -770,6 +890,205 @@ export default function AdminDashboard() {
                   Full Management View →
                 </button>
               </div>
+            </div>
+          </Section>
+        )}
+
+        {active === "banners" && (
+          <Section title="Homepage Banner Management">
+            <div className="flex justify-between items-center mb-6">
+              <p className="text-gray-400 text-sm">
+                Manage dynamic banners for your homepage
+              </p>
+              <button
+                onClick={() => {
+                  setEditingBannerId(null);
+                  setBannerForm({
+                    title: "",
+                    subtitle: "",
+                    link: "",
+                    order: 0,
+                    image: null,
+                  });
+                  setShowBannerForm(true);
+                }}
+                className="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-lg flex items-center gap-2 font-semibold shadow-lg shadow-emerald-600/20 transition-all active:scale-95 cursor-pointer">
+                <Plus size={18} /> Add Banner
+              </button>
+            </div>
+
+            {showBannerForm && (
+              <div className="bg-white/5 border border-gray-700 rounded-xl p-6 mb-8 animate-in fade-in slide-in-from-top-4 duration-300">
+                <h4 className="text-lg font-bold mb-4 text-blue-400">
+                  {editingBannerId ? "Edit Banner" : "New Banner"}
+                </h4>
+                <form
+                  onSubmit={handleBannerSubmit}
+                  className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-gray-500 uppercase">
+                      Banner Title
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={bannerForm.title}
+                      onChange={(e) =>
+                        setBannerForm({ ...bannerForm, title: e.target.value })
+                      }
+                      className="w-full bg-[#111827] border border-gray-700 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="e.g. Fresh Groceries"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-gray-500 uppercase">
+                      Subtitle
+                    </label>
+                    <input
+                      type="text"
+                      value={bannerForm.subtitle}
+                      onChange={(e) =>
+                        setBannerForm({
+                          ...bannerForm,
+                          subtitle: e.target.value,
+                        })
+                      }
+                      className="w-full bg-[#111827] border border-gray-700 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="e.g. Up to 50% Off"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-gray-500 uppercase">
+                      Target Link
+                    </label>
+                    <input
+                      type="text"
+                      value={bannerForm.link}
+                      onChange={(e) =>
+                        setBannerForm({ ...bannerForm, link: e.target.value })
+                      }
+                      className="w-full bg-[#111827] border border-gray-700 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="e.g. /shop"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-gray-500 uppercase">
+                      Sort Order
+                    </label>
+                    <input
+                      type="number"
+                      value={bannerForm.order}
+                      onChange={(e) =>
+                        setBannerForm({ ...bannerForm, order: e.target.value })
+                      }
+                      className="w-full bg-[#111827] border border-gray-700 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div className="md:col-span-2 space-y-1">
+                    <label className="text-xs font-bold text-gray-500 uppercase">
+                      Banner Image
+                    </label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) =>
+                        setBannerForm({
+                          ...bannerForm,
+                          image: e.target.files[0],
+                        })
+                      }
+                      className="w-full bg-[#111827] border border-gray-700 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 file:bg-blue-600 file:border-none file:px-3 file:py-1 file:rounded file:text-white file:text-xs file:font-bold file:mr-4 file:cursor-pointer"
+                    />
+                  </div>
+                  <div className="md:col-span-2 flex justify-end gap-3 mt-4">
+                    <button
+                      type="button"
+                      onClick={() => setShowBannerForm(false)}
+                      className="px-6 py-2 rounded-lg border border-gray-700 text-sm font-bold hover:bg-white/5 cursor-pointer">
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-8 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-sm font-bold shadow-lg shadow-blue-600/20 cursor-pointer">
+                      {editingBannerId ? "Update Banner" : "Publish Banner"}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {banners.length === 0 ? (
+                <div className="col-span-full py-12 text-center text-gray-500 italic">
+                  No banners found. Add your first promotional banner!
+                </div>
+              ) : (
+                banners.map((banner) => (
+                  <div
+                    key={banner._id}
+                    className="bg-[#111827] border border-gray-700 rounded-2xl overflow-hidden group hover:border-blue-500 transition-all shadow-xl">
+                    <div className="relative h-40 bg-gray-900 border-b border-gray-800 flex items-center justify-center overflow-hidden">
+                      <img
+                        src={`http://localhost:8080/uploads/${banner.image}`}
+                        alt={banner.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                      <div className="absolute top-3 right-3 flex gap-2">
+                        <span
+                          className={`px-2 py-1 rounded text-[10px] font-bold uppercase ${banner.status === "active" ? "bg-green-500/20 text-green-400" : "bg-red-500/20 text-red-400"}`}>
+                          {banner.status}
+                        </span>
+                        {banner.order > 0 && (
+                          <span className="bg-blue-600 text-white min-w-[20px] h-5 flex items-center justify-center rounded text-[10px] font-bold">
+                            #{banner.order}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="p-4">
+                      <h5 className="font-bold text-gray-100 line-clamp-1">
+                        {banner.title}
+                      </h5>
+                      <p className="text-xs text-gray-500 mt-1 line-clamp-1 italic">
+                        {banner.subtitle || "No subtitle"}
+                      </p>
+                      <div className="flex items-center justify-between mt-5 pt-4 border-t border-gray-800">
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => {
+                              setEditingBannerId(banner._id);
+                              setBannerForm({
+                                title: banner.title,
+                                subtitle: banner.subtitle || "",
+                                link: banner.link || "",
+                                order: banner.order,
+                                image: null,
+                              });
+                              setShowBannerForm(true);
+                            }}
+                            className="p-2 bg-blue-500/10 text-blue-400 hover:bg-blue-500 hover:text-white rounded-lg transition cursor-pointer"
+                            title="Edit">
+                            <Pencil size={14} />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteBanner(banner._id)}
+                            className="p-2 bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white rounded-lg transition cursor-pointer"
+                            title="Delete">
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
+                        <button
+                          onClick={() => handleToggleBanner(banner._id)}
+                          className={`px-4 py-1.5 rounded-lg text-[11px] font-bold transition cursor-pointer ${banner.status === "active" ? "bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white" : "bg-green-500/10 text-green-400 hover:bg-green-500 hover:text-white"}`}>
+                          {banner.status === "active"
+                            ? "Deactivate"
+                            : "Activate"}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </Section>
         )}
