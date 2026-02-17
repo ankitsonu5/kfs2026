@@ -124,7 +124,14 @@ export default function EditProduct() {
   return (
     <div className="min-h-screen bg-[#0b1a2b] text-white p-6 md:p-10">
       <div className="max-w-3xl mx-auto bg-[#111827] p-6 md:p-8 rounded-xl border border-gray-700">
-        <h1 className="text-2xl md:text-3xl font-bold mb-6">Edit Product</h1>
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl md:text-3xl font-bold">Edit Product</h1>
+          <button
+            onClick={() => router.push("/admindashboard")}
+            className="text-blue-400 hover:text-blue-300 font-semibold text-sm flex items-center gap-1 transition-colors cursor-pointer">
+            ← Back to Dashboard
+          </button>
+        </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>

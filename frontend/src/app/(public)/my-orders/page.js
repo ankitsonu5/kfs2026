@@ -3,7 +3,14 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { FaBoxOpen } from "react-icons/fa";
+import {
+  ShoppingBag,
+  ArrowLeft,
+  Package,
+  XCircle,
+  CheckCircle2,
+  Clock,
+} from "lucide-react";
 
 export default function MyOrders() {
   const [orders, setOrders] = useState([]);
@@ -36,6 +43,44 @@ export default function MyOrders() {
     }
   };
 
+  const handleCancel = async (id) => {
+    if (!confirm("Are you sure you want to cancel this order?")) return;
+    try {
+      const token = localStorage.getItem("token");
+      const res = await axios.put(
+        `http://localhost:8080/my-orders/cancel/${id}`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+      if (res.data.success) {
+        alert("Order cancelled successfully");
+        fetchOrders();
+      }
+    } catch (error) {
+      console.log("Cancel order error:", error);
+      alert(error.response?.data?.message || "Failed to cancel order");
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!confirm("Remove this order from your history?")) return;
+    try {
+      const token = localStorage.getItem("token");
+      const res = await axios.delete(`http://localhost:8080/my-orders/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.data.success) {
+        setOrders(orders.filter((o) => o._id !== id));
+        alert("Order deleted from history");
+      }
+    } catch (error) {
+      console.log("Delete order error:", error);
+      alert(error.response?.data?.message || "Failed to delete order");
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center text-black">
@@ -51,19 +96,22 @@ export default function MyOrders() {
     <div className="min-h-screen bg-gray-50 p-6 md:p-12 text-black">
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center justify-between mb-8">
-          <h2 className="text-3xl font-bold text-gray-800 flex items-center gap-3">
-            🛍️ My Orders
-          </h2>
+          <div className="flex items-center gap-3">
+            <ShoppingBag className="w-8 h-8 text-green-600" />
+            <h2 className="text-3xl font-bold text-gray-800">My Orders</h2>
+          </div>
           <button
             onClick={() => router.push("/")}
-            className="text-green-600 font-semibold hover:underline cursor-pointer">
-            ← Back to Shop
+            className="text-green-600 font-semibold hover:underline flex items-center gap-2 cursor-pointer transition-all">
+            <ArrowLeft className="w-5 h-5" /> Back to Shop
           </button>
         </div>
 
         {orders.length === 0 ? (
-          <div className="bg-white rounded-3xl p-12 text-center shadow-sm border border-gray-100">
-            <FaBoxOpen className="text-6xl text-gray-200 mx-auto mb-4" />
+          <div className="bg-white rounded-3xl p-12 text-center shadow-sm border border-gray-100 flex flex-col items-center">
+            <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-6">
+              <Package className="w-10 h-10 text-gray-300" />
+            </div>
             <h3 className="text-xl font-bold text-gray-700 mb-2">
               No orders placed yet
             </h3>
@@ -125,7 +173,7 @@ export default function MyOrders() {
                               className="w-full h-full object-contain"
                             />
                           ) : (
-                            <span className="text-2xl">📦</span>
+                            <Package className="w-8 h-8 text-gray-300" />
                           )}
                         </div>
                         <div className="flex-1">
@@ -143,7 +191,7 @@ export default function MyOrders() {
                     ))}
                   </div>
 
-                  <div className="mt-6 pt-6 border-t border-gray-50 flex justify-between items-end">
+                  <div className="mt-6 pt-6 border-t border-gray-50 flex flex-wrap justify-between items-end gap-4">
                     <div>
                       <p className="text-xs text-gray-400 uppercase font-bold tracking-widest mb-1">
                         Payment
@@ -152,6 +200,24 @@ export default function MyOrders() {
                         {o.paymentMethod}
                       </p>
                     </div>
+
+                    <div className="flex gap-3">
+                      {["Placed", "Confirmed"].includes(o.orderStatus) && (
+                        <button
+                          onClick={() => handleCancel(o._id)}
+                          className="px-6 py-2 border border-red-500 text-red-500 rounded-full text-sm font-bold hover:bg-red-50 transition cursor-pointer">
+                          Cancel Order
+                        </button>
+                      )}
+                      {["Cancelled", "Delivered"].includes(o.orderStatus) && (
+                        <button
+                          onClick={() => handleDelete(o._id)}
+                          className="px-6 py-2 border border-gray-300 text-gray-500 rounded-full text-sm font-bold hover:bg-gray-50 transition cursor-pointer">
+                          Delete
+                        </button>
+                      )}
+                    </div>
+
                     <div className="text-right">
                       <p className="text-sm text-gray-400">Grand Total</p>
                       <p className="text-2xl font-bold text-green-600">

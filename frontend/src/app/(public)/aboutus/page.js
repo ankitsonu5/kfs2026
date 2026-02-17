@@ -5,10 +5,12 @@ import SpecialOffer from '../../components/redesign/SpecialOffer';
 import FarmerCard from '../../components/redesign/FarmerCard';
 import StatCard from '../../components/redesign/StatCard';
 import Footer from '../../components/redesign/Footer';
+import Header from "../../components/header";
 
 export default function RedesignPage() {
     return (
         <div className="font-sans antialiased text-gray-900 bg-white">
+            <Header />
             <Navbar />
             <Hero />
 

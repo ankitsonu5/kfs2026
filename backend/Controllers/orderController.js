@@ -98,3 +98,59 @@ exports.deleteOrder = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+// User - Cancel order
+exports.cancelOrder = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const orderId = req.params.id;
+
+    const order = await Order.findOne({ _id: orderId, userId: userId });
+
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    // Only allow cancellation for Placed or Confirmed orders
+    if (!["Placed", "Confirmed"].includes(order.orderStatus)) {
+      return res.status(400).json({
+        message: `Order cannot be cancelled as it is already ${order.orderStatus}`,
+      });
+    }
+
+    order.orderStatus = "Cancelled";
+    await order.save();
+
+    res.json({ success: true, message: "Order cancelled successfully", order });
+  } catch (error) {
+    console.error("Cancel order error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// User - Delete order history
+exports.userDeleteOrder = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const orderId = req.params.id;
+
+    const order = await Order.findOne({ _id: orderId, userId: userId });
+
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    // Only allow deletion for Cancelled or Delivered orders
+    if (!["Cancelled", "Delivered"].includes(order.orderStatus)) {
+      return res.status(400).json({
+        message: `Active orders cannot be deleted. Current status: ${order.orderStatus}`,
+      });
+    }
+
+    await Order.findByIdAndDelete(orderId);
+    res.json({ success: true, message: "Order deleted from history" });
+  } catch (error) {
+    console.error("User delete order error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};

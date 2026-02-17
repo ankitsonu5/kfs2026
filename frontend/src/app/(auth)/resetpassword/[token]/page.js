@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import axios from "axios";
+import { ShieldCheck } from "lucide-react";
 
 export default function ResetPassword() {
   const { token } = useParams();
@@ -43,7 +44,7 @@ export default function ResetPassword() {
       <div className="bg-[#111827] p-8 rounded-2xl shadow-2xl w-full max-w-md border border-gray-700 border-t-4 border-t-blue-500">
         <div className="text-center mb-8">
           <div className="w-16 h-16 bg-blue-500/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-blue-500/20">
-            <span className="text-3xl text-blue-400">🛡️</span>
+            <ShieldCheck className="w-8 h-8 text-blue-400" />
           </div>
           <h2 className="text-2xl font-bold mb-2">Create New Password</h2>
           <p className="text-gray-400 text-sm">
