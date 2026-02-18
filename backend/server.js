@@ -16,7 +16,8 @@ const userProfileRoutes = require("./routes/userProfile");
 const orderRoutes = require("./routes/orderRoutes");
 
 app.use(express.json());
-app.use("/uploads", express.static("uploads"));
+const path = require("path");
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use(cors());
 connectDB();
 
@@ -29,6 +30,7 @@ app.use("/", adminProfileRoutes);
 app.use("/", adminSettingsRoutes);
 app.use("/", userProfileRoutes);
 app.use("/", orderRoutes);
+app.use("/api/banners", require("./routes/bannerRoutes"));
 
 app.listen(process.env.PORT || 8080, () => {
   console.log(`Server started on port ${process.env.PORT || 8080}`);

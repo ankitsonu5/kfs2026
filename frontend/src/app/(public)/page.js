@@ -6,6 +6,7 @@ import { SiGnuprivacyguard } from "react-icons/si";
 import { FaUserCircle } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import BannerCarousel from "@/components/BannerCarousel";
 
 export default function GroceryRedesign() {
   const [cartCount, setCartCount] = useState(0);
@@ -341,29 +342,35 @@ export default function GroceryRedesign() {
         </nav>
       </header>
 
-      {/* Hero Section */}
+
+
+      {/* Hero Section / Banner Carousel */}
       <section className="container mx-auto px-4 py-6">
-        <div className="rounded-2xl overflow-hidden shadow-lg relative h-[300px] bg-gradient-to-r from-green-100 to-emerald-50 flex items-center">
-          <div className="w-1/2 px-12 z-10">
-            <span className="inline-block px-3 py-1 bg-green-200 text-green-800 text-xs font-bold rounded-full mb-4">
-              WEEKEND SALE
-            </span>
-            <h1 className="text-5xl font-bold text-gray-800 mb-4 leading-tight">
-              Fresh Organic <br />{" "}
-              <span className="text-green-600">Grocery Delivery</span>
-            </h1>
-            <p className="text-gray-600 mb-8 text-lg">
-              Get flat 30% off on your first order. Use code: FRESH30
-            </p>
-            <button className="bg-green-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-green-700 transition shadow-lg hover:shadow-green-500/30">
-              Shop Now
-            </button>
-          </div>
-          <div className="absolute right-0 bottom-0 h-full w-1/2 bg-[url('https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=1000')] bg-cover bg-center opacity-80 mask-image-linear-to-l">
-            {/* Image Placeholder */}
-            <div className="w-full h-full bg-gradient-to-l from-transparent to-green-100/50"></div>
-          </div>
-        </div>
+        <BannerCarousel
+          fallback={
+            <div className="rounded-2xl overflow-hidden shadow-lg relative h-[300px] bg-gradient-to-r from-green-100 to-emerald-50 flex items-center">
+              <div className="w-1/2 px-12 z-10">
+                <span className="inline-block px-3 py-1 bg-green-200 text-green-800 text-xs font-bold rounded-full mb-4">
+                  WEEKEND SALE
+                </span>
+                <h1 className="text-5xl font-bold text-gray-800 mb-4 leading-tight">
+                  Fresh Organic <br />{" "}
+                  <span className="text-green-600">Grocery Delivery</span>
+                </h1>
+                <p className="text-gray-600 mb-8 text-lg">
+                  Get flat 30% off on your first order. Use code: FRESH30
+                </p>
+                <button className="bg-green-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-green-700 transition shadow-lg hover:shadow-green-500/30">
+                  Shop Now
+                </button>
+              </div>
+              <div className="absolute right-0 bottom-0 h-full w-1/2 bg-[url('https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=1000')] bg-cover bg-center opacity-80 mask-image-linear-to-l">
+                {/* Image Placeholder */}
+                <div className="w-full h-full bg-gradient-to-l from-transparent to-green-100/50"></div>
+              </div>
+            </div>
+          }
+        />
       </section>
 
       {/* Categories */}
@@ -438,11 +445,10 @@ export default function GroceryRedesign() {
 
               <button
                 onClick={() => openMiniCart(product)}
-                className={`w-full py-2 border-2 font-semibold rounded-lg transition flex items-center justify-center gap-2 ${
-                  cartItems[product._id]
-                    ? "bg-green-600 border-green-600 text-white hover:bg-green-700"
-                    : "border-green-600 text-green-600 hover:bg-green-600 hover:text-white"
-                }`}
+                className={`w-full py-2 border-2 font-semibold rounded-lg transition flex items-center justify-center gap-2 ${cartItems[product._id]
+                  ? "bg-green-600 border-green-600 text-white hover:bg-green-700"
+                  : "border-green-600 text-green-600 hover:bg-green-600 hover:text-white"
+                  }`}
                 style={{ cursor: "pointer" }}>
                 {cartItems[product._id] ? (
                   <>
