@@ -14,10 +14,10 @@ const adminProfileRoutes = require("./routes/adminProfileRoutes");
 const adminSettingsRoutes = require("./routes/adminSettingsRoutes");
 const userProfileRoutes = require("./routes/userProfile");
 const orderRoutes = require("./routes/orderRoutes");
+const bannerRoutes = require("./routes/bannerRoutes");
 
 app.use(express.json());
-const path = require("path");
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use("/uploads", express.static("uploads"));
 app.use(cors());
 connectDB();
 
@@ -30,7 +30,7 @@ app.use("/", adminProfileRoutes);
 app.use("/", adminSettingsRoutes);
 app.use("/", userProfileRoutes);
 app.use("/", orderRoutes);
-app.use("/api/banners", require("./routes/bannerRoutes"));
+app.use("/", bannerRoutes);
 
 app.listen(process.env.PORT || 8080, () => {
   console.log(`Server started on port ${process.env.PORT || 8080}`);

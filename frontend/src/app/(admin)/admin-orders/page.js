@@ -2,8 +2,15 @@
 
 import { useEffect, useState } from "react";
 import axios from "axios";
+import {
+  ArrowLeft,
+  Search,
+  Filter,
+  Package,
+  Trash2,
+  Inbox,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
-import { FaChevronLeft, FaSearch, FaFilter } from "react-icons/fa";
 
 export default function AdminOrders() {
   const [orders, setOrders] = useState([]);
@@ -123,8 +130,8 @@ export default function AdminOrders() {
           <div>
             <button
               onClick={() => router.push("/admindashboard")}
-              className="flex items-center gap-2 text-gray-400 hover:text-white transition mb-3 text-sm font-medium">
-              <FaChevronLeft size={12} /> Dashboard
+              className="flex items-center gap-2 text-gray-400 hover:text-white transition mb-3 text-sm font-medium cursor-pointer">
+              <ArrowLeft size={14} /> Dashboard
             </button>
             <h1 className="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">
               Orders Management
@@ -136,7 +143,7 @@ export default function AdminOrders() {
 
           <div className="flex items-center gap-4">
             <div className="relative">
-              <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5" />
               <input
                 type="text"
                 placeholder="Search ID, Name, Email..."
@@ -145,17 +152,17 @@ export default function AdminOrders() {
                 className="bg-[#1e293b] border border-[#334155] rounded-xl pl-12 pr-4 py-3 w-full md:w-80 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition shadow-inner"
               />
             </div>
-            <button className="bg-[#1e293b] p-3.5 rounded-xl border border-[#334155] text-gray-400 hover:text-white transition shadow-sm">
-              <FaFilter />
+            <button className="bg-[#1e293b] p-3.5 rounded-xl border border-[#334155] text-gray-400 hover:text-white transition shadow-sm cursor-pointer">
+              <Filter className="w-5 h-5" />
             </button>
           </div>
         </div>
 
         {/* Orders List */}
         {filteredOrders.length === 0 ? (
-          <div className="bg-[#1e293b] rounded-3xl p-16 text-center border border-[#334155] shadow-2xl">
-            <div className="w-20 h-20 bg-[#334155]/30 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">
-              📭
+          <div className="bg-[#1e293b] rounded-3xl p-16 text-center border border-[#334155] shadow-2xl flex flex-col items-center">
+            <div className="w-20 h-20 bg-[#334155]/30 rounded-full flex items-center justify-center mb-6">
+              <Inbox size={40} className="text-gray-400" />
             </div>
             <h3 className="text-xl font-bold text-gray-200">No orders found</h3>
             <p className="text-gray-500 mt-2">
@@ -217,7 +224,7 @@ export default function AdminOrders() {
                         onClick={() => handleDelete(o._id)}
                         className="p-2 rounded-xl bg-rose-500/10 text-rose-500 border border-rose-500/30 hover:bg-rose-500 hover:text-white transition cursor-pointer"
                         title="Delete Order">
-                        🗑️
+                        <Trash2 size={16} />
                       </button>
                     </div>
                   </div>
@@ -279,7 +286,7 @@ export default function AdminOrders() {
                                   className="w-full h-full object-contain"
                                 />
                               ) : (
-                                <span className="text-2xl">📦</span>
+                                <Package className="w-6 h-6 text-gray-400" />
                               )}
                             </div>
                             <div className="flex-1 min-w-0">
