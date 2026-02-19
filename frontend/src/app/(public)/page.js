@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   ShoppingCart,
   UserCircle,
@@ -12,6 +12,7 @@ import {
   RotateCcw,
   Sparkles,
   ChevronRight,
+  ChevronLeft,
   ShieldCheck,
   Soup,
   Plus,
@@ -36,6 +37,7 @@ export default function GroceryRedesign() {
   const [miniCart, setMiniCart] = useState(null);
   const [banners, setBanners] = useState([]);
   const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
+  const categoryScrollRef = useRef(null);
   const router = useRouter();
 
   // Fetch cart items on load (to show quantities)
@@ -58,9 +60,12 @@ export default function GroceryRedesign() {
           setCartCount(total);
           return;
         }
-        const res = await axios.get("http://localhost:8080/cart", {
-          headers: { Authorization: token },
-        });
+        const res = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_URL}/cart`,
+          {
+            headers: { Authorization: token },
+          },
+        );
         if (res.data && res.data.items) {
           const qtyMap = {};
           let total = 0;
@@ -96,7 +101,7 @@ export default function GroceryRedesign() {
             productId: product._id,
             title: product.title,
             price: product.price,
-            image: product.image,
+            image: product.images?.[0] || "",
             quantity: 1,
           });
         }
@@ -109,12 +114,12 @@ export default function GroceryRedesign() {
         return;
       }
       await axios.post(
-        "http://localhost:8080/add-cart",
+        `${process.env.NEXT_PUBLIC_API_URL}/add-cart`,
         {
           productId: product._id,
           title: product.title,
           price: product.price,
-          image: product.image,
+          image: product.images?.[0] || "",
         },
         {
           headers: { Authorization: token },
@@ -164,7 +169,7 @@ export default function GroceryRedesign() {
         return;
       }
       await axios.put(
-        `http://localhost:8080/cart/decrement/${product._id}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/cart/decrement/${product._id}`,
         {},
         { headers: { Authorization: token } },
       );
@@ -184,9 +189,27 @@ export default function GroceryRedesign() {
     }
   };
 
+  const scrollCategories = (direction) => {
+    if (categoryScrollRef.current) {
+      const scrollAmount = 300;
+      categoryScrollRef.current.scrollBy({
+        left: direction === "left" ? -scrollAmount : scrollAmount,
+        behavior: "smooth",
+      });
+    }
+  };
+
   // Open mini cart popup
   const openMiniCart = (product) => {
-    setMiniCart({ product, qty: 1 });
+    setMiniCart({
+      product: {
+        _id: product._id,
+        title: product.title,
+        price: product.price,
+        image: product.images?.[0] || "",
+      },
+      qty: 1,
+    });
   };
 
   // Confirm add from mini cart popup
@@ -225,7 +248,7 @@ export default function GroceryRedesign() {
       }
       for (let i = 0; i < miniCart.qty; i++) {
         await axios.post(
-          "http://localhost:8080/add-cart",
+          `${process.env.NEXT_PUBLIC_API_URL}/add-cart`,
           {
             productId: miniCart.product._id,
             title: miniCart.product.title,
@@ -251,7 +274,9 @@ export default function GroceryRedesign() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await axios.get("http://localhost:8080/products");
+        const res = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_URL}/products`,
+        );
         setProducts(res.data.products || []);
       } catch (error) {
         console.log("Products fetch error:", error);
@@ -263,7 +288,9 @@ export default function GroceryRedesign() {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await axios.get("http://localhost:8080/categories");
+        const res = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_URL}/categories`,
+        );
         setCategories(res.data || []);
       } catch (error) {
         console.log("Categories fetch error:", error);
@@ -276,7 +303,7 @@ export default function GroceryRedesign() {
     const fetchBanners = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:8080/banners/active",
+          `${process.env.NEXT_PUBLIC_API_URL}/banners/active`,
         );
         setBanners(response.data);
       } catch (error) {
@@ -285,6 +312,11 @@ export default function GroceryRedesign() {
     };
     fetchBanners();
   }, []);
+
+  // Helper to get products by boolean flag (e.g., isDealsOfDay)
+  const getProductsByFlag = (flag) => {
+    return products.filter((p) => p[flag] === true);
+  };
 
   // Simple auto-slider for banners
   useEffect(() => {
@@ -301,110 +333,148 @@ export default function GroceryRedesign() {
       <Navbar />
 
       {/* Hero Section */}
-      <section className="container mx-auto px-4 py-3 md:py-6">
+      <section className="relative w-full h-[70vh] md:h-[calc(100vh-140px)] overflow-hidden bg-gray-100">
         {banners.length > 0 ? (
-          <div className="rounded-2xl overflow-hidden shadow-lg relative h-[220px] md:h-[350px] bg-gradient-to-r from-green-100 to-emerald-50 flex items-center transition-all duration-700">
-            <div className="w-full md:w-1/2 px-6 md:px-12 z-10 animate-in fade-in slide-in-from-left duration-700">
-              <span className="inline-block px-3 py-0.5 bg-green-200 text-green-800 text-[10px] md:text-xs font-bold rounded-full mb-2 uppercase tracking-wider">
-                Special Offer
-              </span>
-              <h1 className="text-2xl md:text-5xl font-extrabold text-gray-800 mb-2 leading-tight">
-                {banners[currentBannerIndex].title}
-              </h1>
-              <p className="text-sm md:text-lg text-gray-600 mb-6 opacity-90 font-medium">
-                {banners[currentBannerIndex].subtitle}
-              </p>
-              {banners[currentBannerIndex].link && (
-                <button
-                  onClick={() => router.push(banners[currentBannerIndex].link)}
-                  className="bg-green-600 text-white px-8 py-3 rounded-xl text-sm md:text-base font-bold hover:bg-green-700 transition shadow-xl hover:shadow-green-500/30 active:scale-95">
-                  Shop Now
-                </button>
-              )}
-            </div>
-            <div className="absolute right-0 bottom-0 h-full w-full md:w-[60%] overflow-hidden">
+          <div className="w-full h-full relative flex items-center transition-all duration-700">
+            {/* Background Image with Overlay */}
+            <div className="absolute inset-0 z-0">
               <img
                 src={`http://localhost:8080/uploads/${banners[currentBannerIndex].image}`}
                 alt={banners[currentBannerIndex].title}
-                className="w-full h-full object-cover md:object-center animate-in fade-in zoom-in duration-1000"
+                className="w-full h-full object-cover animate-in fade-in zoom-in duration-1000"
               />
-              <div className="absolute inset-0 bg-gradient-to-r from-green-100 via-green-100/40 to-transparent md:block hidden"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-white/90 via-white/50 to-transparent"></div>
+            </div>
+
+            {/* Content Overlay */}
+            <div className="container mx-auto px-6 md:px-12 z-10 relative pointer-events-none">
+              <div className="max-w-xl animate-in fade-in slide-in-from-left duration-700 pointer-events-auto">
+                <span className="inline-block px-4 py-1 bg-green-200 text-green-800 text-xs md:text-sm font-bold rounded-full mb-4 uppercase tracking-widest">
+                  Special Offer
+                </span>
+                <h1 className="text-3xl md:text-6xl font-black text-gray-900 mb-4 leading-tight">
+                  {banners[currentBannerIndex].title}
+                </h1>
+                <p className="text-sm md:text-xl text-gray-700 mb-8 opacity-90 font-medium max-w-md">
+                  {banners[currentBannerIndex].subtitle}
+                </p>
+                {banners[currentBannerIndex].link && (
+                  <button
+                    onClick={() =>
+                      router.push(banners[currentBannerIndex].link)
+                    }
+                    className="bg-green-600 text-white px-10 py-4 rounded-xl text-sm md:text-lg font-extrabold hover:bg-green-700 transition shadow-2xl shadow-green-600/30 active:scale-95">
+                    Shop Now
+                  </button>
+                )}
+              </div>
             </div>
 
             {/* Banner Dots */}
             {banners.length > 1 && (
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-20">
+              <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-3 z-20">
                 {banners.map((_, idx) => (
                   <button
                     key={idx}
                     onClick={() => setCurrentBannerIndex(idx)}
-                    className={`h-1.5 rounded-full transition-all duration-300 ${idx === currentBannerIndex ? "w-8 bg-green-600" : "w-2 bg-green-300"}`}
+                    className={`h-2 rounded-full transition-all duration-300 ${idx === currentBannerIndex ? "w-10 bg-green-600" : "w-3 bg-green-300"}`}
                   />
                 ))}
               </div>
             )}
+
+            {/* Scroll Indicator */}
+            <div
+              onClick={() =>
+                document
+                  .getElementById("categories")
+                  ?.scrollIntoView({ behavior: "smooth" })
+              }
+              className="absolute bottom-6 right-12 z-20 animate-bounce hidden md:block cursor-pointer pointer-events-auto">
+              <div className="flex flex-col items-center gap-2 text-gray-400">
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] [writing-mode:vertical-lr]">
+                  Scroll
+                </span>
+                <ChevronRight className="rotate-90 w-5 h-5" />
+              </div>
+            </div>
           </div>
         ) : (
-          <div className="rounded-2xl overflow-hidden shadow-lg relative h-[190px] md:h-[230px] bg-gradient-to-r from-green-100 to-emerald-50 flex items-center">
-            <div className="w-full md:w-1/2 px-6 md:px-12 z-10">
-              <span className="inline-block px-3 py-0.5 bg-green-200 text-green-800 text-[10px] md:text-xs font-bold rounded-full mb-2">
-                WEEKEND SALE
-              </span>
-              <h1 className="text-2xl md:text-4xl font-bold text-gray-800 mb-2 leading-tight">
-                Fresh Organic <br className="hidden md:block" />{" "}
-                <span className="text-green-600">Grocery Delivery</span>
-              </h1>
-              <p className="text-sm md:text-base text-gray-600 mb-4 opacity-90">
-                Flat 30% off. Use code:{" "}
-                <span className="font-bold text-green-700">FRESH30</span>
-              </p>
-              <button className="bg-green-600 text-white px-6 py-2 rounded-lg text-sm font-semibold hover:bg-green-700 transition shadow-lg hover:shadow-green-500/30">
-                Shop Now
-              </button>
-            </div>
-            <div className="hidden md:block absolute right-0 bottom-0 h-full w-1/2 bg-[url('https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=1000')] bg-cover bg-center opacity-80">
-              <div className="w-full h-full bg-gradient-to-l from-transparent to-green-100/50"></div>
-            </div>
+          <div className="w-full h-full bg-green-50 flex items-center justify-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
           </div>
         )}
       </section>
 
       {/* Categories */}
-      <section className="container mx-auto px-4 py-4 md:py-6">
-        <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-4">
-          Shop by Category
-        </h2>
-        <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-4">
-          {categories.map((category, idx) => {
-            const colors = [
-              "bg-green-100",
-              "bg-yellow-100",
-              "bg-orange-100",
-              "bg-red-100",
-              "bg-blue-100",
-              "bg-purple-100",
-            ];
-            return (
-              <div
-                key={category._id}
-                className={`${colors[idx % colors.length]} p-6 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:shadow-md transition transform hover:-translate-y-1 gap-3 border border-transparent hover:border-gray-200`}>
-                <div className="w-16 h-16 flex items-center justify-center overflow-hidden">
-                  {category.image ? (
-                    <img
-                      src={`http://localhost:8080/uploads/${category.image}`}
-                      alt={category.name}
-                      className="w-full h-full object-contain"
-                    />
-                  ) : (
-                    <Package className="w-10 h-10 text-gray-400" />
-                  )}
+      <section
+        id="categories"
+        className="container mx-auto px-4 py-16 md:py-24 relative group">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl md:text-2xl font-bold text-gray-800">
+            Shop by Category
+          </h2>
+        </div>
+
+        <div className="relative group">
+          {/* Left Navigation Arrow */}
+          {categories.length > 6 && (
+            <button
+              onClick={() => scrollCategories("left")}
+              className="absolute -left-4 top-1/2 -translate-y-1/2 z-30 w-12 h-12 bg-white shadow-lg border border-gray-100 flex items-center justify-center text-gray-400 hover:text-green-600 transition-all hidden md:flex">
+              <ChevronLeft size={24} strokeWidth={1} />
+            </button>
+          )}
+
+          {/* Right Navigation Arrow */}
+          {categories.length > 6 && (
+            <button
+              onClick={() => scrollCategories("right")}
+              className="absolute -right-4 top-1/2 -translate-y-1/2 z-30 w-12 h-12 bg-white shadow-lg border border-gray-100 flex items-center justify-center text-gray-400 hover:text-green-600 transition-all hidden md:flex">
+              <ChevronRight size={24} strokeWidth={1} />
+            </button>
+          )}
+
+          <div
+            ref={categoryScrollRef}
+            className="flex overflow-x-auto no-scrollbar gap-5 pb-4 snap-x snap-mandatory scroll-smooth px-2">
+            {categories.map((category, idx) => {
+              // Count products for each category (local filtering)
+              const count = products.filter((p) => {
+                if (Array.isArray(p.category)) {
+                  return p.category.some((id) => id === category._id);
+                }
+                return p.category === category._id;
+              }).length;
+
+              return (
+                <div
+                  key={category._id}
+                  onClick={() => router.push(`/shop?category=${category.name}`)}
+                  className="min-w-[150px] md:min-w-[200px] p-6 rounded-2xl bg-white border border-gray-50 flex flex-col items-center justify-center cursor-pointer hover:shadow-xl hover:border-green-100 transition transform hover:-translate-y-1 gap-3 snap-start">
+                  <div className="w-16 h-16 md:w-24 md:h-24 flex items-center justify-center overflow-hidden mb-2">
+                    {category.image ? (
+                      <img
+                        src={`http://localhost:8080/uploads/${category.image}`}
+                        alt={category.name}
+                        className="w-full h-full object-contain"
+                      />
+                    ) : (
+                      <Package className="w-12 h-12 text-gray-300" />
+                    )}
+                  </div>
+                  <div className="text-center">
+                    <h3 className="font-bold text-green-700 text-sm md:text-base uppercase tracking-tight">
+                      {category.name}
+                    </h3>
+                    <p className="text-xs text-gray-400 font-medium">
+                      {count} products
+                    </p>
+                  </div>
                 </div>
-                <h3 className="font-semibold text-gray-800 mb-1">
-                  {category.name}
-                </h3>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
       </section>
 
@@ -412,81 +482,102 @@ export default function GroceryRedesign() {
       <section className="container mx-auto px-4 py-8 bg-white rounded-3xl my-8 shadow-sm border border-gray-100">
         <div className="flex justify-between items-end mb-6">
           <div>
-            <h2 className="text-2xl font-bold text-gray-800">Best Sellers</h2>
+            <h2 className="text-2xl font-bold text-gray-800">
+              Top Selling Products
+            </h2>
             <p className="text-gray-500 text-sm mt-1">
               Top picked products for this week
             </p>
           </div>
           <button
+            onClick={() => router.push("/shop?flag=isTopSellingProducts")}
             className="text-green-600 font-semibold hover:underline"
             style={{ cursor: "pointer" }}>
             View All &rarr;
           </button>
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-          {products.map((product) => (
-            <div
-              key={product._id}
-              className="border border-gray-100 rounded-xl p-4 hover:shadow-lg transition bg-white relative group">
-              <div className="h-48 flex items-center justify-center bg-gray-50 rounded-lg mb-4 overflow-hidden">
-                {product.image ? (
-                  <img
-                    src={`http://localhost:8080/uploads/${product.image}`}
-                    alt={product.title}
-                    className="w-full h-full object-contain p-2 group-hover:scale-105 transition duration-300"
-                  />
-                ) : (
-                  <Package className="w-16 h-16 text-gray-300" />
-                )}
-              </div>
-              <h3 className="font-semibold text-gray-800 mb-1">
-                {product.title}
-              </h3>
-              <div className="flex items-baseline gap-2 mb-4">
-                <span className="font-bold text-lg text-gray-900">
-                  ₹{product.price}
-                </span>
-              </div>
-
-              <button
-                onClick={() => openMiniCart(product)}
-                className={`w-full py-2 border-2 font-semibold rounded-lg transition flex items-center justify-center gap-2 ${
-                  cartItems[product._id]
-                    ? "bg-green-600 border-green-600 text-white hover:bg-green-700"
-                    : "border-green-600 text-green-600 hover:bg-green-600 hover:text-white"
-                }`}
-                style={{ cursor: "pointer" }}>
-                {cartItems[product._id] ? (
-                  <>
-                    <span>Add to Cart</span>
-                    <span className="bg-white/20 px-2 py-0.5 rounded-full text-[10px] font-bold">
-                      {cartItems[product._id]}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+          {getProductsByFlag("isTopSellingProducts").length > 0 ? (
+            getProductsByFlag("isTopSellingProducts")
+              .slice(0, 8)
+              .map((product) => (
+                <div
+                  key={product._id}
+                  className="border border-gray-100 rounded-xl p-4 hover:shadow-lg transition bg-white relative group">
+                  <div
+                    onClick={() => router.push(`/product/${product._id}`)}
+                    className="h-56 flex items-center justify-center bg-gray-50 rounded-lg mb-4 overflow-hidden cursor-pointer">
+                    {product.images && product.images.length > 0 ? (
+                      <img
+                        src={`http://localhost:8080/uploads/${product.images[0]}`}
+                        alt={product.title}
+                        className="w-full h-full object-cover group-hover:scale-110 transition duration-500"
+                      />
+                    ) : (
+                      <Package className="w-16 h-16 text-gray-300" />
+                    )}
+                  </div>
+                  <h3
+                    onClick={() => router.push(`/product/${product._id}`)}
+                    className="font-semibold text-gray-800 mb-1 cursor-pointer hover:text-green-600 transition-colors">
+                    {product.title}
+                  </h3>
+                  <div className="flex items-baseline gap-2 mb-4">
+                    <span className="font-bold text-lg text-gray-900">
+                      ₹{product.price}
                     </span>
-                  </>
-                ) : (
-                  "Add to Cart"
-                )}
-              </button>
+                  </div>
+
+                  <button
+                    onClick={() => openMiniCart(product)}
+                    className={`w-full py-2 border-2 font-semibold rounded-lg transition flex items-center justify-center gap-2 ${
+                      cartItems[product._id]
+                        ? "bg-green-600 border-green-600 text-white hover:bg-green-700"
+                        : "border-green-600 text-green-600 hover:bg-green-600 hover:text-white"
+                    }`}
+                    style={{ cursor: "pointer" }}>
+                    {cartItems[product._id] ? (
+                      <>
+                        <span>Add to Cart</span>
+                        <span className="bg-white/20 px-2 py-0.5 rounded-full text-[10px] font-bold">
+                          {cartItems[product._id]}
+                        </span>
+                      </>
+                    ) : (
+                      "Add to Cart"
+                    )}
+                  </button>
+                </div>
+              ))
+          ) : (
+            <div className="col-span-full py-10 text-center text-gray-500 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
+              Check back soon for our top picks!
             </div>
-          ))}
+          )}
         </div>
       </section>
 
       {/* Discount Banner */}
       <section className="container mx-auto px-4 py-8">
-        <div className="bg-orange-500 rounded-2xl p-8 md:p-12 text-center text-white relative overflow-hidden">
+        <div className="rounded-2xl p-8 md:p-12 text-center text-white relative overflow-hidden">
+          <Image
+            src="/herobanner.webp"
+            alt="Banner"
+            fill
+            className="object-cover"
+          />
           <div className="relative z-10">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Super Deal of the Week
+              Start your day with tasty organic veggies
             </h2>
             <p className="text-lg md:text-xl mb-8 opacity-90">
-              Save fast on all your favorite snacks and beverages.
+              Get 10% off on your first order
             </p>
             <button
               className="bg-white text-orange-600 px-8 py-3 rounded-full font-bold hover:bg-gray-100 transition shadow-lg"
               style={{ cursor: "pointer" }}>
-              Grab Deal Now
+              Shop Now
             </button>
           </div>
           {/* Decorative Circles */}
@@ -540,78 +631,127 @@ export default function GroceryRedesign() {
         </div>
       </section>
 
-      {/* Daily Staples Section */}
+      {/* Deals of Day Section */}
       <section className="container mx-auto px-4 py-8">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-gray-800">Daily Staples</h2>
-          <button className="text-green-600 font-semibold hover:underline">
+          <h2 className="text-2xl font-bold text-gray-800">Deals of Day</h2>
+          <button
+            onClick={() => router.push("/shop?flag=isDealsOfDay")}
+            className="text-green-600 font-semibold hover:underline">
             View All &rarr;
           </button>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6">
-          {[
-            { name: "Oil", price: "₹145", icon: Droplets },
-            { name: "Atta", price: "₹340", icon: Sprout },
-            { name: "Rice", price: "₹850", icon: Sprout },
-            { name: "Dal", price: "₹120", icon: Soup },
-            { name: "Sugar", price: "₹45", icon: Box },
-          ].map((item, idx) => (
-            <div
-              key={idx}
-              className="bg-white border border-gray-100 rounded-xl p-4 hover:shadow-lg transition group">
-              <div className="h-32 bg-gray-50 rounded-lg flex items-center justify-center mb-4 group-hover:scale-105 transition">
-                <item.icon className="w-12 h-12 text-green-600" />
-              </div>
-              <h3 className="font-semibold text-gray-800 mb-1">{item.name}</h3>
-              <div className="flex justify-between items-center">
-                <span className="font-bold text-lg text-green-700">
-                  {item.price}
-                </span>
-                <button className="w-8 h-8 rounded-full bg-green-100 text-green-600 flex items-center justify-center hover:bg-green-600 hover:text-white transition">
-                  <Plus className="w-4 h-4" />
-                </button>
-              </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+          {getProductsByFlag("isDealsOfDay").length > 0 ? (
+            getProductsByFlag("isDealsOfDay")
+              .slice(0, 8)
+              .map((product) => (
+                <div
+                  key={product._id}
+                  className="bg-white border border-gray-100 rounded-xl p-4 hover:shadow-lg transition group relative">
+                  <div
+                    onClick={() => router.push(`/product/${product._id}`)}
+                    className="h-48 flex items-center justify-center bg-gray-50 rounded-lg mb-4 overflow-hidden cursor-pointer">
+                    {product.images && product.images.length > 0 ? (
+                      <img
+                        src={`http://localhost:8080/uploads/${product.images[0]}`}
+                        alt={product.title}
+                        className="w-full h-full object-cover group-hover:scale-110 transition duration-500"
+                      />
+                    ) : (
+                      <Package className="w-12 h-12 text-gray-300" />
+                    )}
+                  </div>
+                  <h3
+                    onClick={() => router.push(`/product/${product._id}`)}
+                    className="font-semibold text-gray-800 mb-1 truncate hover:text-green-600 cursor-pointer">
+                    {product.title}
+                  </h3>
+                  <div className="flex justify-between items-center">
+                    <span className="font-bold text-lg text-green-700">
+                      ₹{product.price}
+                    </span>
+                    <button
+                      onClick={() => openMiniCart(product)}
+                      className="w-8 h-8 rounded-full bg-green-100 text-green-600 flex items-center justify-center hover:bg-green-600 hover:text-white transition">
+                      <Plus className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              ))
+          ) : (
+            <div className="col-span-full py-10 text-center text-gray-500 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
+              No deals available today.
             </div>
-          ))}
+          )}
         </div>
       </section>
 
-      {/* Snacks & Beverages Section */}
-      <section className="container mx-auto px-4 py-8 mb-8">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-gray-800">
-            Snacks & Beverages
-          </h2>
-          <button className="text-green-600 font-semibold hover:underline">
-            View All &rarr;
-          </button>
-        </div>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-          {[
-            { name: "Chips", price: "₹20", icon: Package },
-            { name: "Juice", price: "₹110", icon: GlassWater },
-            { name: "Cola", price: "₹40", icon: GlassWater },
-            { name: "Cookies", price: "₹60", icon: Sparkles },
-          ].map((item, idx) => (
-            <div
-              key={idx}
-              className="bg-white border border-gray-100 rounded-xl p-4 hover:shadow-lg transition group">
-              <div className="h-32 bg-orange-50 rounded-lg flex items-center justify-center mb-4 group-hover:scale-105 transition">
-                <item.icon className="w-12 h-12 text-orange-600" />
-              </div>
-              <h3 className="font-semibold text-gray-800 mb-1">{item.name}</h3>
-              <div className="flex justify-between items-center">
-                <span className="font-bold text-lg text-green-700">
-                  {item.price}
-                </span>
-                <button className="w-8 h-8 rounded-full bg-green-100 text-green-600 flex items-center justify-center hover:bg-green-600 hover:text-white transition">
-                  <Plus className="w-4 h-4" />
-                </button>
-              </div>
+      {/* Dynamic Sections Loop */}
+      {[
+        { title: "Rice & Grains", flag: "isRice" },
+        { title: "Atta & Flour", flag: "isAttaAndFlour" },
+        { title: "Dry Fruits", flag: "isDryFruites" },
+        { title: "Dal & Pulses", flag: "isDalAndPulses" },
+        { title: "Premium Masala", flag: "isMasala" },
+        { title: "Snacks & Namkeen", flag: "isNamkeenAndSnacks" },
+      ].map((section) => {
+        const sectionProducts = getProductsByFlag(section.flag);
+        if (sectionProducts.length === 0) return null;
+
+        return (
+          <section
+            key={section.flag}
+            className="container mx-auto px-4 py-8 mb-4">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-gray-800">
+                {section.title}
+              </h2>
+              <button
+                onClick={() => router.push(`/shop?flag=${section.flag}`)}
+                className="text-green-600 font-semibold hover:underline">
+                View All &rarr;
+              </button>
             </div>
-          ))}
-        </div>
-      </section>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+              {sectionProducts.slice(0, 8).map((product) => (
+                <div
+                  key={product._id}
+                  className="bg-white border border-gray-100 rounded-xl p-4 hover:shadow-lg transition group relative">
+                  <div
+                    onClick={() => router.push(`/product/${product._id}`)}
+                    className="h-48 flex items-center justify-center bg-gray-50 rounded-lg mb-4 overflow-hidden cursor-pointer">
+                    {product.images && product.images.length > 0 ? (
+                      <img
+                        src={`http://localhost:8080/uploads/${product.images[0]}`}
+                        alt={product.title}
+                        className="w-full h-full object-cover group-hover:scale-110 transition duration-500"
+                      />
+                    ) : (
+                      <Package className="w-12 h-12 text-gray-300" />
+                    )}
+                  </div>
+                  <h3
+                    onClick={() => router.push(`/product/${product._id}`)}
+                    className="font-semibold text-gray-800 mb-1 truncate hover:text-green-600 cursor-pointer">
+                    {product.title}
+                  </h3>
+                  <div className="flex justify-between items-center">
+                    <span className="font-bold text-lg text-green-700">
+                      ₹{product.price}
+                    </span>
+                    <button
+                      onClick={() => openMiniCart(product)}
+                      className="w-8 h-8 rounded-full bg-green-100 text-green-600 flex items-center justify-center hover:bg-green-600 hover:text-white transition">
+                      <Plus className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        );
+      })}
 
       {/* Footer */}
 

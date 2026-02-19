@@ -13,9 +13,12 @@ export default function ForgotPassword() {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await axios.post("http://localhost:8080/forgot-password", {
-        email,
-      });
+      const res = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/forgot-password`,
+        {
+          email,
+        },
+      );
       if (res.data.success) {
         setEmailSent(true);
         setResetToken(res.data.resetToken);

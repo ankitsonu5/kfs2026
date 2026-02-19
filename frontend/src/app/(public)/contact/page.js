@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
+import Header from '../../components/header';
 import Navbar from '../../components/redesign/Navbar';
 import Footer from '../../components/redesign/Footer';
 import { Phone, Mail, MapPin, Clock, Facebook, Twitter, Instagram, Linkedin, Send, User, MessageSquare, Tag } from 'lucide-react';
@@ -65,6 +66,7 @@ export default function Contact() {
 
     return (
         <div className="min-h-screen bg-white">
+        <Header />
             <Navbar />
 
             {/* Hero Section */}

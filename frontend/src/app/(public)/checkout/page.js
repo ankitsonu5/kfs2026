@@ -36,9 +36,12 @@ export default function Checkout() {
           router.push("/login");
           return;
         }
-        const res = await axios.get("http://localhost:8080/cart", {
-          headers: { Authorization: token },
-        });
+        const res = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_URL}/cart`,
+          {
+            headers: { Authorization: token },
+          },
+        );
         setCart(res.data);
         if (!res.data || res.data.items.length === 0) {
           alert("Cart is empty! Add items first.");
@@ -61,12 +64,18 @@ export default function Checkout() {
         if (!token) return;
 
         const [profileRes, settingsRes] = await Promise.all([
-          axios.get("http://localhost:8080/profile", {
-            headers: { Authorization: token },
-          }),
-          axios.get("http://localhost:8080/user-settings", {
-            headers: { Authorization: token },
-          }),
+          axios.get(
+            `${process.env.NEXT_PUBLIC_API_URL}/profile`,
+            {
+              headers: { Authorization: token },
+            },
+          ),
+          axios.get(
+            `${process.env.NEXT_PUBLIC_API_URL}/user-settings`,
+            {
+              headers: { Authorization: token },
+            },
+          ),
         ]);
 
         const user = profileRes.data.user;
@@ -110,7 +119,7 @@ export default function Checkout() {
     try {
       const token = localStorage.getItem("token");
       const res = await axios.post(
-        "http://localhost:8080/place-order",
+        `${process.env.NEXT_PUBLIC_API_URL}/place-order`,
         {
           shippingAddress: {
             fullName: form.fullName,

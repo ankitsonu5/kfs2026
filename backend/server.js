@@ -15,6 +15,7 @@ const adminSettingsRoutes = require("./routes/adminSettingsRoutes");
 const userProfileRoutes = require("./routes/userProfile");
 const orderRoutes = require("./routes/orderRoutes");
 const bannerRoutes = require("./routes/bannerRoutes");
+const wishlistRoutes = require("./routes/wishlistRoutes");
 
 app.use(express.json());
 app.use("/uploads", express.static("uploads"));
@@ -31,6 +32,7 @@ app.use("/", adminSettingsRoutes);
 app.use("/", userProfileRoutes);
 app.use("/", orderRoutes);
 app.use("/", bannerRoutes);
+app.use("/", wishlistRoutes);
 
 app.listen(process.env.PORT || 8080, () => {
   console.log(`Server started on port ${process.env.PORT || 8080}`);

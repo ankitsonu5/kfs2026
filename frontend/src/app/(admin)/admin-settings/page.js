@@ -21,9 +21,10 @@ export default function Settings() {
   const fetchSettings = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:8080/adminsettings", {
-        headers: { Authorization: token },
-      });
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/adminsettings`,
+        { headers: { Authorization: token } },
+      );
       setSettings(res.data.settings || {});
     } catch (err) {
       console.error("Settings fetch error:", err);
@@ -38,7 +39,7 @@ export default function Settings() {
     try {
       const token = localStorage.getItem("token");
       const res = await axios.post(
-        "http://localhost:8080/adminsettings",
+        `${process.env.NEXT_PUBLIC_API_URL}/adminsettings`,
         settings,
         { headers: { Authorization: token } },
       );

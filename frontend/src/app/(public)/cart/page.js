@@ -40,9 +40,12 @@ export default function Cart() {
         setLoading(false);
         return;
       }
-      const res = await axios.get("http://localhost:8080/cart", {
-        headers: { Authorization: token },
-      });
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/cart`,
+        {
+          headers: { Authorization: token },
+        },
+      );
       setCart(res.data);
     } catch (error) {
       console.log("Cart fetch error:", error);
@@ -80,7 +83,7 @@ export default function Cart() {
         return;
       }
       await axios.post(
-        "http://localhost:8080/add-cart",
+        `${process.env.NEXT_PUBLIC_API_URL}/add-cart`,
         {
           productId: item.productId,
           title: item.title,
@@ -144,7 +147,7 @@ export default function Cart() {
       }
 
       await axios.put(
-        `http://localhost:8080/cart/decrement/${productId}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/cart/decrement/${productId}`,
         {},
         { headers: { Authorization: token } },
       );
@@ -185,9 +188,12 @@ export default function Cart() {
         setCart({ items: updatedItems, totalAmount: updatedTotal });
         return;
       }
-      await axios.delete(`http://localhost:8080/cart/${productId}`, {
-        headers: { Authorization: token },
-      });
+      await axios.delete(
+        `${process.env.NEXT_PUBLIC_API_URL}/cart/${productId}`,
+        {
+          headers: { Authorization: token },
+        },
+      );
       const updatedItems = cart.items.filter(
         (item) => item.productId !== productId,
       );

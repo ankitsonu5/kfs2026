@@ -52,9 +52,12 @@ export default function BulkOrder() {
           setCartCount(total);
           return;
         }
-        const res = await axios.get("http://localhost:8080/cart", {
-          headers: { Authorization: token },
-        });
+        const res = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_URL}/cart`,
+          {
+            headers: { Authorization: token },
+          },
+        );
         if (res.data && res.data.items) {
           const qtyMap = {};
           let total = 0;
@@ -74,7 +77,9 @@ export default function BulkOrder() {
 
   const fetchProducts = async () => {
     try {
-      const res = await axios.get("http://localhost:8080/products");
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/products`,
+      );
       const fetchedProducts = res.data.products || [];
       setProducts(fetchedProducts);
       setFilteredProducts(fetchedProducts);
@@ -85,7 +90,9 @@ export default function BulkOrder() {
 
   const fetchCategories = async () => {
     try {
-      const res = await axios.get("http://localhost:8080/categories");
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/categories`,
+      );
       setCategories(res.data || []);
     } catch (error) {
       console.error("Fetch categories error:", error);
@@ -137,7 +144,7 @@ export default function BulkOrder() {
             productId: product._id,
             title: product.title,
             price: product.price,
-            image: product.image,
+            image: product.images?.[0] || "",
             quantity: 1,
           });
         }
@@ -150,12 +157,12 @@ export default function BulkOrder() {
         return;
       }
       await axios.post(
-        "http://localhost:8080/add-cart",
+        `${process.env.NEXT_PUBLIC_API_URL}/add-cart`,
         {
           productId: product._id,
           title: product.title,
           price: product.price,
-          image: product.image,
+          image: product.images?.[0] || "",
         },
         { headers: { Authorization: token } },
       );
@@ -273,10 +280,11 @@ export default function BulkOrder() {
                     className={`bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 group flex ${viewMode === "list" ? "flex-row p-4" : "flex-col"}`}>
                     {/* Image Area */}
                     <div
-                      className={`relative bg-gray-50 flex items-center justify-center ${viewMode === "list" ? "w-48 h-48 rounded-lg" : "h-52 sm:h-64"}`}>
-                      {p.image ? (
+                      onClick={() => router.push(`/product/${p._id}`)}
+                      className={`relative bg-gray-50 flex items-center justify-center cursor-pointer ${viewMode === "list" ? "w-48 h-48 rounded-lg" : "h-52 sm:h-64"}`}>
+                      {p.images && p.images.length > 0 ? (
                         <img
-                          src={`http://localhost:8080/uploads/${p.image}`}
+                          src={`http://localhost:8080/uploads/${p.images[0]}`}
                           alt={p.title}
                           className="w-full h-full object-contain p-4 group-hover:scale-105 transition-transform duration-500"
                         />
@@ -307,7 +315,9 @@ export default function BulkOrder() {
                             : p.category}
                           , Groceries
                         </div>
-                        <h3 className="font-bold text-gray-800 text-sm sm:text-[15px] line-clamp-2 leading-tight group-hover:text-green-600 transition-colors mb-2 h-10 sm:h-11">
+                        <h3
+                          onClick={() => router.push(`/product/${p._id}`)}
+                          className="font-bold text-gray-800 text-sm sm:text-[15px] line-clamp-2 leading-tight group-hover:text-green-600 transition-colors mb-2 h-10 sm:h-11 cursor-pointer">
                           {p.title}
                         </h3>
 

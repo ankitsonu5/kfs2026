@@ -18,7 +18,11 @@ exports.placeOrder = async (req, res) => {
       name: item.productId.title,
       price: item.productId.price,
       quantity: item.quantity,
-      image: item.productId.image,
+      image:
+        item.image ||
+        (item.productId.images && item.productId.images.length > 0
+          ? item.productId.images[0]
+          : ""),
     }));
 
     const totalAmount = cart.totalAmount;
@@ -63,7 +67,7 @@ exports.getMyOrders = async (req, res) => {
 exports.getAllOrders = async (req, res) => {
   try {
     const orders = await Order.find()
-      .populate("userId", "name email")
+      .populate("userId", "fullName email")
       .sort({ createdAt: -1 });
 
     res.json({ success: true, orders });

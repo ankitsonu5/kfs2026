@@ -59,9 +59,12 @@ export default function AdminDashboard() {
     const fetchProducts = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await axios.get("http://localhost:8080/products", {
-          headers: { Authorization: token },
-        });
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_URL}/products`,
+          {
+            headers: { Authorization: token },
+          },
+        );
         setProducts(response.data.products);
       } catch (error) {
         console.log(error);
@@ -76,9 +79,12 @@ export default function AdminDashboard() {
     try {
       const token = localStorage.getItem("token");
 
-      await axios.delete(`http://localhost:8080/products/${id}`, {
-        headers: { Authorization: token },
-      });
+      await axios.delete(
+        `${process.env.NEXT_PUBLIC_API_URL}/products/${id}`,
+        {
+          headers: { Authorization: token },
+        },
+      );
 
       setProducts(products.filter((p) => p._id !== id));
       alert("Product deleted");
@@ -92,9 +98,12 @@ export default function AdminDashboard() {
     const fetchCategories = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await axios.get("http://localhost:8080/categories", {
-          headers: { Authorization: token },
-        });
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_URL}/categories`,
+          {
+            headers: { Authorization: token },
+          },
+        );
         setCategories(response.data);
       } catch (error) {
         console.log(error);
@@ -103,13 +112,18 @@ export default function AdminDashboard() {
     fetchCategories();
   }, []);
 
+  const [range, setRange] = useState("7d");
+
   useEffect(() => {
     const fetchStats = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await axios.get("http://localhost:8080/dashboard-stats", {
-          headers: { Authorization: token },
-        });
+        const res = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_URL}/dashboard-stats?range=${range}`,
+          {
+            headers: { Authorization: token },
+          },
+        );
         if (res.data.success) {
           setDashStats(res.data);
         }
@@ -118,16 +132,19 @@ export default function AdminDashboard() {
       }
     };
     fetchStats();
-  }, []);
+  }, [range]);
 
   useEffect(() => {
     const fetchUsers = async () => {
       if (active !== "users") return;
       try {
         const token = localStorage.getItem("token");
-        const res = await axios.get("http://localhost:8080/all-users", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_URL}/all-users`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          },
+        );
         if (res.data.success) {
           setAllUsers(res.data.users);
         }
@@ -148,7 +165,7 @@ export default function AdminDashboard() {
     try {
       const token = localStorage.getItem("token");
       const res = await axios.delete(
-        `http://localhost:8080/delete-user/${id}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/delete-user/${id}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         },
@@ -169,9 +186,12 @@ export default function AdminDashboard() {
     try {
       const token = localStorage.getItem("token");
 
-      await axios.delete(`http://localhost:8080/categories/${id}`, {
-        headers: { Authorization: token },
-      });
+      await axios.delete(
+        `${process.env.NEXT_PUBLIC_API_URL}/categories/${id}`,
+        {
+          headers: { Authorization: token },
+        },
+      );
 
       setCategories(categories.filter((c) => c._id !== id));
       alert("Category deleted");
@@ -184,7 +204,9 @@ export default function AdminDashboard() {
   useEffect(() => {
     const fetchBanners = async () => {
       try {
-        const response = await axios.get("http://localhost:8080/banners");
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_URL}/banners`,
+        );
         setBanners(response.data);
       } catch (error) {
         console.log("Fetch banners error:", error);
@@ -208,7 +230,7 @@ export default function AdminDashboard() {
     try {
       if (editingBannerId) {
         await axios.put(
-          `http://localhost:8080/banners/${editingBannerId}`,
+          `${process.env.NEXT_PUBLIC_API_URL}/banners/${editingBannerId}`,
           formData,
           {
             headers: {
@@ -219,12 +241,16 @@ export default function AdminDashboard() {
         );
         alert("Banner updated successfully");
       } else {
-        await axios.post("http://localhost:8080/add-banner", formData, {
-          headers: {
-            Authorization: token,
-            "Content-Type": "multipart/form-data",
+        await axios.post(
+          `${process.env.NEXT_PUBLIC_API_URL}/add-banner`,
+          formData,
+          {
+            headers: {
+              Authorization: token,
+              "Content-Type": "multipart/form-data",
+            },
           },
-        });
+        );
         alert("Banner added successfully");
       }
       setShowBannerForm(false);
@@ -237,7 +263,9 @@ export default function AdminDashboard() {
         image: null,
       });
       // Refresh banners
-      const response = await axios.get("http://localhost:8080/banners");
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/banners`,
+      );
       setBanners(response.data);
     } catch (error) {
       console.log("Banner submit error:", error);
@@ -249,9 +277,12 @@ export default function AdminDashboard() {
     if (!confirm("Are you sure you want to delete this banner?")) return;
     const token = localStorage.getItem("token");
     try {
-      await axios.delete(`http://localhost:8080/banners/${id}`, {
-        headers: { Authorization: token },
-      });
+      await axios.delete(
+        `${process.env.NEXT_PUBLIC_API_URL}/banners/${id}`,
+        {
+          headers: { Authorization: token },
+        },
+      );
       setBanners(banners.filter((b) => b._id !== id));
       alert("Banner deleted");
     } catch (error) {
@@ -264,7 +295,7 @@ export default function AdminDashboard() {
     const token = localStorage.getItem("token");
     try {
       await axios.patch(
-        `http://localhost:8080/banners/${id}/toggle`,
+        `${process.env.NEXT_PUBLIC_API_URL}/banners/${id}/toggle`,
         {},
         {
           headers: { Authorization: token },
@@ -458,9 +489,33 @@ export default function AdminDashboard() {
             <Menu size={24} />
           </button>
 
-          <h2 className="text-2xl md:text-3xl font-bold capitalize">
-            {active}
-          </h2>
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+            <h2 className="text-2xl md:text-3xl font-bold capitalize">
+              {active}
+            </h2>
+
+            {active === "dashboard" && (
+              <div className="flex bg-[#111827] p-1 rounded-xl border border-gray-700">
+                {[
+                  { label: "24h", value: "1d" },
+                  { label: "7 Days", value: "7d" },
+                  { label: "30 Days", value: "30d" },
+                  { label: "All Time", value: "any" },
+                ].map((r) => (
+                  <button
+                    key={r.value}
+                    onClick={() => setRange(r.value)}
+                    className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                      range === r.value
+                        ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20"
+                        : "text-gray-400 hover:text-white"
+                    }`}>
+                    {r.label}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
 
           <div className="flex items-center gap-2 bg-[#111827] px-4 py-2 rounded-full border border-gray-700 cursor-pointer hover:border-blue-500 transition-colors">
             <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center">
@@ -549,8 +604,13 @@ export default function AdminDashboard() {
                       <td className="py-3 text-left font-mono font-bold text-blue-400">
                         #{o._id.slice(-4).toUpperCase()}
                       </td>
-                      <td className="py-3 text-left max-w-[100px] truncate">
-                        {o.userId?.fullName || "Guest"}
+                      <td className="py-3 text-left max-w-[150px]">
+                        <p className="truncate">
+                          {o.userId?.fullName || "Guest"}
+                        </p>
+                        <p className="text-[10px] text-gray-500 truncate">
+                          {o.userId?.email || ""}
+                        </p>
                       </td>
                       <td className="py-3 text-right font-bold">
                         ₹{o.totalAmount}
@@ -624,9 +684,9 @@ export default function AdminDashboard() {
                           <td className="py-4 px-6 text-left">
                             <div className="flex items-center gap-4">
                               <div className="w-12 h-12 rounded-lg bg-gray-800 flex items-center justify-center overflow-hidden border border-gray-700 group-hover:border-blue-500/50 transition-colors">
-                                {product.image ? (
+                                {product.images && product.images.length > 0 ? (
                                   <img
-                                    src={`http://localhost:8080/uploads/${product.image}`}
+                                    src={`http://localhost:8080/uploads/${product.images[0]}`}
                                     alt={product.title}
                                     className="w-full h-full object-cover"
                                   />
@@ -858,6 +918,9 @@ export default function AdminDashboard() {
                           </p>
                           <p className="font-medium text-sm truncate max-w-[120px]">
                             {o.userId?.fullName || "Guest"}
+                          </p>
+                          <p className="text-[10px] text-gray-500 truncate max-w-[120px]">
+                            {o.userId?.email || ""}
                           </p>
                         </td>
                         <td className="py-4 px-4 text-center hidden sm:table-cell text-xs text-gray-400">

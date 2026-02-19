@@ -28,9 +28,12 @@ export default function Signup() {
     setLoading(true);
 
     try {
-      const res = await axios.post("http://localhost:8080/signup", {
-        ...formData,
-      });
+      const res = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/signup`,
+        {
+          ...formData,
+        },
+      );
 
       if (res.status === 201) {
         alert("Registration successful! Please login.");

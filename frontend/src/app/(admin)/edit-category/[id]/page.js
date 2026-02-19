@@ -21,16 +21,21 @@ export default function EditCategory() {
     const fetchCategory = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await axios.get(`http://localhost:8080/categories/${id}`, {
-          headers: { Authorization: token },
-        });
+        const res = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_URL}/categories/${id}`,
+          {
+            headers: { Authorization: token },
+          },
+        );
         if (res.data) {
           setForm({
             title: res.data.name,
             status: res.data.status || "active",
           });
           if (res.data.image) {
-            setPreview(`http://localhost:8080/uploads/${res.data.image}`);
+            setPreview(
+              `${process.env.NEXT_PUBLIC_API_URL}/uploads/${res.data.image}`,
+            );
           }
         }
       } catch (error) {
@@ -68,7 +73,7 @@ export default function EditCategory() {
       }
 
       const res = await axios.put(
-        `http://localhost:8080/categories/${id}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/categories/${id}`,
         formData,
         {
           headers: {

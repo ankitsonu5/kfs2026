@@ -23,10 +23,13 @@ export default function ResetPassword() {
 
     setLoading(true);
     try {
-      const res = await axios.post("http://localhost:8080/reset-password", {
-        token,
-        password: formData.password,
-      });
+      const res = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/reset-password`,
+        {
+          token,
+          password: formData.password,
+        },
+      );
 
       if (res.data.success) {
         alert("Password reset successful! You can now login.");

@@ -32,9 +32,12 @@ export default function Login() {
     e.preventDefault();
 
     try {
-      const res = await axios.post("http://localhost:8080/login", {
-        ...formData,
-      });
+      const res = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/login`,
+        {
+          ...formData,
+        },
+      );
 
       if (res.data.success) {
         const token = res.data.token;
@@ -52,7 +55,7 @@ export default function Login() {
         if (guestCart.items.length > 0) {
           try {
             await axios.post(
-              "http://localhost:8080/merge-cart",
+              `${process.env.NEXT_PUBLIC_API_URL}/merge-cart`,
               { items: guestCart.items },
               { headers: { Authorization: token } },
             );

@@ -29,11 +29,14 @@ export default function MyOrders() {
         return;
       }
 
-      const res = await axios.get("http://localhost:8080/my-orders", {
-        headers: {
-          Authorization: `Bearer ${token}`,
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/my-orders`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
-      });
+      );
 
       setOrders(res.data.orders);
     } catch (error) {
@@ -48,7 +51,7 @@ export default function MyOrders() {
     try {
       const token = localStorage.getItem("token");
       const res = await axios.put(
-        `http://localhost:8080/my-orders/cancel/${id}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/my-orders/cancel/${id}`,
         {},
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -68,9 +71,12 @@ export default function MyOrders() {
     if (!confirm("Remove this order from your history?")) return;
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.delete(`http://localhost:8080/my-orders/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await axios.delete(
+        `${process.env.NEXT_PUBLIC_API_URL}/my-orders/${id}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
       if (res.data.success) {
         setOrders(orders.filter((o) => o._id !== id));
         alert("Order deleted from history");

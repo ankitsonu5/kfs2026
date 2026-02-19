@@ -30,11 +30,14 @@ export default function AdminOrders() {
         return;
       }
 
-      const res = await axios.get("http://localhost:8080/orders", {
-        headers: {
-          Authorization: `Bearer ${token}`,
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/orders`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
-      });
+      );
 
       if (res.data.success) {
         setOrders(res.data.orders);
@@ -54,7 +57,7 @@ export default function AdminOrders() {
     try {
       const token = localStorage.getItem("token");
       const res = await axios.put(
-        `http://localhost:8080/orders/${id}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/orders/${id}`,
         { status },
         {
           headers: {
@@ -80,9 +83,10 @@ export default function AdminOrders() {
       return;
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.delete(`http://localhost:8080/orders/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await axios.delete(
+        `${process.env.NEXT_PUBLIC_API_URL}/orders/${id}`,
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
       if (res.data.success) {
         alert("Order deleted successfully");
         fetchOrders();

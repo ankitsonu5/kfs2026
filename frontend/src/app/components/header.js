@@ -16,6 +16,7 @@ import {
   ShoppingBag,
   LogOut,
   X,
+  Heart,
 } from "lucide-react";
 
 export default function Header({ cartCount }) {
@@ -30,9 +31,12 @@ export default function Header({ cartCount }) {
       try {
         const token = localStorage.getItem("token");
         if (!token) return;
-        const res = await axios.get("http://localhost:8080/profile", {
-          headers: { Authorization: token },
-        });
+        const res = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_URL}/profile`,
+          {
+            headers: { Authorization: token },
+          },
+        );
         setUser(res.data.user);
       } catch (error) {
         console.log("User fetch error:", error);
@@ -88,7 +92,7 @@ export default function Header({ cartCount }) {
               placeholder="Search products..."
               className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
             />
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-black w-4 h-4" />
           </div>
 
           {/* Sidebar Nav */}
@@ -99,7 +103,7 @@ export default function Header({ cartCount }) {
             <ul className="space-y-1">
               {[
                 { label: "ABOUT US", path: "/aboutus" },
-                { label: "DEALS TODAY", path: "/dealstoday" },
+                { label: "DEALS TODAY", path: "/shop?flag=isDealsOfDay" },
                 { label: "SHOP", path: "/shop" },
                 { label: "CONTACT", path: "/contact" },
                 { label: "BULK ORDER", path: "/bulk-order" },
@@ -230,6 +234,15 @@ export default function Header({ cartCount }) {
                       className="w-full flex items-center gap-3 px-4 py-3 hover:bg-green-50 text-gray-700 text-sm font-medium border-b border-gray-100 transition-colors">
                       <ShoppingBag className="w-4 h-4 text-green-600" />
                       My Orders
+                    </button>
+                    <button
+                      onClick={() => {
+                        router.push("/wishlist");
+                        setProfileOpen(false);
+                      }}
+                      className="w-full flex items-center gap-3 px-4 py-3 hover:bg-green-50 text-gray-700 text-sm font-medium border-b border-gray-100 transition-colors">
+                      <Heart className="w-4 h-4 text-green-600" />
+                      My Wishlist
                     </button>
                     <button
                       onClick={handleLogout}

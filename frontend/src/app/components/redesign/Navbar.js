@@ -1,60 +1,70 @@
-import Link from 'next/link';
-import { Search, ShoppingCart, Heart, User, Menu } from 'lucide-react';
+"use client";
+
+import React from "react";
+import { PhoneCall, Facebook, Instagram } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function Navbar() {
-    return (
-        <header className="bg-white shadow sticky top-0 z-50">
-            <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-                {/* Logo */}
-                <Link href="/" className="text-2xl font-bold text-green-600">
-                    KFS Store
-                </Link>
-
-                {/* Search Bar - Hidden on mobile, visible on md+ */}
-                <div className="hidden md:flex items-center flex-1 max-w-lg mx-8 relative">
-                    <input
-                        type="text"
-                        placeholder="Search for products..."
-                        className="w-full pl-4 pr-10 py-2 border border-gray-300 rounded-full focus:outline-none focus:border-green-500"
-                    />
-                    <button className="absolute right-2 text-gray-500 hover:text-green-600">
-                        <Search size={20} />
-                    </button>
-                </div>
-
-                {/* Actions */}
-                <div className="flex items-center gap-6">
-                    <Link href="#" className="flex items-center gap-1 text-gray-700 hover:text-green-600">
-                        <User size={20} />
-                        <span className="hidden sm:inline text-sm font-medium">Sign In</span>
-                    </Link>
-                    <Link href="#" className="flex items-center gap-1 text-gray-700 hover:text-green-600">
-                        <Heart size={20} />
-                        <span className="hidden sm:inline text-sm font-medium">Wishlist</span>
-                    </Link>
-                    <Link href="#" className="flex items-center gap-1 text-gray-700 hover:text-green-600 bg-green-50 px-3 py-1.5 rounded-full">
-                        <ShoppingCart size={20} />
-                        <span className="text-sm font-bold">$0.00</span>
-                    </Link>
-                    <button className="md:hidden text-gray-700">
-                        <Menu size={24} />
-                    </button>
-                </div>
+  const router = useRouter();
+  return (
+    <nav className="bg-green-600 text-white overflow-x-auto no-scrollbar hidden md:block">
+      <div className="container mx-auto px-4">
+        <ul className="flex items-center gap-4 md:gap-8 py-2 md:py-3 text-xs md:text-sm font-medium whitespace-nowrap">
+          <li
+            onClick={() => router.push("/aboutus")}
+            className="hover:text-green-100 cursor-pointer">
+            ABOUT US
+          </li>
+          <li
+            onClick={() => router.push("/shop?flag=isDealsOfDay")}
+            className="hover:text-green-100 cursor-pointer">
+            DEALS TODAY
+          </li>
+          <li
+            onClick={() => router.push("/shop")}
+            className="hover:text-green-100 cursor-pointer">
+            SHOP
+          </li>
+          <li
+            onClick={() => router.push("/contact")}
+            className="hover:text-green-100 cursor-pointer">
+            CONTACT
+          </li>
+          <li
+            onClick={() => router.push("/bulk-order")}
+            className="hover:text-green-100 cursor-pointer">
+            BULK ORDER
+          </li>
+          <li className="ml-auto flex items-center gap-4 text-[10px] md:text-sm font-bold tracking-wider hidden sm:flex">
+            <a
+              href="tel:+918800145844"
+              className="flex items-center gap-2 hover:text-green-100 transition-colors group">
+              <PhoneCall
+                size={18}
+                className="group-hover:scale-110 transition-transform"
+              />
+              <span>Call +91 8800145844</span>
+            </a>
+            <span className="opacity-40 font-light px-1 min-h-full">|</span>
+            <div className="flex items-center gap-4">
+              <a
+                href="https://facebook.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-green-100 transition-colors">
+                <Facebook size={20} />
+              </a>
+              <a
+                href="https://instagram.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-green-100 transition-colors">
+                <Instagram size={20} />
+              </a>
             </div>
-
-            {/* Navigation Links */}
-            <nav className="border-t border-gray-100 hidden md:block">
-                <div className="container mx-auto px-4">
-                    <ul className="flex items-center gap-8 py-3 text-sm font-medium text-gray-600">
-                        <li><Link href="#" className="text-green-600">ALL DEPARTMENTS</Link></li>
-                        <li><Link href="/" className="hover:text-green-600">HOME</Link></li>
-                        <li><Link href="/aboutus" className="hover:text-green-600">ABOUT US</Link></li>
-                        <li><Link href="#" className="hover:text-green-600">COLLECTION</Link></li>
-                        <li><Link href="#" className="hover:text-green-600">SHOP</Link></li>
-                        <li><Link href="/contact" className="hover:text-green-600">CONTACT</Link></li>
-                    </ul>
-                </div>
-            </nav>
-        </header>
-    );
+          </li>
+        </ul>
+      </div>
+    </nav>
+  );
 }

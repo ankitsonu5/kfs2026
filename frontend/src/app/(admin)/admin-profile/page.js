@@ -21,9 +21,10 @@ export default function AdminProfile() {
   const fetchProfile = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:8080/adminprofile", {
-        headers: { Authorization: token },
-      });
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/adminprofile`,
+        { headers: { Authorization: token } },
+      );
       setAdmin(res.data.admin);
     } catch (err) {
       console.error("Profile fetch error:", err);
@@ -38,7 +39,7 @@ export default function AdminProfile() {
     try {
       const token = localStorage.getItem("token");
       const res = await axios.put(
-        "http://localhost:8080/adminprofile",
+        `${process.env.NEXT_PUBLIC_API_URL}/adminprofile`,
         { ...admin, password },
         { headers: { Authorization: token } },
       );

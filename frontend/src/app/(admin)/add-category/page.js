@@ -48,7 +48,7 @@ export default function AddCategory() {
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/add-category",
+        `${process.env.NEXT_PUBLIC_API_URL}/add-category`,
         formData,
         {
           headers: {

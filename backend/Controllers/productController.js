@@ -2,17 +2,39 @@ const Product = require("../models/Products");
 
 exports.addProducts = async (req, res) => {
   try {
-    const { title, price, description, category, stock } = req.body;
+    const {
+      title,
+      price,
+      description,
+      category,
+      stock,
+      isTopSellingProducts,
+      isDealsOfDay,
+      isRice,
+      isAttaAndFlour,
+      isDryFruites,
+      isDalAndPulses,
+      isMasala,
+      isNamkeenAndSnacks,
+    } = req.body;
 
-    const image = req.file ? req.file.filename : "";
+    const images = req.files ? req.files.map((file) => file.filename) : [];
 
     const product = new Product({
       title,
       price,
       description,
-      image,
+      images,
       category,
       stock,
+      isTopSellingProducts,
+      isDealsOfDay,
+      isRice,
+      isAttaAndFlour,
+      isDryFruites,
+      isDalAndPulses,
+      isMasala,
+      isNamkeenAndSnacks,
     });
 
     await product.save();
@@ -48,11 +70,39 @@ exports.getProductById = async (req, res) => {
 
 exports.updateProduct = async (req, res) => {
   try {
-    const { title, price, description, category, stock } = req.body;
-    const updateData = { title, price, description, category, stock };
+    const {
+      title,
+      price,
+      description,
+      category,
+      stock,
+      isTopSellingProducts,
+      isDealsOfDay,
+      isRice,
+      isAttaAndFlour,
+      isDryFruites,
+      isDalAndPulses,
+      isMasala,
+      isNamkeenAndSnacks,
+    } = req.body;
+    const updateData = {
+      title,
+      price,
+      description,
+      category,
+      stock,
+      isTopSellingProducts,
+      isDealsOfDay,
+      isRice,
+      isAttaAndFlour,
+      isDryFruites,
+      isDalAndPulses,
+      isMasala,
+      isNamkeenAndSnacks,
+    };
 
-    if (req.file) {
-      updateData.image = req.file.filename;
+    if (req.files && req.files.length > 0) {
+      updateData.images = req.files.map((file) => file.filename);
     }
 
     const product = await Product.findByIdAndUpdate(req.params.id, updateData, {
@@ -77,4 +127,3 @@ exports.deleteProduct = async (req, res) => {
     res.status(500).json({ message: "Error" });
   }
 };
-

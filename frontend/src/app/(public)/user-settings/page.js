@@ -36,9 +36,12 @@ export default function UserSettings() {
           router.push("/login");
           return;
         }
-        const res = await axios.get("http://localhost:8080/user-settings", {
-          headers: { Authorization: token },
-        });
+        const res = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_URL}/user-settings`,
+          {
+            headers: { Authorization: token },
+          },
+        );
         if (res.data.settings) {
           setSettings({
             phone: res.data.settings.phone || "",
@@ -62,7 +65,7 @@ export default function UserSettings() {
     try {
       const token = localStorage.getItem("token");
       const res = await axios.put(
-        "http://localhost:8080/user-settings",
+        `${process.env.NEXT_PUBLIC_API_URL}/user-settings`,
         settings,
         { headers: { Authorization: token } },
       );
@@ -80,7 +83,7 @@ export default function UserSettings() {
     try {
       const token = localStorage.getItem("token");
       const res = await axios.put(
-        "http://localhost:8080/change-password",
+        `${process.env.NEXT_PUBLIC_API_URL}/change-password`,
         { password },
         { headers: { Authorization: token } },
       );
@@ -100,9 +103,12 @@ export default function UserSettings() {
       return;
     try {
       const token = localStorage.getItem("token");
-      await axios.delete("http://localhost:8080/delete-account", {
-        headers: { Authorization: token },
-      });
+      await axios.delete(
+        `${process.env.NEXT_PUBLIC_API_URL}/delete-account`,
+        {
+          headers: { Authorization: token },
+        },
+      );
       localStorage.removeItem("token");
       alert("Account deleted. Sorry to see you go!");
       router.push("/");

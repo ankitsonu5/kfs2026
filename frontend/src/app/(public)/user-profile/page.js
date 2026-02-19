@@ -27,9 +27,12 @@ export default function UserProfile() {
           router.push("/login");
           return;
         }
-        const res = await axios.get("http://localhost:8080/profile", {
-          headers: { Authorization: token },
-        });
+        const res = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_URL}/profile`,
+          {
+            headers: { Authorization: token },
+          },
+        );
         setUser(res.data.user);
         setForm({
           fullName: res.data.user.fullName,
@@ -45,9 +48,11 @@ export default function UserProfile() {
   const handleUpdate = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.put("http://localhost:8080/profile", form, {
-        headers: { Authorization: token },
-      });
+      const res = await axios.put(
+        `${process.env.NEXT_PUBLIC_API_URL}/profile`,
+        form,
+        { headers: { Authorization: token } },
+      );
       alert(res.data.message);
       setUser({ ...user, ...form });
       setEditing(false);
