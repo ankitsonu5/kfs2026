@@ -30,9 +30,6 @@ export default function AdminDashboard() {
   const [open, setOpen] = useState(false);
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [banners, setBanners] = useState([]); // New state for banners
-  const [bannerFile, setBannerFile] = useState(null); // New state for banner upload
-  const [bannerTitle, setBannerTitle] = useState(""); // New state for banner title
 
   const [openMenuId, setOpenMenuId] = useState(null);
   const [masterSetupOpen, setMasterSetupOpen] = useState(false);
@@ -158,59 +155,6 @@ export default function AdminDashboard() {
     };
     fetchUsers();
   }, [active]);
-
-  // Fetch Banners
-  useEffect(() => {
-    const fetchBanners = async () => {
-      try {
-        const res = await axios.get("http://localhost:8080/api/banners");
-        setBanners(res.data);
-      } catch (error) {
-        console.log("Error fetching banners:", error);
-      }
-    };
-    fetchBanners();
-  }, []);
-
-  const handleUploadBanner = async (e) => {
-    e.preventDefault();
-    if (!bannerFile) return alert("Please select an image");
-
-    const formData = new FormData();
-    formData.append("image", bannerFile);
-    formData.append("title", bannerTitle);
-
-    try {
-      const token = localStorage.getItem("token");
-      const res = await axios.post("http://localhost:8080/api/banners", formData, {
-        headers: {
-          Authorization: token,
-          "Content-Type": "multipart/form-data",
-        },
-      });
-      setBanners([res.data, ...banners]);
-      setBannerFile(null);
-      setBannerTitle("");
-      alert("Banner uploaded successfully");
-    } catch (error) {
-      console.error(error);
-      alert("Failed to upload banner");
-    }
-  };
-
-  const handleDeleteBanner = async (id) => {
-    if (!confirm("Delete this banner?")) return;
-    try {
-      const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:8080/api/banners/${id}`, {
-        headers: { Authorization: token },
-      });
-      setBanners(banners.filter((b) => b._id !== id));
-    } catch (error) {
-      console.error(error);
-      alert("Failed to delete banner");
-    }
-  };
 
   const handleDeleteUser = async (id) => {
     if (
@@ -682,10 +626,10 @@ export default function AdminDashboard() {
                       <td className="py-3 text-right hidden sm:table-cell">
                         <span
                           className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${o.orderStatus === "Delivered"
-                              ? "text-green-400 bg-green-400/10"
-                              : o.orderStatus === "Cancelled"
-                                ? "text-red-400 bg-red-400/10"
-                                : "text-yellow-400 bg-yellow-400/10"
+                            ? "text-green-400 bg-green-400/10"
+                            : o.orderStatus === "Cancelled"
+                              ? "text-red-400 bg-red-400/10"
+                              : "text-yellow-400 bg-yellow-400/10"
                             }`}>
                           {o.orderStatus}
                         </span>
@@ -772,13 +716,12 @@ export default function AdminDashboard() {
                           </td>
                           <td className="py-4 px-6 text-center hidden sm:table-cell">
                             <span
-                              className={`px-3 py-1 rounded-full text-[10px] font-bold ${
-                                product.stock > 10
-                                  ? "bg-green-500/10 text-green-500"
-                                  : product.stock > 0
-                                    ? "bg-yellow-500/10 text-yellow-500"
-                                    : "bg-red-500/10 text-red-500"
-                              }`}>
+                              className={`px-3 py-1 rounded-full text-[10px] font-bold ${product.stock > 10
+                                ? "bg-green-500/10 text-green-500"
+                                : product.stock > 0
+                                  ? "bg-yellow-500/10 text-yellow-500"
+                                  : "bg-red-500/10 text-red-500"
+                                }`}>
                               {product.stock > 0
                                 ? `${product.stock} IN STOCK`
                                 : "OUT OF STOCK"}
@@ -892,11 +835,10 @@ export default function AdminDashboard() {
                           </td>
                           <td className="py-4 px-6 text-center">
                             <span
-                              className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                                category.status === "active"
-                                  ? "bg-green-500/10 text-green-500"
-                                  : "bg-red-500/10 text-red-500"
-                              }`}>
+                              className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${category.status === "active"
+                                ? "bg-green-500/10 text-green-500"
+                                : "bg-red-500/10 text-red-500"
+                                }`}>
                               {category.status || "active"}
                             </span>
                           </td>
@@ -995,10 +937,10 @@ export default function AdminDashboard() {
                         <td className="py-4 px-4 text-right">
                           <span
                             className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${o.orderStatus === "Delivered"
-                                ? "bg-green-400/20 text-green-400"
-                                : o.orderStatus === "Cancelled"
-                                  ? "bg-red-400/20 text-red-400"
-                                  : "bg-blue-400/20 text-blue-400"
+                              ? "bg-green-400/20 text-green-400"
+                              : o.orderStatus === "Cancelled"
+                                ? "bg-red-400/20 text-red-400"
+                                : "bg-blue-400/20 text-blue-400"
                               }`}>
                             {o.orderStatus}
                           </span>
@@ -1314,60 +1256,6 @@ export default function AdminDashboard() {
                   )}
                 </tbody>
               </table>
-            </div>
-          </Section>
-        )}
-
-        {active === "banners" && (
-          <Section title="Manage Banners">
-            <div className="mb-8 p-4 bg-[#1f2937] rounded-lg border border-gray-700">
-              <h4 className="text-lg font-medium mb-4">Upload New Banner</h4>
-              <form onSubmit={handleUploadBanner} className="flex flex-col gap-4 max-w-md">
-                <input
-                  type="text"
-                  placeholder="Banner Title (Optional)"
-                  value={bannerTitle}
-                  onChange={(e) => setBannerTitle(e.target.value)}
-                  className="px-4 py-2 bg-[#111827] border border-gray-600 rounded text-white focus:outline-none focus:border-blue-500"
-                />
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => setBannerFile(e.target.files[0])}
-                  className="text-gray-300"
-                />
-                <button
-                  type="submit"
-                  className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition-colors w-fit"
-                >
-                  Upload Banner
-                </button>
-              </form>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {banners.map((banner) => (
-                <div key={banner._id} className="relative group bg-[#111827] border border-gray-700 rounded-lg overflow-hidden">
-                  <img
-                    src={`http://localhost:8080${banner.image}`}
-                    alt={banner.title || "Banner"}
-                    className="w-full h-48 object-cover"
-                  />
-                  <div className="p-4">
-                    <h5 className="font-medium text-white truncate">{banner.title || "Untitled Banner"}</h5>
-                  </div>
-                  <button
-                    onClick={() => handleDeleteBanner(banner._id)}
-                    className="absolute top-2 right-2 bg-red-600 hover:bg-red-700 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                    title="Delete Banner"
-                  >
-                    🗑️
-                  </button>
-                </div>
-              ))}
-              {banners.length === 0 && (
-                <p className="text-gray-500 col-span-full text-center py-8">No banners uploaded yet.</p>
-              )}
             </div>
           </Section>
         )}
