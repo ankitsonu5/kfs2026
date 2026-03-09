@@ -30,14 +30,11 @@ export default function AdminOrders() {
         return;
       }
 
-      const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/orders`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/orders`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
         },
-      );
+      });
 
       if (res.data.success) {
         setOrders(res.data.orders);
@@ -285,7 +282,7 @@ export default function AdminOrders() {
                             <div className="w-14 h-14 bg-white rounded-xl flex items-center justify-center overflow-hidden border border-[#334155]/50 flex-shrink-0 p-1 shadow-sm">
                               {item.image ? (
                                 <img
-                                  src={`http://localhost:8080/uploads/${item.image}`}
+                                  src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${item.image}`}
                                   alt={item.name}
                                   className="w-full h-full object-contain"
                                 />

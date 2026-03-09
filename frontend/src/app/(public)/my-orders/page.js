@@ -174,7 +174,7 @@ export default function MyOrders() {
                         <div className="w-16 h-16 bg-gray-50 rounded-xl flex items-center justify-center overflow-hidden border border-gray-100 flex-shrink-0">
                           {item.image ? (
                             <img
-                              src={`http://localhost:8080/uploads/${item.image}`}
+                              src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${item.image}`}
                               alt={item.name}
                               className="w-full h-full object-contain"
                             />

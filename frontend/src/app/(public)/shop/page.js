@@ -58,12 +58,9 @@ function ShopContent() {
           setCartItems(qtyMap);
           return;
         }
-        const res = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_URL}/cart`,
-          {
-            headers: { Authorization: token },
-          },
-        );
+        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/cart`, {
+          headers: { Authorization: token },
+        });
         if (res.data && res.data.items) {
           const qtyMap = {};
           res.data.items.forEach((item) => {
@@ -250,7 +247,7 @@ function ShopContent() {
                       className="h-52 flex items-center justify-center bg-gray-50 rounded-lg mb-4 overflow-hidden cursor-pointer">
                       {product.images && product.images.length > 0 ? (
                         <img
-                          src={`http://localhost:8080/uploads/${product.images[0]}`}
+                          src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${product.images[0]}`}
                           alt={product.title}
                           className="w-full h-full object-cover group-hover:scale-110 transition duration-500"
                         />
@@ -323,7 +320,7 @@ function ShopContent() {
                 <div className="w-16 h-16 bg-gray-50 rounded-lg overflow-hidden flex items-center justify-center">
                   {miniCart.product.image ? (
                     <img
-                      src={`http://localhost:8080/uploads/${miniCart.product.image}`}
+                      src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${miniCart.product.image}`}
                       alt={miniCart.product.title}
                       className="w-full h-full object-contain p-1"
                     />

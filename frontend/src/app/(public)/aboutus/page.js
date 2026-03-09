@@ -55,7 +55,7 @@ export default function RedesignPage() {
             </section>
 
             {/* Stats Section with Parallax/Background */}
-            <section className="relative py-24 bg-fixed bg-cover bg-center" style={{ backgroundImage: 'url("https://placehold.co/1920x600/111827/1f2937?text=Farm+Background")' }}>
+            <section className="relative py-24 bg-fixed bg-cover bg-center" style={{ backgroundImage: 'url("/aboutus/factsbg.webp")' }}>
                 <div className="absolute inset-0 bg-black/70"></div>
                 <div className="container mx-auto px-4 relative z-10 text-center">
                     <span className="text-green-400 font-semibold uppercase tracking-wide text-sm mb-2 block">Our Numbers</span>

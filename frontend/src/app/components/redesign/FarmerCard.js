@@ -5,7 +5,7 @@ export default function FarmerCard({ name, role, email }) {
         <div className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100">
             <div className="aspect-[4/3] bg-gray-200 relative overflow-hidden">
                 <img
-                    src={`https://placehold.co/400x300/e2e8f0/475569?text=${name.replace(' ', '+')}`}
+                    src="/aboutus/team-01.webp"
                     alt={name}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />

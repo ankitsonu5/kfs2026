@@ -36,12 +36,9 @@ export default function Checkout() {
           router.push("/login");
           return;
         }
-        const res = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_URL}/cart`,
-          {
-            headers: { Authorization: token },
-          },
-        );
+        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/cart`, {
+          headers: { Authorization: token },
+        });
         setCart(res.data);
         if (!res.data || res.data.items.length === 0) {
           alert("Cart is empty! Add items first.");
@@ -64,18 +61,12 @@ export default function Checkout() {
         if (!token) return;
 
         const [profileRes, settingsRes] = await Promise.all([
-          axios.get(
-            `${process.env.NEXT_PUBLIC_API_URL}/profile`,
-            {
-              headers: { Authorization: token },
-            },
-          ),
-          axios.get(
-            `${process.env.NEXT_PUBLIC_API_URL}/user-settings`,
-            {
-              headers: { Authorization: token },
-            },
-          ),
+          axios.get(`${process.env.NEXT_PUBLIC_API_URL}/profile`, {
+            headers: { Authorization: token },
+          }),
+          axios.get(`${process.env.NEXT_PUBLIC_API_URL}/user-settings`, {
+            headers: { Authorization: token },
+          }),
         ]);
 
         const user = profileRes.data.user;
@@ -349,7 +340,7 @@ export default function Checkout() {
                     <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0">
                       {item.image ? (
                         <img
-                          src={`http://localhost:8080/uploads/${item.image}`}
+                          src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${item.image}`}
                           alt={item.title}
                           className="w-full h-full object-cover"
                         />

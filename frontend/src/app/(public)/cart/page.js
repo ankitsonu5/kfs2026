@@ -40,12 +40,9 @@ export default function Cart() {
         setLoading(false);
         return;
       }
-      const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/cart`,
-        {
-          headers: { Authorization: token },
-        },
-      );
+      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/cart`, {
+        headers: { Authorization: token },
+      });
       setCart(res.data);
     } catch (error) {
       console.log("Cart fetch error:", error);
@@ -274,7 +271,7 @@ export default function Cart() {
                   <div className="w-20 h-20 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0">
                     {item.image ? (
                       <img
-                        src={`http://localhost:8080/uploads/${item.image}`}
+                        src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${item.image}`}
                         alt={item.title}
                         className="w-full h-full object-cover"
                       />

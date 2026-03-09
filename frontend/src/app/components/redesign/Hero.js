@@ -34,11 +34,13 @@ export default function Hero() {
                 {/* Image Content */}
                 <div className="flex-1 relative w-full h-[300px] lg:h-[500px]">
                     {/* Placeholder for Hero Image */}
-                    <div className="absolute inset-0 bg-gradient-to-tr from-green-50 to-orange-50 rounded-2xl overflow-hidden shadow-2xl">
-                        <img
-                            src="https://placehold.co/800x600/e2e8f0/1e293b?text=Fresh+Vegetables+Basket"
+                    <div className="absolute inset-0 bg-gradient-to-tr from-green-50 to-orange-50 overflow-hidden">
+                        <Image
+                            src="/aboutus/aboutsideimage.webp"
                             alt="Fresh Vegetables"
                             className="w-full h-full object-cover mix-blend-multiply opacity-90"
+                            width={250}
+                            height={250}
                         />
                     </div>
                     {/* Decorative Elements */}

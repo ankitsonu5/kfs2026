@@ -60,12 +60,9 @@ export default function GroceryRedesign() {
           setCartCount(total);
           return;
         }
-        const res = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_URL}/cart`,
-          {
-            headers: { Authorization: token },
-          },
-        );
+        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/cart`, {
+          headers: { Authorization: token },
+        });
         if (res.data && res.data.items) {
           const qtyMap = {};
           let total = 0;
@@ -338,9 +335,11 @@ export default function GroceryRedesign() {
           <div className="w-full h-full relative flex items-center transition-all duration-700">
             {/* Background Image with Overlay */}
             <div className="absolute inset-0 z-0">
-              <img
-                src={`http://localhost:8080/uploads/${banners[currentBannerIndex].image}`}
+              <Image
+                src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${banners[currentBannerIndex].image}`}
                 alt={banners[currentBannerIndex].title}
+                width={1920}
+                height={1080}
                 className="w-full h-full object-cover animate-in fade-in zoom-in duration-1000"
               />
               <div className="absolute inset-0 bg-gradient-to-r from-white/90 via-white/50 to-transparent"></div>
@@ -454,9 +453,11 @@ export default function GroceryRedesign() {
                   className="min-w-[150px] md:min-w-[200px] p-6 rounded-2xl bg-white border border-gray-50 flex flex-col items-center justify-center cursor-pointer hover:shadow-xl hover:border-green-100 transition transform hover:-translate-y-1 gap-3 snap-start">
                   <div className="w-16 h-16 md:w-24 md:h-24 flex items-center justify-center overflow-hidden mb-2">
                     {category.image ? (
-                      <img
-                        src={`http://localhost:8080/uploads/${category.image}`}
+                      <Image
+                        src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${category.image}`}
                         alt={category.name}
+                        width={200}
+                        height={200}
                         className="w-full h-full object-contain"
                       />
                     ) : (
@@ -509,9 +510,11 @@ export default function GroceryRedesign() {
                     onClick={() => router.push(`/product/${product._id}`)}
                     className="h-56 flex items-center justify-center bg-gray-50 rounded-lg mb-4 overflow-hidden cursor-pointer">
                     {product.images && product.images.length > 0 ? (
-                      <img
-                        src={`http://localhost:8080/uploads/${product.images[0]}`}
+                      <Image
+                        src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${product.images[0]}`}
                         alt={product.title}
+                        width={400}
+                        height={400}
                         className="w-full h-full object-cover group-hover:scale-110 transition duration-500"
                       />
                     ) : (
@@ -653,9 +656,11 @@ export default function GroceryRedesign() {
                     onClick={() => router.push(`/product/${product._id}`)}
                     className="h-48 flex items-center justify-center bg-gray-50 rounded-lg mb-4 overflow-hidden cursor-pointer">
                     {product.images && product.images.length > 0 ? (
-                      <img
-                        src={`http://localhost:8080/uploads/${product.images[0]}`}
+                      <Image
+                        src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${product.images[0]}`}
                         alt={product.title}
+                        width={400}
+                        height={400}
                         className="w-full h-full object-cover group-hover:scale-110 transition duration-500"
                       />
                     ) : (
@@ -722,9 +727,11 @@ export default function GroceryRedesign() {
                     onClick={() => router.push(`/product/${product._id}`)}
                     className="h-48 flex items-center justify-center bg-gray-50 rounded-lg mb-4 overflow-hidden cursor-pointer">
                     {product.images && product.images.length > 0 ? (
-                      <img
-                        src={`http://localhost:8080/uploads/${product.images[0]}`}
+                      <Image
+                        src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${product.images[0]}`}
                         alt={product.title}
+                        width={400}
+                        height={400}
                         className="w-full h-full object-cover group-hover:scale-110 transition duration-500"
                       />
                     ) : (
@@ -785,9 +792,11 @@ export default function GroceryRedesign() {
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-16 h-16 bg-gray-50 rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center">
                   {miniCart.product.image ? (
-                    <img
-                      src={`http://localhost:8080/uploads/${miniCart.product.image}`}
+                    <Image
+                      src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${miniCart.product.image}`}
                       alt={miniCart.product.title}
+                      width={100}
+                      height={100}
                       className="w-full h-full object-contain p-1"
                     />
                   ) : (

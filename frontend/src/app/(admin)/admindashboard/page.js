@@ -21,6 +21,7 @@ import {
   Image as ImageIcon,
 } from "lucide-react";
 import { AreaChart, Area, ResponsiveContainer, Tooltip, XAxis } from "recharts";
+import Image from "next/image";
 
 import axios from "axios";
 
@@ -30,9 +31,7 @@ export default function AdminDashboard() {
   const [open, setOpen] = useState(false);
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [banners, setBanners] = useState([]); // New state for banners
-  const [bannerFile, setBannerFile] = useState(null); // New state for banner upload
-  const [bannerTitle, setBannerTitle] = useState(""); // New state for banner title
+  const [banners, setBanners] = useState([]);
 
   const [openMenuId, setOpenMenuId] = useState(null);
   const [masterSetupOpen, setMasterSetupOpen] = useState(false);
@@ -48,7 +47,6 @@ export default function AdminDashboard() {
   });
   const [allUsers, setAllUsers] = useState([]);
   const [userSearchTerm, setUserSearchTerm] = useState("");
-  const [banners, setBanners] = useState([]);
   const [bannerForm, setBannerForm] = useState({
     title: "",
     subtitle: "",
@@ -83,12 +81,9 @@ export default function AdminDashboard() {
     try {
       const token = localStorage.getItem("token");
 
-      await axios.delete(
-        `${process.env.NEXT_PUBLIC_API_URL}/products/${id}`,
-        {
-          headers: { Authorization: token },
-        },
-      );
+      await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/products/${id}`, {
+        headers: { Authorization: token },
+      });
 
       setProducts(products.filter((p) => p._id !== id));
       alert("Product deleted");
@@ -159,50 +154,11 @@ export default function AdminDashboard() {
     fetchUsers();
   }, [active]);
 
-  // Fetch Banners
-  useEffect(() => {
-    const fetchBanners = async () => {
-      try {
-        const res = await axios.get("http://localhost:8080/api/banners");
-        setBanners(res.data);
-      } catch (error) {
-        console.log("Error fetching banners:", error);
-      }
-    };
-    fetchBanners();
-  }, []);
-
-  const handleUploadBanner = async (e) => {
-    e.preventDefault();
-    if (!bannerFile) return alert("Please select an image");
-
-    const formData = new FormData();
-    formData.append("image", bannerFile);
-    formData.append("title", bannerTitle);
-
-    try {
-      const token = localStorage.getItem("token");
-      const res = await axios.post("http://localhost:8080/api/banners", formData, {
-        headers: {
-          Authorization: token,
-          "Content-Type": "multipart/form-data",
-        },
-      });
-      setBanners([res.data, ...banners]);
-      setBannerFile(null);
-      setBannerTitle("");
-      alert("Banner uploaded successfully");
-    } catch (error) {
-      console.error(error);
-      alert("Failed to upload banner");
-    }
-  };
-
   const handleDeleteBanner = async (id) => {
     if (!confirm("Delete this banner?")) return;
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:8080/api/banners/${id}`, {
+      await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/banners/${id}`, {
         headers: { Authorization: token },
       });
       setBanners(banners.filter((b) => b._id !== id));
@@ -330,24 +286,6 @@ export default function AdminDashboard() {
     }
   };
 
-  const handleDeleteBanner = async (id) => {
-    if (!confirm("Are you sure you want to delete this banner?")) return;
-    const token = localStorage.getItem("token");
-    try {
-      await axios.delete(
-        `${process.env.NEXT_PUBLIC_API_URL}/banners/${id}`,
-        {
-          headers: { Authorization: token },
-        },
-      );
-      setBanners(banners.filter((b) => b._id !== id));
-      alert("Banner deleted");
-    } catch (error) {
-      console.log("Delete banner error:", error);
-      alert("Failed to delete banner");
-    }
-  };
-
   const handleToggleBanner = async (id) => {
     const token = localStorage.getItem("token");
     try {
@@ -430,8 +368,9 @@ export default function AdminDashboard() {
                   viewBox="0 0 20 20"
                   fill="currentColor"
                   aria-hidden="true"
-                  className={`ml-1 w-5 h-5 text-gray-400 transition-transform duration-200 ${masterSetupOpen ? "rotate-180" : ""
-                    }`}>
+                  className={`ml-1 w-5 h-5 text-gray-400 transition-transform duration-200 ${
+                    masterSetupOpen ? "rotate-180" : ""
+                  }`}>
                   <path
                     d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z"
                     clipRule="evenodd"
@@ -465,14 +404,6 @@ export default function AdminDashboard() {
                       setOpen(false);
                     }}>
                     <ImageIcon size={16} /> Banners
-                  </li>
-                  <li
-                    className="text-sm text-gray-300 hover:text-blue-400 cursor-pointer py-1"
-                    onClick={() => {
-                      setActive("banners"); // Switch to banners view
-                      setOpen(false);
-                    }}>
-                    🖼️ Banners
                   </li>
                   {/* <li
                     className="text-sm text-gray-300 hover:text-blue-400 cursor-pointer py-1"
@@ -681,12 +612,13 @@ export default function AdminDashboard() {
                       </td>
                       <td className="py-3 text-right hidden sm:table-cell">
                         <span
-                          className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${o.orderStatus === "Delivered"
+                          className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
+                            o.orderStatus === "Delivered"
                               ? "text-green-400 bg-green-400/10"
                               : o.orderStatus === "Cancelled"
                                 ? "text-red-400 bg-red-400/10"
                                 : "text-yellow-400 bg-yellow-400/10"
-                            }`}>
+                          }`}>
                           {o.orderStatus}
                         </span>
                       </td>
@@ -702,7 +634,7 @@ export default function AdminDashboard() {
           <Section title="Product Management">
             <div className="flex justify-between items-center mb-6">
               <p className="text-gray-400 text-sm">
-                Manage your store's inventory and products
+                Manage your store&apos;s inventory and products
               </p>
               <button
                 onClick={() => {
@@ -748,9 +680,11 @@ export default function AdminDashboard() {
                             <div className="flex items-center gap-4">
                               <div className="w-12 h-12 rounded-lg bg-gray-800 flex items-center justify-center overflow-hidden border border-gray-700 group-hover:border-blue-500/50 transition-colors">
                                 {product.images && product.images.length > 0 ? (
-                                  <img
-                                    src={`http://localhost:8080/uploads/${product.images[0]}`}
+                                  <Image
+                                    src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${product.images[0]}`}
                                     alt={product.title}
+                                    width={48}
+                                    height={48}
                                     className="w-full h-full object-cover"
                                   />
                                 ) : (
@@ -873,9 +807,11 @@ export default function AdminDashboard() {
                             <div className="flex items-center gap-4">
                               <div className="w-10 h-10 rounded-xl bg-gray-800 flex items-center justify-center overflow-hidden border border-gray-700 group-hover:border-emerald-500/50 transition-colors">
                                 {category.image ? (
-                                  <img
-                                    src={`http://localhost:8080/uploads/${category.image}`}
+                                  <Image
+                                    src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${category.image}`}
                                     alt={category.name}
+                                    width={40}
+                                    height={40}
                                     className="w-full h-full object-cover"
                                   />
                                 ) : (
@@ -994,12 +930,13 @@ export default function AdminDashboard() {
                         </td>
                         <td className="py-4 px-4 text-right">
                           <span
-                            className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${o.orderStatus === "Delivered"
+                            className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
+                              o.orderStatus === "Delivered"
                                 ? "bg-green-400/20 text-green-400"
                                 : o.orderStatus === "Cancelled"
                                   ? "bg-red-400/20 text-red-400"
                                   : "bg-blue-400/20 text-blue-400"
-                              }`}>
+                            }`}>
                             {o.orderStatus}
                           </span>
                         </td>
@@ -1153,9 +1090,10 @@ export default function AdminDashboard() {
                     key={banner._id}
                     className="bg-[#111827] border border-gray-700 rounded-2xl overflow-hidden group hover:border-blue-500 transition-all shadow-xl">
                     <div className="relative h-40 bg-gray-900 border-b border-gray-800 flex items-center justify-center overflow-hidden">
-                      <img
-                        src={`http://localhost:8080/uploads/${banner.image}`}
+                      <Image
+                        src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${banner.image}`}
                         alt={banner.title}
+                        fill
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
                       <div className="absolute top-3 right-3 flex gap-2">
@@ -1314,60 +1252,6 @@ export default function AdminDashboard() {
                   )}
                 </tbody>
               </table>
-            </div>
-          </Section>
-        )}
-
-        {active === "banners" && (
-          <Section title="Manage Banners">
-            <div className="mb-8 p-4 bg-[#1f2937] rounded-lg border border-gray-700">
-              <h4 className="text-lg font-medium mb-4">Upload New Banner</h4>
-              <form onSubmit={handleUploadBanner} className="flex flex-col gap-4 max-w-md">
-                <input
-                  type="text"
-                  placeholder="Banner Title (Optional)"
-                  value={bannerTitle}
-                  onChange={(e) => setBannerTitle(e.target.value)}
-                  className="px-4 py-2 bg-[#111827] border border-gray-600 rounded text-white focus:outline-none focus:border-blue-500"
-                />
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => setBannerFile(e.target.files[0])}
-                  className="text-gray-300"
-                />
-                <button
-                  type="submit"
-                  className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition-colors w-fit"
-                >
-                  Upload Banner
-                </button>
-              </form>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {banners.map((banner) => (
-                <div key={banner._id} className="relative group bg-[#111827] border border-gray-700 rounded-lg overflow-hidden">
-                  <img
-                    src={`http://localhost:8080${banner.image}`}
-                    alt={banner.title || "Banner"}
-                    className="w-full h-48 object-cover"
-                  />
-                  <div className="p-4">
-                    <h5 className="font-medium text-white truncate">{banner.title || "Untitled Banner"}</h5>
-                  </div>
-                  <button
-                    onClick={() => handleDeleteBanner(banner._id)}
-                    className="absolute top-2 right-2 bg-red-600 hover:bg-red-700 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                    title="Delete Banner"
-                  >
-                    🗑️
-                  </button>
-                </div>
-              ))}
-              {banners.length === 0 && (
-                <p className="text-gray-500 col-span-full text-center py-8">No banners uploaded yet.</p>
-              )}
             </div>
           </Section>
         )}

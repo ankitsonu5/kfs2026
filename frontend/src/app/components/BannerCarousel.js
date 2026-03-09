@@ -66,7 +66,7 @@ export default function BannerCarousel({ fallback = null }) {
     useEffect(() => {
         const fetchBanners = async () => {
             try {
-                const res = await axios.get("http://localhost:8080/api/banners", {
+                const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/banners`, {
                     validateStatus: function (status) {
                         return status >= 200 && status < 600; // Resolve even on 500
                     }
@@ -95,7 +95,7 @@ export default function BannerCarousel({ fallback = null }) {
                     {displayBanners.map((banner) => (
                         <div className="relative flex-[0_0_100%] min-w-0 h-[250px] sm:h-[350px] md:h-[450px]" key={banner._id}>
                             <img
-                                src={banner.isDefault ? banner.image : `http://localhost:8080${banner.image}`}
+                                src={banner.isDefault ? banner.image : `${process.env.NEXT_PUBLIC_API_URL}${banner.image}`}
                                 alt={banner.title || "Banner"}
                                 className="w-full h-full object-cover"
                             />

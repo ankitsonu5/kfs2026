@@ -158,8 +158,8 @@ export default function WishlistPage() {
               Your Wishlist is Empty
             </h2>
             <p className="text-gray-500 mb-8 max-w-sm mx-auto">
-              You haven't added any products to your wishlist yet. Explore our
-              products and save your favorites!
+              You haven&apos;t added any products to your wishlist yet. Explore
+              our products and save your favorites!
             </p>
             <button
               onClick={() => router.push("/")}
@@ -177,7 +177,7 @@ export default function WishlistPage() {
                   onClick={() => router.push(`/product/${item.productId}`)}
                   className="h-48 bg-gray-50 relative flex items-center justify-center p-4 cursor-pointer overflow-hidden">
                   <img
-                    src={`http://localhost:8080/uploads/${item.image}`}
+                    src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${item.image}`}
                     alt={item.title}
                     className="w-full h-full object-contain group-hover:scale-105 transition duration-500"
                   />
