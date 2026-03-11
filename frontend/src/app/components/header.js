@@ -57,7 +57,7 @@ export default function Header({ cartCount }) {
 
   return (
     <>
-      <header className="sticky top-0 z-50 bg-white shadow-sm md:h-20 flex items-center py-3 md:py-0">
+      <header className="sticky top-0 z-[60] bg-white shadow-sm h-16 md:h-20 flex items-center py-0">
         <div className="container mx-auto px-4 flex items-center justify-between gap-x-8 md:gap-x-4">
           {/* Logo - Left on Desktop, Left on Mobile */}
           <div className="flex-shrink-0 md:flex-1 md:order-1">
@@ -115,7 +115,7 @@ export default function Header({ cartCount }) {
                   </button>
 
                   {profileOpen && (
-                    <div className="absolute right-0 top-12 w-44 bg-white border border-gray-200 rounded-lg shadow-xl z-50 overflow-hidden">
+                    <div className="absolute right-0 top-12 w-44 bg-white border border-gray-200 rounded-lg shadow-xl z-[70] overflow-hidden">
                       <button
                         onClick={() => {
                           router.push("/user-profile");

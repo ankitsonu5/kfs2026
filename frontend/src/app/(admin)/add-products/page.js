@@ -16,7 +16,6 @@ import {
 } from "lucide-react";
 
 export default function AddProducts() {
-  const [isMounted, setIsMounted] = useState(false);
   const [previews, setPreviews] = useState([]);
   const [imageFiles, setImageFiles] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -38,7 +37,6 @@ export default function AddProducts() {
   });
 
   useEffect(() => {
-    setIsMounted(true);
     const fetchCategories = async () => {
       try {
         const token = localStorage.getItem("token");
@@ -146,7 +144,7 @@ export default function AddProducts() {
       <div className="max-w-4xl w-full bg-[#111827]/80 backdrop-blur-xl border border-gray-700/50 rounded-3xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
         <div className="md:flex">
           {/* Sidebar Info */}
-          <div className="md:w-1/3 bg-gradient-to-br from-blue-600/20 to-purple-600/20 p-8 border-r border-gray-700/50 flex flex-col justify-between">
+          <div className="md:w-1/3 bg-gradient-to-br from-blue-600/20 to-purple-600/20 p-6 md:p-8 border-r border-gray-700/50 flex flex-col justify-between">
             <div>
               <button
                 onClick={() => router.push("/admindashboard")}
@@ -175,7 +173,7 @@ export default function AddProducts() {
           </div>
 
           {/* Form Content */}
-          <div className="md:w-2/3 p-8">
+          <div className="md:w-2/3 p-5 md:p-8">
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
@@ -265,7 +263,7 @@ export default function AddProducts() {
               </div>
 
               {/* Homepage Section Flags */}
-              <div className="space-y-4 bg-[#1f2937]/30 p-6 rounded-2xl border border-gray-700/50">
+              <div className="space-y-4 bg-[#1f2937]/30 p-4 md:p-6 rounded-2xl border border-gray-700/50">
                 <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-2">
                   Display Settings (Homepage)
                 </h3>

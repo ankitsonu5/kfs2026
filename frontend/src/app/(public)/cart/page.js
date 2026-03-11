@@ -13,6 +13,10 @@ import {
   Trash2,
   Lock,
 } from "lucide-react";
+import Image from "next/image";
+import Header from "../../components/header";
+import Navbar from "../../components/redesign/Navbar";
+import Footer from "../../components/redesign/Footer";
 
 export default function Cart() {
   const router = useRouter();
@@ -217,28 +221,10 @@ export default function Cart() {
   }
 
   return (
+    <>
+    <Header />
+    <Navbar />
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => router.back()}
-              className="text-gray-500 hover:text-green-600 transition p-2 hover:bg-gray-100 rounded-full cursor-pointer">
-              <ArrowLeft className="w-6 h-6" />
-            </button>
-            <div className="flex items-center gap-2">
-              <ShoppingCart className="w-6 h-6 text-green-600" />
-              <h1 className="text-2xl font-bold text-gray-800">My Cart</h1>
-            </div>
-          </div>
-          <button
-            onClick={() => router.push("/")}
-            className="text-green-600 font-semibold hover:underline flex items-center gap-2 cursor-pointer">
-            Continue Shopping <MoveRight className="w-4 h-4" />
-          </button>
-        </div>
-      </header>
-
       <div className="container mx-auto px-4 py-8">
         {cart.items.length === 0 ? (
           <div className="text-center py-20 flex flex-col items-center">
@@ -270,9 +256,11 @@ export default function Cart() {
                   className="bg-white rounded-xl border border-gray-200 p-4 flex items-center gap-4 hover:shadow-md transition">
                   <div className="w-20 h-20 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0">
                     {item.image ? (
-                      <img
+                      <Image
                         src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${item.image}`}
                         alt={item.title}
+                        width={100}
+                        height={100}
                         className="w-full h-full object-cover"
                       />
                     ) : (
@@ -321,7 +309,7 @@ export default function Cart() {
             </div>
 
             <div className="lg:col-span-1">
-              <div className="bg-white rounded-xl border border-gray-200 p-6 sticky top-24">
+              <div className="bg-white rounded-xl border border-gray-200 p-6 sticky top-[80px] md:top-[140px]">
                 <h3 className="text-lg font-bold text-gray-800 mb-4">
                   Order Summary
                 </h3>
@@ -356,5 +344,7 @@ export default function Cart() {
         )}
       </div>
     </div>
+    <Footer />
+    </>
   );
 }

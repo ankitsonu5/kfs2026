@@ -177,7 +177,7 @@ export default function AdminOrders() {
                 key={o._id}
                 className="bg-[#1e293b] rounded-3xl border border-[#334155] overflow-hidden hover:border-blue-500/30 transition group shadow-xl">
                 {/* Order Meta Header */}
-                <div className="bg-[#334155]/20 px-6 py-5 flex flex-wrap justify-between items-center gap-4 border-b border-[#334155]/50">
+                <div className="bg-[#334155]/20 px-4 md:px-6 py-3 md:py-5 flex flex-wrap justify-between items-center gap-4 border-b border-[#334155]/50">
                   <div className="flex items-center gap-4">
                     <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-400 font-bold border border-blue-500/20">
                       {o.userId?.fullName?.charAt(0) || "U"}
@@ -192,8 +192,8 @@ export default function AdminOrders() {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-6">
-                    <div className="text-right hidden sm:block">
+                  <div className="flex items-center gap-3 md:gap-6">
+                    <div className="text-right hidden md:block">
                       <p className="text-xs text-gray-500 font-bold uppercase tracking-wider">
                         Created At
                       </p>
@@ -201,11 +201,11 @@ export default function AdminOrders() {
                         {new Date(o.createdAt).toLocaleString()}
                       </p>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2 md:gap-3">
                       <select
                         onChange={(e) => updateStatus(o._id, e.target.value)}
                         value={o.orderStatus}
-                        className={`px-4 py-2 rounded-xl text-sm font-bold border transition cursor-pointer focus:outline-none ${
+                        className={`px-2 md:px-4 py-1.5 md:py-2 rounded-xl text-[11px] md:text-sm font-bold border transition cursor-pointer focus:outline-none ${
                           o.orderStatus === "Delivered"
                             ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
                             : o.orderStatus === "Cancelled"
@@ -223,15 +223,15 @@ export default function AdminOrders() {
                       </select>
                       <button
                         onClick={() => handleDelete(o._id)}
-                        className="p-2 rounded-xl bg-rose-500/10 text-rose-500 border border-rose-500/30 hover:bg-rose-500 hover:text-white transition cursor-pointer"
+                        className="p-1.5 md:p-2 rounded-xl bg-rose-500/10 text-rose-500 border border-rose-500/30 hover:bg-rose-500 hover:text-white transition cursor-pointer"
                         title="Delete Order">
-                        <Trash2 size={16} />
+                        <Trash2 size={14} className="md:w-4 md:h-4" />
                       </button>
                     </div>
                   </div>
                 </div>
 
-                <div className="p-6">
+                <div className="p-4 md:p-6">
                   <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 font-extrabold">
                     {/* User & Shipping */}
                     <div className="lg:col-span-4 space-y-6">
@@ -323,10 +323,10 @@ export default function AdminOrders() {
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="text-xs text-gray-500 font-bold uppercase tracking-[0.1em] mb-1">
+                        <p className="text-[10px] text-gray-500 font-bold uppercase tracking-[0.1em] mb-1">
                           Total Order Value
                         </p>
-                        <p className="text-3xl font-black text-emerald-400">
+                        <p className="text-xl md:text-3xl font-black text-emerald-400">
                           ₹{o.totalAmount?.toLocaleString("en-IN")}
                         </p>
                       </div>

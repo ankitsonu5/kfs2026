@@ -13,9 +13,51 @@ import {
   Search,
   ArrowLeft,
   Minus,
+  ArrowUpDown,
+  Check,
 } from "lucide-react";
+import Image from "next/image";
 import Header from "../../components/header";
+import Navbar from "../../components/redesign/Navbar";
 import Footer from "../../components/redesign/Footer";
+
+const SidebarContent = ({ categories, categoryFilter, flagFilter, router, setIsSidebarOpen }) => (
+  <div className="bg-white p-6 md:rounded-2xl md:shadow-sm md:border md:border-gray-100 h-full overflow-y-auto">
+    <div className="flex items-center justify-between mb-6 md:mb-4">
+      <h3 className="font-bold text-gray-800 flex items-center gap-2 text-lg md:text-base">
+        <Filter className="w-5 h-5 md:w-4 md:h-4 text-green-600" />
+        Categories
+      </h3>
+      <button 
+        onClick={() => setIsSidebarOpen(false)}
+        className="md:hidden p-2 hover:bg-gray-100 rounded-full"
+      >
+        <X className="w-6 h-6 text-gray-400" />
+      </button>
+    </div>
+    <ul className="space-y-1">
+      <li
+        className={`text-sm cursor-pointer hover:bg-green-50 px-3 py-2.5 rounded-xl transition-all ${!categoryFilter && !flagFilter ? "bg-green-50 text-green-600 font-bold" : "text-gray-600 font-medium"}`}
+        onClick={() => {
+          router.push("/shop");
+          setIsSidebarOpen(false);
+        }}>
+        All Categories
+      </li>
+      {categories.map((cat) => (
+        <li
+          key={cat._id}
+          className={`text-sm cursor-pointer hover:bg-green-50 px-3 py-2.5 rounded-xl transition-all ${categoryFilter === cat.name ? "bg-green-50 text-green-600 font-bold" : "text-gray-600 font-medium"}`}
+          onClick={() => {
+            router.push(`/shop?category=${cat.name}`);
+            setIsSidebarOpen(false);
+          }}>
+          {cat.name}
+        </li>
+      ))}
+    </ul>
+  </div>
+);
 
 function ShopContent() {
   const searchParams = useSearchParams();
@@ -28,6 +70,11 @@ function ShopContent() {
   const [categories, setCategories] = useState([]);
   const [cartItems, setCartItems] = useState({});
   const [miniCart, setMiniCart] = useState(null);
+  
+  // New States for mobile UI and Sorting
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isSortOpen, setIsSortOpen] = useState(false);
+  const [sortOption, setSortOption] = useState("newest");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -75,9 +122,17 @@ function ShopContent() {
     fetchCart();
   }, []);
 
-  const getFilteredProducts = () => {
-    let filtered = products;
+  const getFilteredAndSortedProducts = () => {
+    let filtered = [...products];
 
+    // Search Filter
+    if (searchQuery) {
+      filtered = filtered.filter((p) =>
+        p.title.toLowerCase().includes(searchQuery.toLowerCase()),
+      );
+    }
+
+    // Category Filter
     if (categoryFilter) {
       const category = categories.find(
         (c) => c.name.toLowerCase() === categoryFilter.toLowerCase(),
@@ -85,24 +140,39 @@ function ShopContent() {
       if (category) {
         filtered = filtered.filter((p) => p.category.includes(category._id));
       } else {
-        return [];
+        filtered = [];
       }
     }
 
+    // Flag Filter
     if (flagFilter) {
       filtered = filtered.filter((p) => p[flagFilter] === true);
     }
 
-    if (searchQuery) {
-      filtered = filtered.filter((p) =>
-        p.title.toLowerCase().includes(searchQuery.toLowerCase()),
-      );
+    // Sorting Logic
+    switch (sortOption) {
+      case "price-low":
+        filtered.sort((a, b) => a.price - b.price);
+        break;
+      case "price-high":
+        filtered.sort((a, b) => b.price - a.price);
+        break;
+      case "name-az":
+        filtered.sort((a, b) => a.title.localeCompare(b.title));
+        break;
+      case "name-za":
+        filtered.sort((a, b) => b.title.localeCompare(a.title));
+        break;
+      case "newest":
+      default:
+        filtered.reverse();
+        break;
     }
 
     return filtered;
   };
 
-  const filteredProducts = getFilteredProducts();
+  const filteredProducts = getFilteredAndSortedProducts();
 
   const getPageTitle = () => {
     if (searchQuery) return `Search Results for "${searchQuery}"`;
@@ -183,93 +253,132 @@ function ShopContent() {
     }
   };
 
+  const sortOptions = [
+    { label: "Newest Arrivals", value: "newest" },
+    { label: "Price: Low to High", value: "price-low" },
+    { label: "Price: High to Low", value: "price-high" },
+    { label: "Name: A to Z", value: "name-az" },
+    { label: "Name: Z to A", value: "name-za" },
+  ];
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <Header cartCount={Object.values(cartItems).reduce((a, b) => a + b, 0)} />
+      <Navbar />
 
-      <main className="flex-1 container mx-auto px-4 py-8">
-        {/* Breadcrumbs */}
-        <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">
-          <span
-            className="hover:text-green-600 cursor-pointer"
-            onClick={() => router.push("/")}>
-            Home
-          </span>
-          <ChevronRight className="w-4 h-4" />
-          <span className="font-semibold text-green-600">{getPageTitle()}</span>
+      <main className="flex-1 container mx-auto px-4 py-4 md:py-8">
+        {/* Mobile Filter & Sort Bar */}
+        <div className="md:hidden flex gap-3 mb-6 sticky top-[68px] z-40 bg-gray-50/90 backdrop-blur-md py-3 mt-[-4px]">
+          <button 
+            onClick={() => setIsSidebarOpen(true)}
+            className="flex-1 flex items-center justify-center gap-2 bg-white border border-gray-100 py-3 rounded-2xl text-sm font-bold text-gray-800 shadow-sm active:scale-95 transition-all"
+          >
+            <Filter className="w-4 h-4 text-green-600" />
+            Filter
+          </button>
+          <button 
+            onClick={() => setIsSortOpen(true)}
+            className="flex-1 flex items-center justify-center gap-2 bg-white border border-gray-100 py-3 rounded-2xl text-sm font-bold text-gray-800 shadow-sm active:scale-95 transition-all"
+          >
+            <ArrowUpDown className="w-4 h-4 text-green-600" />
+            Sort
+          </button>
         </div>
 
         <div className="flex flex-col md:flex-row gap-8">
-          {/* Sidebar / Filters (Placeholder) */}
-          <aside className="w-full md:w-64 space-y-8">
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-              <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
-                <Filter className="w-4 h-4 text-green-600" />
-                Categories
-              </h3>
-              <ul className="space-y-2">
-                <li
-                  className={`text-sm cursor-pointer hover:text-green-600 transition-colors ${!categoryFilter && !flagFilter ? "text-green-600 font-bold" : "text-gray-600"}`}
-                  onClick={() => router.push("/shop")}>
-                  All Categories
-                </li>
-                {categories.map((cat) => (
-                  <li
-                    key={cat._id}
-                    className={`text-sm cursor-pointer hover:text-green-600 transition-colors ${categoryFilter === cat.name ? "text-green-600 font-bold" : "text-gray-600"}`}
-                    onClick={() => router.push(`/shop?category=${cat.name}`)}>
-                    {cat.name}
-                  </li>
-                ))}
-              </ul>
-            </div>
+          {/* Desktop Sidebar */}
+          <aside className="hidden md:block w-64 space-y-8">
+            <SidebarContent 
+              categories={categories} 
+              categoryFilter={categoryFilter}
+              flagFilter={flagFilter}
+              router={router}
+              setIsSidebarOpen={setIsSidebarOpen}
+            />
           </aside>
 
-          {/* Product Grid */}
+          {/* Mobile Sidebar Overlay */}
+          {isSidebarOpen && (
+            <div className="fixed inset-0 z-[120] md:hidden">
+              <div 
+                className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+                onClick={() => setIsSidebarOpen(false)}
+              />
+              <div className="absolute left-0 top-0 bottom-0 w-[80%] max-w-[300px] animate-in slide-in-from-left duration-300">
+                <SidebarContent 
+                  categories={categories} 
+                  categoryFilter={categoryFilter}
+                  flagFilter={flagFilter}
+                  router={router}
+                  setIsSidebarOpen={setIsSidebarOpen}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Product Grid Area */}
           <div className="flex-1">
             <div className="flex justify-between items-center mb-6">
-              <h1 className="text-2xl font-bold text-gray-800">
-                {getPageTitle()}
-              </h1>
-              <span className="text-sm text-gray-500">
-                {filteredProducts.length} items found
-              </span>
+              <div>
+                <h1 className="text-xl md:text-2xl font-bold text-gray-800">
+                  {getPageTitle()}
+                </h1>
+                <p className="text-xs md:text-sm text-gray-500 mt-1">
+                  {filteredProducts.length} items found
+                </p>
+              </div>
+              
+              {/* Desktop Sort Dropdown */}
+              <div className="hidden md:flex items-center gap-3">
+                <span className="text-sm text-gray-500 font-medium">Sort by:</span>
+                <select 
+                  value={sortOption}
+                  onChange={(e) => setSortOption(e.target.value)}
+                  className="bg-white border border-gray-100 rounded-xl px-4 py-2 text-sm font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-green-500 shadow-sm cursor-pointer"
+                >
+                  {sortOptions.map(opt => (
+                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                  ))}
+                </select>
+              </div>
             </div>
 
             {filteredProducts.length > 0 ? (
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
                 {filteredProducts.map((product) => (
                   <div
                     key={product._id}
-                    className="bg-white border border-gray-100 rounded-xl p-4 hover:shadow-lg transition group relative">
+                    className="bg-white border border-gray-100 rounded-3xl p-3 md:p-4 hover:shadow-xl transition-all group relative animate-in fade-in zoom-in duration-300">
                     <div
                       onClick={() => router.push(`/product/${product._id}`)}
-                      className="h-52 flex items-center justify-center bg-gray-50 rounded-lg mb-4 overflow-hidden cursor-pointer">
+                      className="aspect-square flex items-center justify-center bg-gray-50 rounded-2xl mb-4 overflow-hidden cursor-pointer relative">
                       {product.images && product.images.length > 0 ? (
-                        <img
+                        <Image
                           src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${product.images[0]}`}
                           alt={product.title}
                           className="w-full h-full object-cover group-hover:scale-110 transition duration-500"
+                          width={300}
+                          height={300}
                         />
                       ) : (
-                        <Package className="w-12 h-12 text-gray-300" />
+                        <Package className="w-10 h-10 text-gray-300" />
                       )}
                     </div>
                     <h3
                       onClick={() => router.push(`/product/${product._id}`)}
-                      className="font-semibold text-gray-800 mb-1 hover:text-green-600 cursor-pointer truncate">
+                      className="text-sm md:text-base font-bold text-gray-800 mb-1 hover:text-green-600 cursor-pointer line-clamp-2 min-h-[40px]">
                       {product.title}
                     </h3>
-                    <div className="flex justify-between items-center mt-4">
-                      <span className="font-bold text-lg text-gray-900">
+                    <div className="flex justify-between items-center mt-3">
+                      <span className="font-extrabold text-base md:text-lg text-gray-900">
                         ₹{product.price}
                       </span>
                       <button
                         onClick={() => openMiniCart(product)}
-                        className={`p-2 rounded-lg transition-colors ${
+                        className={`p-2.5 md:p-3 rounded-2xl transition-all active:scale-90 ${
                           cartItems[product._id]
-                            ? "bg-green-600 text-white"
-                            : "bg-green-100 text-green-600 hover:bg-green-600 hover:text-white"
+                            ? "bg-green-600 text-white shadow-lg shadow-green-100"
+                            : "bg-green-50 text-green-600 hover:bg-green-600 hover:text-white"
                         }`}>
                         <Plus className="w-5 h-5" />
                       </button>
@@ -278,14 +387,17 @@ function ShopContent() {
                 ))}
               </div>
             ) : (
-              <div className="flex flex-col items-center justify-center py-20 bg-white rounded-3xl border border-dashed border-gray-200">
-                <Package className="w-16 h-16 text-gray-300 mb-4" />
-                <p className="text-gray-500">
-                  No products found for this filter.
+              <div className="flex flex-col items-center justify-center py-20 bg-white rounded-[2rem] border border-dashed border-gray-200">
+                <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-4">
+                  <Package className="w-10 h-10 text-gray-300" />
+                </div>
+                <p className="text-gray-800 font-bold mb-1">No products found</p>
+                <p className="text-gray-500 text-sm mb-6">
+                  Try adjusting your filters or search query.
                 </p>
                 <button
                   onClick={() => router.push("/shop")}
-                  className="mt-4 text-green-600 font-semibold hover:underline">
+                  className="bg-green-600 text-white px-8 py-3 rounded-2xl text-sm font-bold hover:bg-green-700 transition-all shadow-lg shadow-green-100 active:scale-95">
                   Clear all filters
                 </button>
               </div>
@@ -296,52 +408,96 @@ function ShopContent() {
 
       <Footer />
 
-      {/* Mini Cart Popup */}
+      {/* Mobile Sort Bottom Sheet */}
+      {isSortOpen && (
+        <div className="fixed inset-0 z-[150] md:hidden flex items-end">
+          <div 
+            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+            onClick={() => setIsSortOpen(false)}
+          />
+          <div className="relative w-full bg-white rounded-t-[2.5rem] p-6 pb-12 animate-in slide-in-from-bottom duration-300">
+            <div className="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mb-6" />
+            <div className="flex items-center justify-between mb-8">
+              <h3 className="text-xl font-extrabold text-gray-800 tracking-tight">Sort By</h3>
+              <button 
+                onClick={() => setIsSortOpen(false)}
+                className="p-2 bg-gray-100 rounded-full text-gray-400"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="space-y-2">
+              {sortOptions.map((opt) => (
+                <button
+                  key={opt.value}
+                  onClick={() => {
+                    setSortOption(opt.value);
+                    setIsSortOpen(false);
+                  }}
+                  className={`w-full flex items-center justify-between p-4 px-5 rounded-2xl text-left font-bold transition-all ${
+                    sortOption === opt.value 
+                      ? "bg-green-50 text-green-600 ring-1 ring-green-100" 
+                      : "text-gray-700 hover:bg-gray-50"
+                  }`}
+                >
+                  {opt.label}
+                  {sortOption === opt.value && <Check className="w-5 h-5" />}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Mini Cart Bottom Sheet / Modal */}
       {miniCart && (
         <>
           <div
             onClick={() => setMiniCart(null)}
-            className="fixed inset-0 bg-black/30 z-50"
+            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[160]"
           />
-          <div className="fixed top-4 right-4 w-80 bg-white rounded-2xl shadow-2xl z-50 overflow-hidden border border-gray-200">
-            <div className="bg-green-600 text-white px-4 py-3 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <ShoppingCart className="w-4 h-4" />
-                <span className="font-bold text-sm">Add to Cart</span>
+          <div className="fixed bottom-0 md:top-1/2 md:left-1/2 md:bottom-auto md:-translate-x-1/2 md:-translate-y-1/2 w-full md:max-w-md bg-white rounded-t-[2.5rem] md:rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.2)] z-[170] overflow-hidden animate-in slide-in-from-bottom md:zoom-in duration-300">
+            <div className="bg-green-600 text-white px-6 py-4 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <ShoppingCart className="w-5 h-5" />
+                <span className="font-extrabold text-lg tracking-tight">Add to Cart</span>
               </div>
               <button
                 onClick={() => setMiniCart(null)}
-                className="text-white hover:text-green-200 transition-colors">
-                <X className="w-5 h-5" />
+                className="p-1 hover:bg-white/20 rounded-full transition-colors">
+                <X className="w-6 h-6" />
               </button>
             </div>
-            <div className="p-4">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-16 h-16 bg-gray-50 rounded-lg overflow-hidden flex items-center justify-center">
+            <div className="p-6">
+              <div className="flex items-center gap-5 mb-8">
+                <div className="w-24 h-24 bg-gray-50 rounded-2xl overflow-hidden flex items-center justify-center p-2 border border-gray-100">
                   {miniCart.product.image ? (
-                    <img
+                    <Image
                       src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${miniCart.product.image}`}
                       alt={miniCart.product.title}
-                      className="w-full h-full object-contain p-1"
+                      className="w-full h-full object-contain"
+                      width={100}
+                      height={100}
                     />
                   ) : (
-                    <Package className="w-8 h-8 text-gray-300" />
+                    <Package className="w-10 h-10 text-gray-300" />
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h4 className="font-semibold text-gray-800 text-sm truncate">
+                  <h4 className="font-extrabold text-gray-800 text-lg leading-tight mb-2">
                     {miniCart.product.title}
                   </h4>
-                  <p className="text-green-600 font-bold">
+                  <p className="text-green-600 font-black text-2xl">
                     ₹{miniCart.product.price}
                   </p>
                 </div>
               </div>
-              <div className="flex items-center justify-between bg-gray-50 rounded-xl p-3 mb-4">
-                <span className="text-sm font-medium text-gray-600">
+
+              <div className="bg-gray-50 rounded-[2rem] p-4 flex items-center justify-between mb-8 border border-gray-100">
+                <span className="text-sm font-bold text-gray-500 pl-4 uppercase tracking-widest">
                   Quantity
                 </span>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-5">
                   <button
                     onClick={() =>
                       setMiniCart((p) => ({
@@ -349,31 +505,33 @@ function ShopContent() {
                         qty: Math.max(1, p.qty - 1),
                       }))
                     }
-                    className="w-8 h-8 rounded-full bg-green-100 text-green-700 font-bold flex items-center justify-center hover:bg-green-200 transition">
-                    <Minus className="w-4 h-4" />
+                    className="w-12 h-12 rounded-2xl bg-white text-green-700 font-bold flex items-center justify-center hover:shadow-md transition-all active:scale-90 border border-gray-100">
+                    <Minus className="w-5 h-5" />
                   </button>
-                  <span className="font-bold text-lg text-gray-800 w-8 text-center">
+                  <span className="font-black text-2xl text-gray-900 w-10 text-center">
                     {miniCart.qty}
                   </span>
                   <button
                     onClick={() =>
                       setMiniCart((p) => ({ ...p, qty: p.qty + 1 }))
                     }
-                    className="w-8 h-8 rounded-full bg-green-100 text-green-700 font-bold flex items-center justify-center hover:bg-green-200 transition">
-                    <Plus className="w-4 h-4" />
+                    className="w-12 h-12 rounded-2xl bg-green-600 text-white font-bold flex items-center justify-center hover:bg-green-700 shadow-lg shadow-green-100 transition-all active:scale-90">
+                    <Plus className="w-5 h-5" />
                   </button>
                 </div>
               </div>
-              <div className="flex items-center justify-between mb-4 px-1">
-                <span className="text-sm text-gray-500">Total</span>
-                <span className="font-bold text-lg text-gray-800">
+
+              <div className="flex items-center justify-between mb-8 px-2 font-bold">
+                <span className="text-gray-500">Subtotal</span>
+                <span className="text-2xl text-gray-900 font-extrabold">
                   ₹{miniCart.product.price * miniCart.qty}
                 </span>
               </div>
+
               <button
                 onClick={confirmMiniCart}
-                className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-green-200">
-                Confirm & Add
+                className="w-full bg-green-600 hover:bg-green-700 text-white font-black py-5 rounded-[2rem] transition-all shadow-2xl shadow-green-200 active:scale-[0.98] text-lg uppercase tracking-widest">
+                Add to Cart
               </button>
             </div>
           </div>
@@ -385,7 +543,7 @@ function ShopContent() {
 
 export default function ShopPage() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<div className="h-screen w-full flex items-center justify-center font-bold text-green-600">Loading...</div>}>
       <ShopContent />
     </Suspense>
   );

@@ -322,8 +322,16 @@ export default function AdminDashboard() {
       <div
         className={`fixed md:static top-0 left-0 min-h-screen w-64 bg-[#111827] p-5 border-r border-gray-700 z-50 flex flex-col justify-between transform transition-transform duration-300
       ${open ? "translate-x-0" : "-translate-x-full"} md:translate-x-0`}>
-        <div>
-          <h1 className="text-2xl font-bold mb-8 text-blue-500">Admin</h1>
+        <div className="flex flex-col h-full">
+          <div className="flex items-center gap-3 mb-8 pb-4 border-b border-gray-700/50">
+            <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center shrink-0 shadow-lg shadow-blue-600/20">
+              <User size={20} />
+            </div>
+            <div className="truncate">
+              <p className="text-sm font-bold text-white">Admin Panel</p>
+              <p className="text-[10px] text-gray-500 truncate italic">admin@kfs.com</p>
+            </div>
+          </div>
 
           <ul className="space-y-4">
             <li
@@ -460,16 +468,8 @@ export default function AdminDashboard() {
           </ul>
         </div>
 
-        <div className="flex items-center gap-3 pt-4 border-t border-gray-700">
-          <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center">
-            <User size={20} />
-          </div>
-          <div>
-            <p className="text-sm font-semibold">Admin</p>
-            <p className="text-xs text-gray-400">admin@kfs.com</p>
-          </div>
-        </div>
       </div>
+
 
       {open && (
         <div
@@ -477,23 +477,28 @@ export default function AdminDashboard() {
           onClick={() => setOpen(false)}></div>
       )}
 
-      <div className="flex-1 md:ml-0 p-6 w-full">
-        <div className="flex justify-between items-center mb-8">
-          <button
-            className="md:hidden bg-[#111827] p-2 rounded-lg"
-            onClick={() => setOpen(true)}>
-            <Menu size={24} />
-          </button>
-
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-            <h2 className="text-2xl md:text-3xl font-bold capitalize">
+      <div className="flex-1 md:ml-0 p-4 md:p-8 w-full">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
+          <div className="flex items-center gap-3 bg-[#111827]/80 backdrop-blur-md px-4 py-2 rounded-2xl border border-gray-700 shadow-2xl self-start">
+            <button
+              className="md:hidden bg-gray-800/50 p-2 rounded-lg hover:bg-gray-700 transition"
+              onClick={() => setOpen(true)}>
+              <Menu size={20} />
+            </button>
+            <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center shrink-0 shadow-lg shadow-blue-600/40">
+              <User size={22} className="text-white" />
+            </div>
+            <div className="h-6 w-px bg-gray-700 mx-1 hidden md:block"></div>
+            <h2 className="text-xl md:text-2xl font-black capitalize tracking-tight text-white mb-0">
               {active}
             </h2>
+          </div>
 
+          <div className="flex items-center gap-3">
             {active === "dashboard" && (
-              <div className="flex bg-[#111827] p-1 rounded-xl border border-gray-700">
+              <div className="flex bg-[#111827] p-1 rounded-xl border border-gray-700 shadow-sm">
                 {[
-                  { label: "24h", value: "1d" },
+                  { label: "Today", value: "1d" },
                   { label: "7 Days", value: "7d" },
                   { label: "30 Days", value: "30d" },
                   { label: "All Time", value: "any" },
@@ -501,7 +506,7 @@ export default function AdminDashboard() {
                   <button
                     key={r.value}
                     onClick={() => setRange(r.value)}
-                    className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                    className={`px-3 md:px-4 py-1.5 rounded-lg text-[10px] font-bold transition-all ${
                       range === r.value
                         ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20"
                         : "text-gray-400 hover:text-white"
@@ -511,13 +516,6 @@ export default function AdminDashboard() {
                 ))}
               </div>
             )}
-          </div>
-
-          <div className="flex items-center gap-2 bg-[#111827] px-4 py-2 rounded-full border border-gray-700 cursor-pointer hover:border-blue-500 transition-colors">
-            <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center">
-              <User size={16} />
-            </div>
-            <span className="text-sm hidden sm:inline">Admin</span>
           </div>
         </div>
 
@@ -583,10 +581,10 @@ export default function AdminDashboard() {
               <table className="w-full text-sm">
                 <thead className="text-gray-400">
                   <tr className="border-b border-gray-800">
-                    <th className="py-3 text-left">Order</th>
-                    <th className="py-3 text-left">User</th>
-                    <th className="py-3 text-right">Amount</th>
-                    <th className="py-3 text-right hidden sm:table-cell">
+                    <th className="py-3 text-left px-2 md:px-4">Order</th>
+                    <th className="py-3 text-left px-2 md:px-4">User</th>
+                    <th className="py-3 text-right px-2 md:px-4">Amount</th>
+                    <th className="py-3 text-right hidden md:table-cell">
                       Status
                     </th>
                   </tr>
@@ -597,21 +595,21 @@ export default function AdminDashboard() {
                     <tr
                       key={o._id}
                       className="border-t border-gray-800 hover:bg-white/5 transition">
-                      <td className="py-3 text-left font-mono font-bold text-blue-400">
+                      <td className="py-3 px-2 md:px-4 text-left font-mono font-bold text-blue-400 text-xs">
                         #{o._id.slice(-4).toUpperCase()}
                       </td>
-                      <td className="py-3 text-left max-w-[150px]">
-                        <p className="truncate">
+                      <td className="py-3 px-2 md:px-4 text-left max-w-[100px] md:max-w-[150px]">
+                        <p className="truncate text-xs md:text-sm">
                           {o.userId?.fullName || "Guest"}
                         </p>
-                        <p className="text-[10px] text-gray-500 truncate">
+                        <p className="text-[9px] md:text-[10px] text-gray-500 truncate">
                           {o.userId?.email || ""}
                         </p>
                       </td>
-                      <td className="py-3 text-right font-bold">
+                      <td className="py-3 px-2 md:px-4 text-right font-bold text-xs md:text-sm">
                         ₹{o.totalAmount}
                       </td>
-                      <td className="py-3 text-right hidden sm:table-cell">
+                      <td className="py-3 text-right hidden md:table-cell">
                         <span
                           className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
                             o.orderStatus === "Delivered"
@@ -633,8 +631,8 @@ export default function AdminDashboard() {
 
         {active === "products" && (
           <Section title="Product Management">
-            <div className="flex justify-between items-center mb-6">
-              <p className="text-gray-400 text-sm">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
+              <p className="text-gray-400 text-xs md:text-sm">
                 Manage your store&apos;s inventory and products
               </p>
               <button
@@ -642,7 +640,7 @@ export default function AdminDashboard() {
                   router.push("/add-products");
                   setOpen(false);
                 }}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg flex items-center gap-2 font-semibold shadow-lg shadow-blue-600/20 transition-all active:scale-95 cursor-pointer">
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 md:px-5 md:py-2.5 rounded-lg flex items-center justify-center gap-2 font-semibold shadow-lg shadow-blue-600/20 transition-all active:scale-95 cursor-pointer text-sm">
                 <Plus size={18} /> Add Product
               </button>
             </div>
@@ -652,14 +650,14 @@ export default function AdminDashboard() {
                 <table className="w-full text-sm">
                   <thead className="text-gray-400 bg-white/5 uppercase tracking-wider text-[11px] font-bold">
                     <tr>
-                      <th className="py-4 text-left px-6">
-                        Product Information
+                      <th className="py-4 text-left px-3 md:px-6">
+                        Product
                       </th>
-                      <th className="py-4 text-right px-6">Price</th>
-                      <th className="py-4 text-center px-6 hidden sm:table-cell">
-                        Stock Status
+                      <th className="py-4 text-right px-3 md:px-6">Price</th>
+                      <th className="py-4 text-center px-6 hidden md:table-cell">
+                        Stock
                       </th>
-                      <th className="py-4 text-right px-6">Actions</th>
+                      <th className="py-4 text-right px-3 md:px-6">Actions</th>
                     </tr>
                   </thead>
 
@@ -677,9 +675,9 @@ export default function AdminDashboard() {
                         <tr
                           key={product._id}
                           className="hover:bg-white/[0.03] transition-colors group">
-                          <td className="py-4 px-6 text-left">
-                            <div className="flex items-center gap-4">
-                              <div className="w-12 h-12 rounded-lg bg-gray-800 flex items-center justify-center overflow-hidden border border-gray-700 group-hover:border-blue-500/50 transition-colors">
+                          <td className="py-4 px-3 md:px-6 text-left">
+                            <div className="flex items-center gap-3 md:gap-4">
+                              <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-gray-800 flex items-center justify-center overflow-hidden border border-gray-700 group-hover:border-blue-500/50 transition-colors flex-shrink-0">
                                 {product.images && product.images.length > 0 ? (
                                   <Image
                                     src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${product.images[0]}`}
@@ -692,20 +690,20 @@ export default function AdminDashboard() {
                                   <Package className="w-6 h-6 text-gray-500" />
                                 )}
                               </div>
-                              <div className="max-w-[180px]">
-                                <p className="font-bold text-gray-100 truncate group-hover:text-blue-400 transition-colors">
+                              <div className="max-w-[120px] md:max-w-[180px]">
+                                <p className="font-bold text-gray-100 truncate text-xs md:text-sm group-hover:text-blue-400 transition-colors">
                                   {product.title}
                                 </p>
-                                <p className="text-[10px] text-gray-500 font-mono">
-                                  ID: {product._id.slice(-6).toUpperCase()}
+                                <p className="text-[9px] md:text-[10px] text-gray-500 font-mono">
+                                  {product._id.slice(-6).toUpperCase()}
                                 </p>
                               </div>
                             </div>
                           </td>
-                          <td className="py-4 px-6 text-right font-bold text-gray-100 italic">
+                          <td className="py-4 px-3 md:px-6 text-right font-bold text-gray-100 italic text-xs md:text-sm">
                             ₹{product.price.toLocaleString("en-IN")}
                           </td>
-                          <td className="py-4 px-6 text-center hidden sm:table-cell">
+                          <td className="py-4 px-6 text-center hidden md:table-cell">
                             <span
                               className={`px-3 py-1 rounded-full text-[10px] font-bold ${
                                 product.stock > 10
@@ -719,7 +717,7 @@ export default function AdminDashboard() {
                                 : "OUT OF STOCK"}
                             </span>
                           </td>
-                          <td className="py-4 px-6 text-right relative">
+                          <td className="py-4 px-3 md:px-6 text-right relative">
                             <div className="flex justify-end">
                               <button
                                 onClick={() =>
@@ -735,7 +733,7 @@ export default function AdminDashboard() {
                             </div>
 
                             {openMenuId === product._id && (
-                              <div className="absolute top-0 right-16 w-36 bg-[#1f2937] border border-gray-700 rounded-xl shadow-2xl z-[100] overflow-hidden animate-in fade-in slide-in-from-right-1 duration-200">
+                              <div className="absolute top-0 right-10 md:right-16 w-32 md:w-36 bg-[#1f2937] border border-gray-700 rounded-xl shadow-2xl z-[100] overflow-hidden animate-in fade-in slide-in-from-right-1 duration-200">
                                 <button
                                   className="w-full px-4 py-2.5 hover:bg-blue-600 flex items-center gap-3 text-left text-xs font-semibold cursor-pointer"
                                   onClick={() =>
@@ -764,8 +762,8 @@ export default function AdminDashboard() {
 
         {active === "category" && (
           <Section title="Category Management">
-            <div className="flex justify-between items-center mb-6">
-              <p className="text-gray-400 text-sm">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
+              <p className="text-gray-400 text-xs md:text-sm">
                 Organize products into distinct collections
               </p>
               <button
@@ -773,9 +771,9 @@ export default function AdminDashboard() {
                   router.push("/add-category");
                   setOpen(false);
                 }}
-                className="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-lg flex items-center gap-2 font-semibold shadow-lg shadow-emerald-600/20 transition-all active:scale-95"
-                style={{ cursor: "pointer" }}>
-                <span className="text-xl">+</span> Add Category
+                className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 md:px-5 md:py-2.5 rounded-lg flex items-center justify-center gap-2 font-semibold shadow-lg shadow-emerald-600/20 transition-all active:scale-95 text-sm cursor-pointer"
+               >
+                <Plus size={18} /> Add Category
               </button>
             </div>
 
@@ -784,9 +782,9 @@ export default function AdminDashboard() {
                 <table className="w-full text-sm">
                   <thead className="text-gray-400 bg-white/5 uppercase tracking-wider text-[11px] font-bold">
                     <tr>
-                      <th className="py-4 text-left px-6">Collection</th>
-                      <th className="py-4 text-center px-6">Visibility</th>
-                      <th className="py-4 text-right px-6">Actions</th>
+                      <th className="py-4 text-left px-3 md:px-6">Collection</th>
+                      <th className="py-4 text-center px-4 hidden md:table-cell">Visibility</th>
+                      <th className="py-4 text-right px-3 md:px-6">Actions</th>
                     </tr>
                   </thead>
 
@@ -801,12 +799,12 @@ export default function AdminDashboard() {
                       </tr>
                     ) : (
                       categories.map((category) => (
-                        <tr
+                         <tr
                           key={category._id}
                           className="hover:bg-white/[0.03] transition-colors group">
-                          <td className="py-4 px-6 text-left">
-                            <div className="flex items-center gap-4">
-                              <div className="w-10 h-10 rounded-xl bg-gray-800 flex items-center justify-center overflow-hidden border border-gray-700 group-hover:border-emerald-500/50 transition-colors">
+                          <td className="py-4 px-3 md:px-6 text-left">
+                            <div className="flex items-center gap-3 md:gap-4">
+                              <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-gray-800 flex items-center justify-center overflow-hidden border border-gray-700 group-hover:border-emerald-500/50 transition-colors flex-shrink-0">
                                 {category.image ? (
                                   <Image
                                     src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${category.image}`}
@@ -818,16 +816,16 @@ export default function AdminDashboard() {
                                 ) : (
                                   <FolderTree
                                     className="text-gray-600"
-                                    size={20}
+                                    size={18}
                                   />
                                 )}
                               </div>
-                              <span className="font-bold text-gray-100 group-hover:text-emerald-400 transition-colors">
+                              <span className="font-bold text-gray-100 group-hover:text-emerald-400 transition-colors text-xs md:text-sm truncate max-w-[100px] md:max-w-none">
                                 {category.name}
                               </span>
                             </div>
                           </td>
-                          <td className="py-4 px-6 text-center">
+                          <td className="py-4 px-6 text-center hidden md:table-cell">
                             <span
                               className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
                                 category.status === "active"
@@ -837,7 +835,7 @@ export default function AdminDashboard() {
                               {category.status || "active"}
                             </span>
                           </td>
-                          <td className="py-4 px-6 text-right relative">
+                          <td className="py-4 px-3 md:px-6 text-right relative">
                             <div className="flex justify-end">
                               <button
                                 onClick={() =>
@@ -959,7 +957,7 @@ export default function AdminDashboard() {
 
         {active === "banners" && (
           <Section title="Homepage Banner Management">
-            <div className="flex justify-between items-center mb-6">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
               <p className="text-gray-400 text-sm">
                 Manage dynamic banners for your homepage
               </p>
@@ -975,7 +973,7 @@ export default function AdminDashboard() {
                   });
                   setShowBannerForm(true);
                 }}
-                className="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-lg flex items-center gap-2 font-semibold shadow-lg shadow-emerald-600/20 transition-all active:scale-95 cursor-pointer">
+                className="w-full md:w-auto bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-lg flex items-center justify-center gap-2 font-semibold shadow-lg shadow-emerald-600/20 transition-all active:scale-95 cursor-pointer text-sm">
                 <Plus size={18} /> Add Banner
               </button>
             </div>
@@ -1080,7 +1078,7 @@ export default function AdminDashboard() {
               </div>
             )}
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
               {banners.length === 0 ? (
                 <div className="col-span-full py-12 text-center text-gray-500 italic">
                   No banners found. Add your first promotional banner!
@@ -1089,8 +1087,8 @@ export default function AdminDashboard() {
                 banners.map((banner) => (
                   <div
                     key={banner._id}
-                    className="bg-[#111827] border border-gray-700 rounded-2xl overflow-hidden group hover:border-blue-500 transition-all shadow-xl">
-                    <div className="relative h-40 bg-gray-900 border-b border-gray-800 flex items-center justify-center overflow-hidden">
+                    className="bg-[#111827] border border-gray-700 rounded-xl md:rounded-2xl overflow-hidden group hover:border-blue-500 transition-all shadow-xl">
+                    <div className="relative aspect-video bg-gray-900 border-b border-gray-800 flex items-center justify-center overflow-hidden">
                       <Image
                         src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${banner.image}`}
                         alt={banner.title}
@@ -1117,8 +1115,8 @@ export default function AdminDashboard() {
                       <p className="text-xs text-gray-500 mt-1 line-clamp-1 italic">
                         {banner.subtitle || "No subtitle"}
                       </p>
-                      <div className="flex items-center justify-between mt-5 pt-4 border-t border-gray-800">
-                        <div className="flex gap-2">
+                      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between mt-5 pt-4 border-t border-gray-800 gap-3">
+                        <div className="flex justify-center sm:justify-start gap-2">
                           <button
                             onClick={() => {
                               setEditingBannerId(banner._id);
@@ -1131,20 +1129,20 @@ export default function AdminDashboard() {
                               });
                               setShowBannerForm(true);
                             }}
-                            className="p-2 bg-blue-500/10 text-blue-400 hover:bg-blue-500 hover:text-white rounded-lg transition cursor-pointer"
+                            className="p-2 bg-blue-500/10 text-blue-400 hover:bg-blue-500 hover:text-white rounded-lg transition-all cursor-pointer flex-1 sm:flex-none flex items-center justify-center"
                             title="Edit">
-                            <Pencil size={14} />
+                            <Pencil size={16} />
                           </button>
                           <button
                             onClick={() => handleDeleteBanner(banner._id)}
-                            className="p-2 bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white rounded-lg transition cursor-pointer"
+                            className="p-2 bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white rounded-lg transition-all cursor-pointer flex-1 sm:flex-none flex items-center justify-center"
                             title="Delete">
-                            <Trash2 size={14} />
+                            <Trash2 size={16} />
                           </button>
                         </div>
                         <button
                           onClick={() => handleToggleBanner(banner._id)}
-                          className={`px-4 py-1.5 rounded-lg text-[11px] font-bold transition cursor-pointer ${banner.status === "active" ? "bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white" : "bg-green-500/10 text-green-400 hover:bg-green-500 hover:text-white"}`}>
+                          className={`w-full sm:w-auto px-4 py-2 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${banner.status === "active" ? "bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white" : "bg-green-500/10 text-green-400 hover:bg-green-500 hover:text-white"}`}>
                           {banner.status === "active"
                             ? "Deactivate"
                             : "Activate"}
@@ -1188,12 +1186,12 @@ export default function AdminDashboard() {
               <table className="w-full text-sm">
                 <thead className="text-gray-400 border-b border-gray-800">
                   <tr>
-                    <th className="py-3 text-left px-4">Name</th>
-                    <th className="py-3 text-left px-4 hidden sm:table-cell">
+                    <th className="py-3 text-left px-2 md:px-4">Name</th>
+                    <th className="py-3 text-left px-2 md:px-4 hidden md:table-cell">
                       Email
                     </th>
-                    <th className="py-3 text-center px-4">Role</th>
-                    <th className="py-3 text-right px-4">Actions</th>
+                    <th className="py-3 text-center px-2 md:px-4">Role</th>
+                    <th className="py-3 text-right px-2 md:px-4">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1220,24 +1218,24 @@ export default function AdminDashboard() {
                         <tr
                           key={u._id}
                           className="border-t border-gray-800 hover:bg-white/5 transition">
-                          <td className="py-4 px-4 text-left">
-                            <p className="font-medium text-sm">
+                          <td className="py-4 px-2 md:px-4 text-left">
+                            <p className="font-medium text-xs md:text-sm truncate max-w-[100px] md:max-w-none">
                               {u.fullName || u.name || "N/A"}
                             </p>
-                            <p className="text-[10px] text-gray-500 sm:hidden truncate max-w-[120px]">
+                            <p className="text-[9px] md:text-[10px] text-gray-500 md:hidden truncate max-w-[80px]">
                               {u.email}
                             </p>
                           </td>
-                          <td className="py-4 px-4 text-left text-gray-400 hidden sm:table-cell truncate max-w-[150px]">
+                          <td className="py-4 px-2 md:px-4 text-left text-gray-400 hidden md:table-cell truncate max-w-[150px]">
                             {u.email}
                           </td>
-                          <td className="py-4 px-4 text-center">
+                          <td className="py-4 px-2 md:px-4 text-center">
                             <span
-                              className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${u.role === "admin" ? "bg-purple-500/20 text-purple-400" : "bg-green-500/20 text-green-400"}`}>
+                              className={`px-2 py-0.5 rounded text-[9px] md:text-[10px] font-bold uppercase ${u.role === "admin" ? "bg-purple-500/20 text-purple-400" : "bg-green-500/20 text-green-400"}`}>
                               {u.role}
                             </span>
                           </td>
-                          <td className="py-4 px-4 text-right">
+                          <td className="py-4 px-2 md:px-4 text-right">
                             <div className="flex justify-end">
                               {u.role !== "admin" && (
                                 <button
@@ -1264,8 +1262,8 @@ export default function AdminDashboard() {
 
 function Section({ title, children }) {
   return (
-    <div className="bg-[#111827] p-6 rounded-xl border border-gray-700">
-      <h3 className="text-xl mb-4">{title}</h3>
+    <div className="bg-[#111827] p-4 md:p-6 rounded-xl border border-gray-700">
+      <h3 className="text-lg md:text-xl mb-4 font-semibold">{title}</h3>
       {children}
     </div>
   );

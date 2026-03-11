@@ -330,7 +330,7 @@ export default function GroceryRedesign() {
       <Navbar />
 
       {/* Hero Section */}
-      <section className="relative w-full h-[70vh] md:h-[calc(100vh-140px)] overflow-hidden bg-gray-100">
+      <section className="relative w-full h-[50vh] md:h-[calc(100vh-140px)] overflow-hidden bg-gray-100">
         {banners.length > 0 ? (
           <div className="w-full h-full relative flex items-center transition-all duration-700">
             {/* Background Image with Overlay */}
@@ -340,21 +340,21 @@ export default function GroceryRedesign() {
                 alt={banners[currentBannerIndex].title}
                 width={1920}
                 height={1080}
-                className="w-full h-full object-cover animate-in fade-in zoom-in duration-1000"
+                className="w-full h-full object-cover object-right md:object-center animate-in fade-in zoom-in duration-1000"
               />
-              <div className="absolute inset-0 bg-gradient-to-r from-white/90 via-white/50 to-transparent"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-white/95 via-white/60 to-transparent md:from-white/90 md:via-white/50"></div>
             </div>
 
             {/* Content Overlay */}
             <div className="container mx-auto px-6 md:px-12 z-10 relative pointer-events-none">
-              <div className="max-w-xl animate-in fade-in slide-in-from-left duration-700 pointer-events-auto">
-                <span className="inline-block px-4 py-1 bg-green-200 text-green-800 text-xs md:text-sm font-bold rounded-full mb-4 uppercase tracking-widest">
+              <div className="max-w-[75%] md:max-w-xl animate-in fade-in slide-in-from-left duration-700 pointer-events-auto">
+                <span className="inline-block px-3 py-1 bg-green-200 text-green-800 text-[10px] md:text-sm font-bold rounded-full mb-3 uppercase tracking-widest">
                   Special Offer
                 </span>
-                <h1 className="text-3xl md:text-6xl font-black text-gray-900 mb-4 leading-tight">
+                <h1 className="text-2xl md:text-6xl font-black text-gray-900 mb-2 md:mb-4 leading-tight">
                   {banners[currentBannerIndex].title}
                 </h1>
-                <p className="text-sm md:text-xl text-gray-700 mb-8 opacity-90 font-medium max-w-md">
+                <p className="text-xs md:text-xl text-gray-700 mb-5 md:mb-8 opacity-90 font-medium max-w-[200px] md:max-w-md line-clamp-2 md:line-clamp-none">
                   {banners[currentBannerIndex].subtitle}
                 </p>
                 {banners[currentBannerIndex].link && (
@@ -362,7 +362,7 @@ export default function GroceryRedesign() {
                     onClick={() =>
                       router.push(banners[currentBannerIndex].link)
                     }
-                    className="bg-green-600 text-white px-10 py-4 rounded-xl text-sm md:text-lg font-extrabold hover:bg-green-700 transition shadow-2xl shadow-green-600/30 active:scale-95">
+                    className="bg-green-600 text-white px-6 py-2.5 md:px-10 md:py-4 rounded-xl text-xs md:text-lg font-extrabold hover:bg-green-700 transition shadow-xl shadow-green-600/20 active:scale-95 cursor-pointer">
                     Shop Now
                   </button>
                 )}
@@ -421,7 +421,7 @@ export default function GroceryRedesign() {
             <button
               onClick={() => scrollCategories("left")}
               className="absolute -left-4 top-1/2 -translate-y-1/2 z-30 w-12 h-12 bg-white shadow-lg border border-gray-100 flex items-center justify-center text-gray-400 hover:text-green-600 transition-all hidden md:flex">
-              <ChevronLeft size={24} strokeWidth={1} />
+              <ChevronLeft size={24} strokeWidth={1} className="cursor-pointer"/>
             </button>
           )}
 
@@ -430,7 +430,7 @@ export default function GroceryRedesign() {
             <button
               onClick={() => scrollCategories("right")}
               className="absolute -right-4 top-1/2 -translate-y-1/2 z-30 w-12 h-12 bg-white shadow-lg border border-gray-100 flex items-center justify-center text-gray-400 hover:text-green-600 transition-all hidden md:flex">
-              <ChevronRight size={24} strokeWidth={1} />
+              <ChevronRight size={24} strokeWidth={1} className="cursor-pointer"/>
             </button>
           )}
 
@@ -450,26 +450,26 @@ export default function GroceryRedesign() {
                 <div
                   key={category._id}
                   onClick={() => router.push(`/shop?category=${category.name}`)}
-                  className="min-w-[150px] md:min-w-[200px] p-6 rounded-2xl bg-white border border-gray-50 flex flex-col items-center justify-center cursor-pointer hover:shadow-xl hover:border-green-100 transition transform hover:-translate-y-1 gap-3 snap-start">
-                  <div className="w-16 h-16 md:w-24 md:h-24 flex items-center justify-center overflow-hidden mb-2">
+                  className="min-w-[130px] md:min-w-[200px] p-4 md:p-6 rounded-2xl bg-white border border-gray-50 flex flex-col items-center justify-center cursor-pointer hover:shadow-xl hover:border-green-100 transition transform hover:-translate-y-1 gap-2 md:gap-3 snap-start">
+                  <div className="w-20 h-20 md:w-24 md:h-24 flex items-center justify-center overflow-hidden mb-1 md:mb-2">
                     {category.image ? (
                       <Image
                         src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${category.image}`}
                         alt={category.name}
                         width={200}
                         height={200}
-                        className="w-full h-full object-contain"
+                        className="w-full h-full object-contain p-2 md:p-0"
                       />
                     ) : (
-                      <Package className="w-12 h-12 text-gray-300" />
+                      <Package className="w-10 h-10 md:w-12 md:h-12 text-gray-300" />
                     )}
                   </div>
                   <div className="text-center">
-                    <h3 className="font-bold text-green-700 text-sm md:text-base uppercase tracking-tight">
+                    <h3 className="font-bold text-green-700 text-[11px] md:text-base uppercase tracking-tight line-clamp-1">
                       {category.name}
                     </h3>
-                    <p className="text-xs text-gray-400 font-medium">
-                      {count} products
+                    <p className="text-[10px] md:text-xs text-gray-400 font-medium">
+                      {count} items
                     </p>
                   </div>
                 </div>
@@ -480,7 +480,7 @@ export default function GroceryRedesign() {
       </section>
 
       {/* Featured Products */}
-      <section className="container mx-auto px-4 py-8 bg-white rounded-3xl my-8 shadow-sm border border-gray-100">
+      <section className="container mx-auto px-4 py-0 bg-white rounded-3xl my-8 shadow-sm border border-gray-100">
         <div className="flex justify-between items-end mb-6">
           <div>
             <h2 className="text-2xl font-bold text-gray-800">
@@ -492,8 +492,7 @@ export default function GroceryRedesign() {
           </div>
           <button
             onClick={() => router.push("/shop?flag=isTopSellingProducts")}
-            className="text-green-600 font-semibold hover:underline"
-            style={{ cursor: "pointer" }}>
+            className="text-green-600 font-semibold hover:underline cursor-pointer">
             View All &rarr;
           </button>
         </div>
@@ -563,7 +562,7 @@ export default function GroceryRedesign() {
 
       {/* Discount Banner */}
       <section className="container mx-auto px-4 py-8">
-        <div className="rounded-2xl p-8 md:p-12 text-center text-white relative overflow-hidden">
+        <div className="rounded-2xl p-6 md:p-12 text-center text-white relative overflow-hidden min-h-[250px] flex flex-col items-center justify-center">
           <Image
             src="/herobanner.webp"
             alt="Banner"
@@ -571,10 +570,10 @@ export default function GroceryRedesign() {
             className="object-cover"
           />
           <div className="relative z-10">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+            <h2 className="text-2xl md:text-4xl font-bold mb-4">
               Start your day with tasty organic veggies
             </h2>
-            <p className="text-lg md:text-xl mb-8 opacity-90">
+            <p className="text-base md:text-xl mb-8 opacity-90">
               Get 10% off on your first order
             </p>
             <button
@@ -640,7 +639,7 @@ export default function GroceryRedesign() {
           <h2 className="text-2xl font-bold text-gray-800">Deals of Day</h2>
           <button
             onClick={() => router.push("/shop?flag=isDealsOfDay")}
-            className="text-green-600 font-semibold hover:underline">
+            className="text-green-600 font-semibold hover:underline cursor-pointer">
             View All &rarr;
           </button>
         </div>
@@ -714,7 +713,7 @@ export default function GroceryRedesign() {
               </h2>
               <button
                 onClick={() => router.push(`/shop?flag=${section.flag}`)}
-                className="text-green-600 font-semibold hover:underline">
+                className="text-green-600 font-semibold hover:underline cursor-pointer">
                 View All &rarr;
               </button>
             </div>
@@ -797,7 +796,7 @@ export default function GroceryRedesign() {
                       alt={miniCart.product.title}
                       width={100}
                       height={100}
-                      className="w-full h-full object-contain p-1"
+                      className="w-full h-full object-contain p-2"
                     />
                   ) : (
                     <Package className="w-8 h-8 text-gray-300" />

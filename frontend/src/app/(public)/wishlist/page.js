@@ -14,6 +14,7 @@ import {
 import Header from "../../components/header";
 import Navbar from "../../components/redesign/Navbar";
 import Footer from "../../components/redesign/Footer";
+import Image from "next/image";
 
 export default function WishlistPage() {
   const router = useRouter();
@@ -135,11 +136,6 @@ export default function WishlistPage() {
 
       <main className="container mx-auto px-4 py-8 flex-1">
         <div className="flex items-center justify-between mb-8">
-          <button
-            onClick={() => router.back()}
-            className="flex items-center gap-1 text-gray-500 hover:text-green-600 transition-colors font-medium">
-            <ChevronLeft size={18} /> Back
-          </button>
           <div className="flex items-center gap-2">
             <Heart className="text-red-500 fill-current" size={24} />
             <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
@@ -176,7 +172,7 @@ export default function WishlistPage() {
                 <div
                   onClick={() => router.push(`/product/${item.productId}`)}
                   className="h-48 bg-gray-50 relative flex items-center justify-center p-4 cursor-pointer overflow-hidden">
-                  <img
+                  <Image
                     src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${item.image}`}
                     alt={item.title}
                     className="w-full h-full object-contain group-hover:scale-105 transition duration-500"

@@ -7,9 +7,14 @@ import { useRouter } from "next/navigation";
 export default function Navbar() {
   const router = useRouter();
   return (
-    <nav className="bg-green-600 text-white overflow-x-auto no-scrollbar hidden md:block">
+    <nav className="bg-green-600 text-white overflow-x-auto no-scrollbar hidden md:block sticky top-20 z-50">
       <div className="container mx-auto px-4">
         <ul className="flex items-center gap-4 md:gap-8 py-2 md:py-3 text-xs md:text-sm font-medium whitespace-nowrap">
+          <li
+            onClick={() => router.push("/")}
+            className="hover:text-green-100 cursor-pointer">
+            HOME
+          </li>
           <li
             onClick={() => router.push("/aboutus")}
             className="hover:text-green-100 cursor-pointer">

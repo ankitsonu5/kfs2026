@@ -17,6 +17,7 @@ import {
 import Header from "../../../components/header";
 import Navbar from "../../../components/redesign/Navbar";
 import Footer from "../../../components/redesign/Footer";
+import Image from "next/image";
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -228,11 +229,6 @@ export default function ProductDetail() {
       <Navbar />
 
       <main className="container mx-auto px-4 py-8">
-        <button
-          onClick={() => router.back()}
-          className="flex items-center gap-1 text-gray-500 hover:text-green-600 mb-6 transition-colors font-medium">
-          <ChevronLeft size={18} /> Back
-        </button>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
           {/* Images Section */}
@@ -248,10 +244,12 @@ export default function ProductDetail() {
                       ? "border-green-600 shadow-lg"
                       : "border-gray-100 opacity-70 hover:opacity-100"
                   }`}>
-                  <img
+                  <Image
                     src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${img}`}
                     alt={`pic-${idx}`}
                     className="w-full h-full object-cover"
+                    width={100}
+                    height={100}
                   />
                 </button>
               ))}
@@ -261,10 +259,12 @@ export default function ProductDetail() {
             <div className="flex-1 relative group">
               {/* Desktop Main Image */}
               <div className="hidden md:flex bg-gray-50 rounded-3xl overflow-hidden aspect-square flex items-center justify-center border border-gray-100 shadow-sm relative">
-                <img
+                <Image
                   src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${mainImage}`}
                   alt={product.title}
                   className="w-full h-full object-contain p-6 group-hover:scale-110 transition-transform duration-700"
+                  width={100}
+                  height={100}
                 />
                 <div className="absolute top-4 right-4 z-10">
                   <button
@@ -285,10 +285,12 @@ export default function ProductDetail() {
                     <div
                       key={idx}
                       className="flex-shrink-0 w-full h-full snap-center flex items-center justify-center">
-                      <img
+                      <Image
                         src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${img}`}
                         alt={`slide-${idx}`}
                         className="w-full h-full object-contain p-6"
+                        width={100}
+                        height={100}
                       />
                     </div>
                   ))}

@@ -13,6 +13,10 @@ import {
   Lock,
   ChevronRight,
 } from "lucide-react";
+import Image from "next/image";
+import Header from "../../components/header";
+import Navbar from "../../components/redesign/Navbar";
+import Footer from "../../components/redesign/Footer";
 
 export default function Checkout() {
   const router = useRouter();
@@ -153,16 +157,19 @@ export default function Checkout() {
   }
 
   return (
+    <>
+    <Header />
+    <Navbar />
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white shadow-sm sticky top-0 z-50">
+      <header className="bg-white shadow-sm sticky top-16 md:top-[124px] z-40">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <button
+            {/* <button
               onClick={() => router.back()}
               className="text-gray-500 hover:text-green-600 transition p-2 hover:bg-gray-100 rounded-full cursor-pointer">
               <ArrowLeft className="w-6 h-6" />
-            </button>
+            </button> */}
             <div className="flex items-center gap-2">
               <ClipboardList className="w-6 h-6 text-green-600" />
               <h1 className="text-2xl font-bold text-gray-800">Checkout</h1>
@@ -326,7 +333,7 @@ export default function Checkout() {
 
           {/* Order Summary Sidebar */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-xl border border-gray-200 p-6 sticky top-24">
+            <div className="bg-white rounded-xl border border-gray-200 p-6 sticky top-[80px] md:top-[140px]">
               <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
                 <ReceiptText className="w-5 h-5 text-green-600" /> Order Summary
               </h3>
@@ -339,9 +346,11 @@ export default function Checkout() {
                     className="flex items-center gap-3 pb-3 border-b border-gray-100">
                     <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0">
                       {item.image ? (
-                        <img
+                        <Image
                           src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${item.image}`}
                           alt={item.title}
+                          width={100}
+                          height={100}
                           className="w-full h-full object-cover"
                         />
                       ) : (
@@ -395,5 +404,7 @@ export default function Checkout() {
         </div>
       </div>
     </div>
+    <Footer />
+    </>
   );
 }

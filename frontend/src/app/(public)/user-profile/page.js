@@ -12,6 +12,9 @@ import {
   UserCircle,
 } from "lucide-react";
 import axios from "axios";
+import Header from "../../components/header";
+import Navbar from "../../components/redesign/Navbar";
+import Footer from "../../components/redesign/Footer";
 
 export default function UserProfile() {
   const router = useRouter();
@@ -62,15 +65,13 @@ export default function UserProfile() {
   };
 
   return (
+    <>
+    <Header />
+    <Navbar />
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-emerald-50">
       {/* Header */}
-      <header className="bg-white shadow-sm sticky top-0 z-50">
+      <header className="bg-white shadow-sm sticky top-16 md:top-[124px] z-40">
         <div className="container mx-auto px-4 py-4 flex items-center gap-4">
-          <button
-            onClick={() => router.back()}
-            className="text-gray-500 hover:text-green-600 transition p-2 hover:bg-gray-100 rounded-full cursor-pointer">
-            <ArrowLeft className="w-6 h-6" />
-          </button>
           <h1 className="text-2xl font-bold text-green-600">My Profile</h1>
         </div>
       </header>
@@ -208,5 +209,7 @@ export default function UserProfile() {
         </div>
       </div>
     </div>
+    <Footer />
+    </>
   );
 }

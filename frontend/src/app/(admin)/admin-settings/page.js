@@ -25,7 +25,12 @@ export default function Settings() {
         `${process.env.NEXT_PUBLIC_API_URL}/adminsettings`,
         { headers: { Authorization: token } },
       );
-      setSettings(res.data.settings || {});
+      const data = res.data.settings || {};
+      setSettings({
+        siteName: data.siteName || "",
+        supportEmail: data.supportEmail || "",
+        deliveryCharge: data.deliveryCharge || "",
+      });
     } catch (err) {
       console.error("Settings fetch error:", err);
     } finally {
@@ -90,7 +95,7 @@ export default function Settings() {
                 Website Settings
               </h1>
               <p className="text-gray-400 text-sm">
-                Configure your platform's global parameters
+                Configure your platform&apos;s global parameters
               </p>
             </div>
           </div>

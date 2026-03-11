@@ -11,6 +11,10 @@ import {
   CheckCircle2,
   Clock,
 } from "lucide-react";
+import Header from "../../components/header";
+import Navbar from "../../components/redesign/Navbar";
+import Footer from "../../components/redesign/Footer";
+import Image from "next/image";
 
 export default function MyOrders() {
   const [orders, setOrders] = useState([]);
@@ -99,6 +103,9 @@ export default function MyOrders() {
   }
 
   return (
+    <>
+    <Header />
+    <Navbar />
     <div className="min-h-screen bg-gray-50 p-6 md:p-12 text-black">
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center justify-between mb-8">
@@ -106,11 +113,6 @@ export default function MyOrders() {
             <ShoppingBag className="w-8 h-8 text-green-600" />
             <h2 className="text-3xl font-bold text-gray-800">My Orders</h2>
           </div>
-          <button
-            onClick={() => router.push("/")}
-            className="text-green-600 font-semibold hover:underline flex items-center gap-2 cursor-pointer transition-all">
-            <ArrowLeft className="w-5 h-5" /> Back to Shop
-          </button>
         </div>
 
         {orders.length === 0 ? (
@@ -173,10 +175,12 @@ export default function MyOrders() {
                       <div key={idx} className="flex items-center gap-4">
                         <div className="w-16 h-16 bg-gray-50 rounded-xl flex items-center justify-center overflow-hidden border border-gray-100 flex-shrink-0">
                           {item.image ? (
-                            <img
+                            <Image
                               src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${item.image}`}
                               alt={item.name}
                               className="w-full h-full object-contain"
+                              width={100}
+                              height={100}
                             />
                           ) : (
                             <Package className="w-8 h-8 text-gray-300" />
@@ -238,5 +242,7 @@ export default function MyOrders() {
         )}
       </div>
     </div>
+    <Footer />
+    </>
   );
 }
