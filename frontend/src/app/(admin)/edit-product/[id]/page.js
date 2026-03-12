@@ -18,6 +18,7 @@ export default function EditProduct() {
     description: "",
     category: "",
     stock: "",
+    discountPrice: "",
     isTopSellingProducts: false,
     isDealsOfDay: false,
     isRice: false,
@@ -46,6 +47,7 @@ export default function EditProduct() {
             description: p.description,
             category: p.category?.[0] || "",
             stock: p.stock,
+            discountPrice: p.discountPrice || "",
             isTopSellingProducts: p.isTopSellingProducts || false,
             isDealsOfDay: p.isDealsOfDay || false,
             isRice: p.isRice || false,
@@ -124,6 +126,7 @@ export default function EditProduct() {
       formData.append("description", form.description);
       formData.append("category", form.category);
       formData.append("stock", form.stock);
+      formData.append("discountPrice", form.discountPrice);
 
       // Append Boolean Flags
       formData.append("isTopSellingProducts", form.isTopSellingProducts);
@@ -198,20 +201,37 @@ export default function EditProduct() {
             />
           </div>
 
-          <div>
-            <label className="block text-sm text-gray-300 mb-1">
-              Price (₹)
-            </label>
-            <input
-              type="number"
-              name="price"
-              value={form.price}
-              onChange={handleChange}
-              required
-              placeholder="Enter price"
-              className="w-full px-3 py-2 bg-[#1f2937] border border-gray-600 rounded-md 
-              text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm text-gray-300 mb-1">
+                Selling Price (₹)
+              </label>
+              <input
+                type="number"
+                name="price"
+                value={form.price}
+                onChange={handleChange}
+                required
+                placeholder="Enter price"
+                className="w-full px-3 py-2 bg-[#1f2937] border border-gray-600 rounded-md 
+                text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm text-gray-300 mb-1">
+                MRP (Discount Price) (₹)
+              </label>
+              <input
+                type="number"
+                name="discountPrice"
+                value={form.discountPrice}
+                onChange={handleChange}
+                placeholder="Optional"
+                className="w-full px-3 py-2 bg-[#1f2937] border border-gray-600 rounded-md 
+                text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
           </div>
 
           <div>

@@ -156,6 +156,17 @@ export default function Checkout() {
     );
   }
 
+  const subtotal = cart.items.reduce((sum, item) => sum + (Number(item.price) * item.quantity), 0);
+  const totalMrp = cart.items.reduce((sum, item) => {
+    const p = Number(item.price);
+    const dp = Number(item.discountPrice);
+    const mrp = (dp && dp > p) ? dp : p;
+    return sum + (mrp * item.quantity);
+  }, 0);
+  const totalSavings = totalMrp - subtotal;
+  const deliveryCharge = subtotal > 1000 || subtotal === 0 ? 0 : 50;
+  const grandTotal = subtotal + deliveryCharge;
+
   return (
     <>
     <Header />
@@ -326,7 +337,7 @@ export default function Checkout() {
                 className="lg:hidden w-full bg-green-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-green-700 transition shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed cursor-pointer">
                 {placing
                   ? "Placing Order..."
-                  : `Place Order — ₹${cart.totalAmount}`}
+                  : `Place Order — ₹${grandTotal}`}
               </button>
             </form>
           </div>
@@ -375,16 +386,30 @@ export default function Checkout() {
               {/* Totals */}
               <div className="space-y-2 mb-4">
                 <div className="flex justify-between text-gray-600 text-sm">
-                  <span>Subtotal ({cart.items.length} items)</span>
-                  <span>₹{cart.totalAmount}</span>
+                  <span>Total MRP ({cart.items.length} items)</span>
+                  <span className="line-through text-gray-400">₹{totalMrp}</span>
                 </div>
                 <div className="flex justify-between text-gray-600 text-sm">
-                  <span>Delivery</span>
-                  <span className="text-green-600 font-semibold">FREE</span>
+                  <span>Selling Price</span>
+                  <span>₹{subtotal}</span>
+                </div>
+                {totalSavings > 0 && (
+                  <div className="flex justify-between text-gray-600 text-sm font-semibold">
+                    <span>You Save</span>
+                    <span>-₹{totalSavings}</span>
+                  </div>
+                )}
+                <div className="flex justify-between text-gray-600 text-sm">
+                  <span>Delivery Charges <span className="text-[10px] text-gray-400 font-normal ml-1">(Free above ₹1000)</span></span>
+                  {deliveryCharge === 0 ? (
+                    <span className="text-green-600 font-semibold">FREE</span>
+                  ) : (
+                    <span>₹{deliveryCharge}</span>
+                  )}
                 </div>
                 <div className="border-t border-gray-200 pt-2 flex justify-between font-bold text-gray-800 text-lg">
                   <span>Total</span>
-                  <span className="text-green-600">₹{cart.totalAmount}</span>
+                  <span className="text-green-600">₹{grandTotal}</span>
                 </div>
               </div>
 

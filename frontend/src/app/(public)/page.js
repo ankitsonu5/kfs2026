@@ -98,6 +98,7 @@ export default function GroceryRedesign() {
             productId: product._id,
             title: product.title,
             price: product.price,
+            discountPrice: product.discountPrice,
             image: product.images?.[0] || "",
             quantity: 1,
           });
@@ -116,6 +117,7 @@ export default function GroceryRedesign() {
           productId: product._id,
           title: product.title,
           price: product.price,
+          discountPrice: product.discountPrice,
           image: product.images?.[0] || "",
         },
         {
@@ -203,6 +205,7 @@ export default function GroceryRedesign() {
         _id: product._id,
         title: product.title,
         price: product.price,
+        discountPrice: product.discountPrice,
         image: product.images?.[0] || "",
       },
       qty: 1,
@@ -229,6 +232,7 @@ export default function GroceryRedesign() {
             productId: miniCart.product._id,
             title: miniCart.product.title,
             price: miniCart.product.price,
+            discountPrice: miniCart.product.discountPrice,
             image: miniCart.product.image,
             quantity: miniCart.qty,
           });
@@ -250,6 +254,7 @@ export default function GroceryRedesign() {
             productId: miniCart.product._id,
             title: miniCart.product.title,
             price: miniCart.product.price,
+            discountPrice: miniCart.product.discountPrice,
             image: miniCart.product.image,
           },
           { headers: { Authorization: token } },
@@ -330,7 +335,7 @@ export default function GroceryRedesign() {
       <Navbar />
 
       {/* Hero Section */}
-      <section className="relative w-full h-[50vh] md:h-[calc(100vh-140px)] overflow-hidden bg-gray-100">
+      <section className="relative w-full h-[250px] md:h-[calc(100vh-128px)] overflow-hidden bg-gray-100">
         {banners.length > 0 ? (
           <div className="w-full h-full relative flex items-center transition-all duration-700">
             {/* Background Image with Overlay */}
@@ -340,21 +345,21 @@ export default function GroceryRedesign() {
                 alt={banners[currentBannerIndex].title}
                 width={1920}
                 height={1080}
-                className="w-full h-full object-cover object-right md:object-center animate-in fade-in zoom-in duration-1000"
+                className="w-full h-full object-cover object-center animate-in fade-in zoom-in duration-1000"
               />
-              <div className="absolute inset-0 bg-gradient-to-r from-white/95 via-white/60 to-transparent md:from-white/90 md:via-white/50"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-white/95 via-white/40 to-transparent md:from-white/90 md:via-white/50"></div>
             </div>
 
             {/* Content Overlay */}
             <div className="container mx-auto px-6 md:px-12 z-10 relative pointer-events-none">
-              <div className="max-w-[75%] md:max-w-xl animate-in fade-in slide-in-from-left duration-700 pointer-events-auto">
-                <span className="inline-block px-3 py-1 bg-green-200 text-green-800 text-[10px] md:text-sm font-bold rounded-full mb-3 uppercase tracking-widest">
+              <div className="max-w-[85%] md:max-w-xl animate-in fade-in slide-in-from-left duration-700 pointer-events-auto">
+                <span className="inline-block px-2 py-0.5 md:px-3 md:py-1 bg-green-200 text-green-800 text-[8px] md:text-sm font-bold rounded-full mb-1 md:mb-3 uppercase tracking-widest">
                   Special Offer
                 </span>
-                <h1 className="text-2xl md:text-6xl font-black text-gray-900 mb-2 md:mb-4 leading-tight">
+                <h1 className="text-xl md:text-6xl font-black text-gray-900 mb-1 md:mb-4 leading-tight">
                   {banners[currentBannerIndex].title}
                 </h1>
-                <p className="text-xs md:text-xl text-gray-700 mb-5 md:mb-8 opacity-90 font-medium max-w-[200px] md:max-w-md line-clamp-2 md:line-clamp-none">
+                <p className="text-[10px] md:text-xl text-gray-700 mb-3 md:mb-8 opacity-90 font-medium max-w-[180px] md:max-w-md line-clamp-2 md:line-clamp-none">
                   {banners[currentBannerIndex].subtitle}
                 </p>
                 {banners[currentBannerIndex].link && (
@@ -362,7 +367,7 @@ export default function GroceryRedesign() {
                     onClick={() =>
                       router.push(banners[currentBannerIndex].link)
                     }
-                    className="bg-green-600 text-white px-6 py-2.5 md:px-10 md:py-4 rounded-xl text-xs md:text-lg font-extrabold hover:bg-green-700 transition shadow-xl shadow-green-600/20 active:scale-95 cursor-pointer">
+                    className="bg-green-600 text-white px-4 py-2 md:px-10 md:py-4 rounded-lg md:rounded-xl text-[10px] md:text-lg font-extrabold hover:bg-green-700 transition shadow-xl shadow-green-600/20 active:scale-95 cursor-pointer">
                     Shop Now
                   </button>
                 )}
@@ -504,31 +509,43 @@ export default function GroceryRedesign() {
               .map((product) => (
                 <div
                   key={product._id}
-                  className="border border-gray-100 rounded-xl p-4 hover:shadow-lg transition bg-white relative group">
+                  className="border border-gray-100 rounded-xl p-4 hover:shadow-lg transition bg-white relative group flex flex-col h-full">
                   <div
                     onClick={() => router.push(`/product/${product._id}`)}
-                    className="h-56 flex items-center justify-center bg-gray-50 rounded-lg mb-4 overflow-hidden cursor-pointer">
+                    className="relative h-56 flex items-center justify-center bg-gray-50 rounded-lg mb-4 overflow-hidden cursor-pointer">
+                    {product.discountPrice && product.discountPrice > product.price && (
+                      <div className="absolute top-2 left-2 bg-[#be1e2d] text-white text-[10px] font-bold px-2 py-1 rounded shadow-sm uppercase tracking-wider z-10">
+                        YOU SAVE {Math.round(((product.discountPrice - product.price) / product.discountPrice) * 100)}%
+                      </div>
+                    )}
                     {product.images && product.images.length > 0 ? (
                       <Image
                         src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${product.images[0]}`}
                         alt={product.title}
                         width={400}
                         height={400}
-                        className="w-full h-full object-cover group-hover:scale-110 transition duration-500"
+                        className="w-full h-full object-contain p-2 group-hover:scale-110 transition duration-500"
                       />
                     ) : (
                       <Package className="w-16 h-16 text-gray-300" />
                     )}
                   </div>
-                  <h3
-                    onClick={() => router.push(`/product/${product._id}`)}
-                    className="font-semibold text-gray-800 mb-1 cursor-pointer hover:text-green-600 transition-colors">
-                    {product.title}
-                  </h3>
-                  <div className="flex items-baseline gap-2 mb-4">
-                    <span className="font-bold text-lg text-gray-900">
-                      ₹{product.price}
-                    </span>
+                  <div className="flex-grow flex flex-col">
+                    <h3
+                      onClick={() => router.push(`/product/${product._id}`)}
+                      className="font-semibold text-gray-800 mb-1 cursor-pointer hover:text-green-600 transition-colors line-clamp-2 min-h-[3rem]">
+                      {product.title}
+                    </h3>
+                    <div className="flex items-baseline gap-2 mb-4">
+                      <span className="font-bold text-lg text-green-700">
+                        ₹{product.price}
+                      </span>
+                      {product.discountPrice && product.discountPrice > product.price && (
+                        <span className="text-xs text-gray-400 line-through font-medium">
+                          ₹{product.discountPrice}
+                        </span>
+                      )}
+                    </div>
                   </div>
 
                   <button
@@ -650,36 +667,64 @@ export default function GroceryRedesign() {
               .map((product) => (
                 <div
                   key={product._id}
-                  className="bg-white border border-gray-100 rounded-xl p-4 hover:shadow-lg transition group relative">
+                  className="bg-white border border-gray-100 rounded-xl p-4 hover:shadow-lg transition group relative flex flex-col h-full">
                   <div
                     onClick={() => router.push(`/product/${product._id}`)}
-                    className="h-48 flex items-center justify-center bg-gray-50 rounded-lg mb-4 overflow-hidden cursor-pointer">
+                    className="relative h-48 flex items-center justify-center bg-gray-50 rounded-lg mb-4 overflow-hidden cursor-pointer">
+                    {product.discountPrice && product.discountPrice > product.price && (
+                      <div className="absolute top-2 left-2 bg-[#be1e2d] text-white text-[10px] font-bold px-2 py-1 rounded shadow-sm uppercase tracking-wider z-10">
+                        YOU SAVE {Math.round(((product.discountPrice - product.price) / product.discountPrice) * 100)}%
+                      </div>
+                    )}
                     {product.images && product.images.length > 0 ? (
                       <Image
                         src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${product.images[0]}`}
                         alt={product.title}
                         width={400}
                         height={400}
-                        className="w-full h-full object-cover group-hover:scale-110 transition duration-500"
+                        className="w-full h-full object-contain p-2 group-hover:scale-110 transition duration-500"
                       />
                     ) : (
                       <Package className="w-12 h-12 text-gray-300" />
                     )}
                   </div>
-                  <h3
-                    onClick={() => router.push(`/product/${product._id}`)}
-                    className="font-semibold text-gray-800 mb-1 truncate hover:text-green-600 cursor-pointer">
-                    {product.title}
-                  </h3>
-                  <div className="flex justify-between items-center">
-                    <span className="font-bold text-lg text-green-700">
-                      ₹{product.price}
-                    </span>
+                  <div className="flex-grow">
+                    <h3
+                      onClick={() => router.push(`/product/${product._id}`)}
+                      className="font-semibold text-gray-800 mb-1 line-clamp-2 min-h-[3rem] hover:text-green-600 cursor-pointer">
+                      {product.title}
+                    </h3>
+                  </div>
+                  <div className="flex justify-between items-end mb-1">
+                    <div className="flex flex-col">
+                      <span className="font-bold text-lg text-green-700 leading-none">
+                        ₹{product.price}
+                      </span>
+                      {product.discountPrice && product.discountPrice > product.price && (
+                        <span className="text-[11px] text-gray-400 line-through font-medium mt-1 leading-none">
+                          ₹{product.discountPrice}
+                        </span>
+                      )}
+                    </div>
                     <button
-                      onClick={() => openMiniCart(product)}
-                      className="w-8 h-8 rounded-full bg-green-100 text-green-600 flex items-center justify-center hover:bg-green-600 hover:text-white transition">
-                      <Plus className="w-4 h-4" />
-                    </button>
+                    onClick={() => openMiniCart(product)}
+                    className={`w-30 py-2 border-2 font-semibold rounded-lg transition flex items-center justify-center gap-2 ${
+                      cartItems[product._id]
+                        ? "bg-green-600 border-green-600 text-white hover:bg-green-700"
+                        : "border-green-600 text-green-600 hover:bg-green-600 hover:text-white"
+                    }`}
+                    style={{ cursor: "pointer" }}>
+                    {cartItems[product._id] ? (
+                      <>
+                        <span>Add to Cart</span>
+                        <span className="bg-white/20 px-2 py-0.5 rounded-full text-[10px] font-bold">
+                          {cartItems[product._id]}
+                        </span>
+                      </>
+                    ) : (
+                      "Add to Cart"
+                    )}
+                  </button>
                   </div>
                 </div>
               ))
@@ -721,36 +766,64 @@ export default function GroceryRedesign() {
               {sectionProducts.slice(0, 8).map((product) => (
                 <div
                   key={product._id}
-                  className="bg-white border border-gray-100 rounded-xl p-4 hover:shadow-lg transition group relative">
+                  className="bg-white border border-gray-100 rounded-xl p-4 hover:shadow-lg transition group relative flex flex-col h-full">
                   <div
                     onClick={() => router.push(`/product/${product._id}`)}
-                    className="h-48 flex items-center justify-center bg-gray-50 rounded-lg mb-4 overflow-hidden cursor-pointer">
+                    className="relative h-48 flex items-center justify-center bg-gray-50 rounded-lg mb-4 overflow-hidden cursor-pointer">
+                    {product.discountPrice && product.discountPrice > product.price && (
+                      <div className="absolute top-2 left-2 bg-[#be1e2d] text-white text-[10px] font-bold px-2 py-1 rounded shadow-sm uppercase tracking-wider z-10">
+                        YOU SAVE {Math.round(((product.discountPrice - product.price) / product.discountPrice) * 100)}%
+                      </div>
+                    )}
                     {product.images && product.images.length > 0 ? (
                       <Image
                         src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${product.images[0]}`}
                         alt={product.title}
                         width={400}
                         height={400}
-                        className="w-full h-full object-cover group-hover:scale-110 transition duration-500"
+                        className="w-full h-full object-contain p-2 group-hover:scale-110 transition duration-500"
                       />
                     ) : (
                       <Package className="w-12 h-12 text-gray-300" />
                     )}
                   </div>
-                  <h3
-                    onClick={() => router.push(`/product/${product._id}`)}
-                    className="font-semibold text-gray-800 mb-1 truncate hover:text-green-600 cursor-pointer">
-                    {product.title}
-                  </h3>
-                  <div className="flex justify-between items-center">
-                    <span className="font-bold text-lg text-green-700">
-                      ₹{product.price}
-                    </span>
+                  <div className="flex-grow">
+                    <h3
+                      onClick={() => router.push(`/product/${product._id}`)}
+                      className="font-semibold text-gray-800 mb-1 line-clamp-2 min-h-[3rem] hover:text-green-600 cursor-pointer">
+                      {product.title}
+                    </h3>
+                  </div>
+                  <div className="flex justify-between items-end mb-1">
+                    <div className="flex flex-col">
+                      <span className="font-bold text-lg text-green-700 leading-none">
+                        ₹{product.price}
+                      </span>
+                      {product.discountPrice && product.discountPrice > product.price && (
+                        <span className="text-[11px] text-gray-400 line-through font-medium mt-1 leading-none">
+                          ₹{product.discountPrice}
+                        </span>
+                      )}
+                    </div>
                     <button
-                      onClick={() => openMiniCart(product)}
-                      className="w-8 h-8 rounded-full bg-green-100 text-green-600 flex items-center justify-center hover:bg-green-600 hover:text-white transition">
-                      <Plus className="w-4 h-4" />
-                    </button>
+                    onClick={() => openMiniCart(product)}
+                    className={`w-30 py-2 border-2 font-semibold rounded-lg transition flex items-center justify-center gap-2 ${
+                      cartItems[product._id]
+                        ? "bg-green-600 border-green-600 text-white hover:bg-green-700"
+                        : "border-green-600 text-green-600 hover:bg-green-600 hover:text-white"
+                    }`}
+                    style={{ cursor: "pointer" }}>
+                    {cartItems[product._id] ? (
+                      <>
+                        <span>Add to Cart</span>
+                        <span className="bg-white/20 px-2 py-0.5 rounded-full text-[10px] font-bold">
+                          {cartItems[product._id]}
+                        </span>
+                      </>
+                    ) : (
+                      "Add to Cart"
+                    )}
+                  </button>
                   </div>
                 </div>
               ))}

@@ -26,6 +26,7 @@ export default function AddProducts() {
     description: "",
     category: "",
     stock: "",
+    discountPrice: "",
     isTopSellingProducts: false,
     isDealsOfDay: false,
     isRice: false,
@@ -86,6 +87,7 @@ export default function AddProducts() {
       formData.append("description", form.description);
       formData.append("category", form.category);
       formData.append("stock", form.stock);
+      formData.append("discountPrice", form.discountPrice);
 
       // Append Boolean Flags
       formData.append("isTopSellingProducts", form.isTopSellingProducts);
@@ -119,6 +121,7 @@ export default function AddProducts() {
           description: "",
           category: "",
           stock: "",
+          discountPrice: "",
           isTopSellingProducts: false,
           isDealsOfDay: false,
           isRice: false,
@@ -193,7 +196,7 @@ export default function AddProducts() {
 
                 <div className="space-y-2">
                   <label className="flex items-center gap-2 text-sm font-semibold text-gray-300">
-                    <DollarSign size={16} className="text-green-500" /> Price
+                    <DollarSign size={16} className="text-green-500" /> Selling Price
                     (₹)
                   </label>
                   <input
@@ -204,6 +207,23 @@ export default function AddProducts() {
                     required
                     placeholder="0.00"
                     className="w-full px-4 py-3 bg-[#1f2937]/50 border border-gray-600/50 rounded-xl focus:ring-2 focus:ring-green-500/50 focus:border-green-500 outline-none transition-all placeholder:text-gray-600"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="flex items-center gap-2 text-sm font-semibold text-gray-300">
+                    <DollarSign size={16} className="text-red-500" /> MRP (Discount Price)
+                    (₹)
+                  </label>
+                  <input
+                    type="number"
+                    name="discountPrice"
+                    value={form.discountPrice}
+                    onChange={handleChange}
+                    placeholder="Optional (Must be > Selling Price for badge)"
+                    className="w-full px-4 py-3 bg-[#1f2937]/50 border border-gray-600/50 rounded-xl focus:ring-2 focus:ring-red-500/50 focus:border-red-500 outline-none transition-all placeholder:text-gray-600"
                   />
                 </div>
               </div>

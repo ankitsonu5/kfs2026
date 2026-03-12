@@ -5,6 +5,7 @@ exports.addProducts = async (req, res) => {
     const {
       title,
       price,
+      discountPrice,
       description,
       category,
       stock,
@@ -23,6 +24,7 @@ exports.addProducts = async (req, res) => {
     const product = new Product({
       title,
       price,
+      discountPrice,
       description,
       images,
       category,
@@ -73,6 +75,7 @@ exports.updateProduct = async (req, res) => {
     const {
       title,
       price,
+      discountPrice,
       description,
       category,
       stock,
@@ -88,6 +91,7 @@ exports.updateProduct = async (req, res) => {
     const updateData = {
       title,
       price,
+      discountPrice,
       description,
       category,
       stock,

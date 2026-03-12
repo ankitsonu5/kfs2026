@@ -154,6 +154,7 @@ export default function ProductDetail() {
             productId: product._id,
             title: product.title,
             price: product.price,
+            discountPrice: product.discountPrice,
             image: product.images?.[0] || "",
             quantity: quantity,
           });
@@ -168,6 +169,7 @@ export default function ProductDetail() {
               productId: product._id,
               title: product.title,
               price: product.price,
+              discountPrice: product.discountPrice,
               image: product.images?.[0] || "",
             },
             {
@@ -336,12 +338,16 @@ export default function ProductDetail() {
                 <p className="text-3xl font-black text-green-700">
                   ₹{product.price}
                 </p>
-                <p className="text-gray-400 line-through">
-                  ₹{product.price + 100}
-                </p>
-                <p className="bg-red-100 text-red-600 text-xs font-bold px-2 py-0.5 rounded">
-                  SAVE ₹100
-                </p>
+                {product.discountPrice > product.price && (
+                  <>
+                    <p className="text-gray-400 line-through">
+                      ₹{product.discountPrice}
+                    </p>
+                    <p className="bg-red-100 text-red-600 text-xs font-bold px-2 py-0.5 rounded">
+                      SAVE {Math.round(((product.discountPrice - product.price) / product.discountPrice) * 100)}%
+                    </p>
+                  </>
+                )}
               </div>
             </div>
 
@@ -363,7 +369,7 @@ export default function ProductDetail() {
                 <div className="flex items-center gap-3 bg-gray-100 rounded-2xl p-1.5 border border-gray-200 shadow-inner">
                   <button
                     onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                    className="w-10 h-10 rounded-xl bg-white text-green-700 font-bold flex items-center justify-center hover:bg-green-50 transition shadow-sm border border-gray-200">
+                    className="w-10 h-10 rounded-xl bg-white text-green-700 font-bold flex items-center justify-center hover:bg-green-50 transition shadow-sm border border-gray-200 cursor-pointer">
                     <Minus size={16} />
                   </button>
                   <span className="font-bold text-lg w-10 text-center">
@@ -371,7 +377,7 @@ export default function ProductDetail() {
                   </span>
                   <button
                     onClick={() => setQuantity((q) => q + 1)}
-                    className="w-10 h-10 rounded-xl bg-white text-green-700 font-bold flex items-center justify-center hover:bg-green-50 transition shadow-sm border border-gray-200">
+                    className="w-10 h-10 rounded-xl bg-white text-green-700 font-bold flex items-center justify-center hover:bg-green-50 transition shadow-sm border border-gray-200 cursor-pointer">
                     <Plus size={16} />
                   </button>
                 </div>
@@ -380,12 +386,12 @@ export default function ProductDetail() {
               <div className="flex flex-col sm:flex-row gap-4 pt-4 border-t border-gray-100">
                 <button
                   onClick={handleAddToCart}
-                  className="flex-1 bg-white border-2 border-green-600 text-green-600 py-4 rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-green-50 transition shadow-lg shadow-green-600/5 active:scale-95">
+                  className="flex-1 bg-white border-2 border-green-600 text-green-600 py-4 rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-green-50 transition shadow-lg shadow-green-600/5 active:scale-95 cursor-pointer">
                   <ShoppingCart size={20} /> Add to Cart
                 </button>
                 <button
                   onClick={handleBuyNow}
-                  className="flex-1 bg-green-600 text-white py-4 rounded-2xl font-bold hover:bg-green-700 transition shadow-xl shadow-green-600/20 active:scale-95">
+                  className="flex-1 bg-green-600 text-white py-4 rounded-2xl font-bold hover:bg-green-700 transition shadow-xl shadow-green-600/20 active:scale-95 cursor-pointer">
                   Buy Now
                 </button>
               </div>

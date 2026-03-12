@@ -25,7 +25,8 @@ exports.placeOrder = async (req, res) => {
           : ""),
     }));
 
-    const totalAmount = cart.totalAmount;
+    const deliveryCharge = cart.totalAmount > 1000 ? 0 : 50;
+    const totalAmount = cart.totalAmount + deliveryCharge;
 
     const order = new Order({
       userId,

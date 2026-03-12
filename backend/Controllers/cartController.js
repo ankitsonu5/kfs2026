@@ -2,7 +2,7 @@ const Cart = require("../models/Cart");
 
 exports.addToCart = async (req, res) => {
   try {
-    const { productId, title, price, image } = req.body;
+    const { productId, title, price, discountPrice, image } = req.body;
     const userId = req.user.id;
 
     let cart = await Cart.findOne({ user: userId });
@@ -10,7 +10,7 @@ exports.addToCart = async (req, res) => {
     if (!cart) {
       cart = new Cart({
         user: userId,
-        items: [{ productId, title, price, image, quantity: 1 }],
+        items: [{ productId, title, price, discountPrice, image, quantity: 1 }],
       });
     } else {
       const index = cart.items.findIndex(
@@ -20,7 +20,7 @@ exports.addToCart = async (req, res) => {
       if (index > -1) {
         cart.items[index].quantity += 1;
       } else {
-        cart.items.push({ productId, title, price, image, quantity: 1 });
+        cart.items.push({ productId, title, price, discountPrice, image, quantity: 1 });
       }
     }
 
@@ -130,6 +130,7 @@ exports.mergeCart = async (req, res) => {
           productId: item.productId,
           title: item.title,
           price: item.price,
+          discountPrice: item.discountPrice,
           image: item.image,
           quantity: item.quantity || 1,
         })),
@@ -147,6 +148,7 @@ exports.mergeCart = async (req, res) => {
             productId: newItem.productId,
             title: newItem.title,
             price: newItem.price,
+            discountPrice: newItem.discountPrice,
             image: newItem.image,
             quantity: newItem.quantity || 1,
           });

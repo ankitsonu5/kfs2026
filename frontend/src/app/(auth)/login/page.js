@@ -20,7 +20,7 @@ export default function Login() {
     if (token && role === "admin") {
       router.push("/admindashboard");
     }
-  }, []);
+  }, [router]);
 
   const handleChange = (e) => {
     setFormData({
@@ -80,8 +80,8 @@ export default function Login() {
 
   return (
     <>
-      <section className="bg-gray-50 dark:bg-green-100">
-        <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto h-screen lg:py-0">
+      <section className="bg-gray-50 dark:bg-green-100 min-h-screen">
+        <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
           <Link
             href="/"
             className="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white">
@@ -145,11 +145,11 @@ export default function Login() {
                       </label>
                     </div>
                   </div>
-                  <a
+                  <Link
                     href="/forgotpassword"
                     className="text-sm text-blue-600 hover:underline">
                     Forgot password?
-                  </a>
+                  </Link>
                 </div>
                 <button
                   type="submit"
@@ -157,13 +157,13 @@ export default function Login() {
                   style={{ cursor: "pointer" }}>
                   Sign in
                 </button>
-                <p className="text-sm font-light text-white dark:text-white">
+                <p className="text-sm font-light text-gray-500 dark:text-gray-400">
                   Don’t have an account yet?{" "}
-                  <a
+                  <Link
                     href="/signup"
-                    className="text-sm text-blue-600 hover:underline">
+                    className="font-medium text-blue-600 hover:underline dark:text-blue-500">
                     Sign up
-                  </a>
+                  </Link>
                 </p>
               </form>
             </div>

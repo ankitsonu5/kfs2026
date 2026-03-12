@@ -16,11 +16,12 @@ import {
   Minus,
 } from "lucide-react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 export default function BulkOrder() {
+  const router = useRouter();
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [filteredProducts, setFilteredProducts] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [sortOption, setSortOption] = useState("default");
   const [resultsPerPage, setResultsPerPage] = useState(15);
@@ -28,13 +29,9 @@ export default function BulkOrder() {
   const [cartItems, setCartItems] = useState({});
   const [viewMode, setViewMode] = useState("grid"); // 'grid' or 'list'
 
-  useEffect(() => {
-    fetchProducts();
-    fetchCategories();
-    initializeCart();
-  }, []);
 
-  const initializeCart = () => {
+
+  function initializeCart() {
     const fetchCart = async () => {
       try {
         const token = localStorage.getItem("token");
@@ -72,20 +69,19 @@ export default function BulkOrder() {
     fetchCart();
   };
 
-  const fetchProducts = async () => {
+  async function fetchProducts() {
     try {
       const res = await axios.get(
         `${process.env.NEXT_PUBLIC_API_URL}/products`,
       );
       const fetchedProducts = res.data.products || [];
       setProducts(fetchedProducts);
-      setFilteredProducts(fetchedProducts);
     } catch (error) {
       console.error("Fetch products error:", error);
     }
   };
 
-  const fetchCategories = async () => {
+  async function fetchCategories() {
     try {
       const res = await axios.get(
         `${process.env.NEXT_PUBLIC_API_URL}/categories`,
@@ -94,34 +90,43 @@ export default function BulkOrder() {
     } catch (error) {
       console.error("Fetch categories error:", error);
     }
-  };
+  }
 
   useEffect(() => {
-    let result = [...products];
+    const loadAll = async () => {
+      fetchProducts();
+      fetchCategories();
+      
+      // Delay initializeCart off the synchronous path to avoid React complaints 
+      // about synchronous state updates in effects
+      await Promise.resolve();
+      initializeCart();
+    };
+    loadAll();
+  }, []);
 
-    // Category Filter
-    if (selectedCategory !== "all") {
-      result = result.filter(
-        (p) =>
-          p.category === selectedCategory ||
-          (p.category && p.category.name === selectedCategory),
-      );
-    }
+  let filteredProducts = [...products];
 
-    // Sorting
-    if (sortOption === "price-low") {
-      result.sort((a, b) => a.price - b.price);
-    } else if (sortOption === "price-high") {
-      result.sort((a, b) => b.price - a.price);
-    }
+  // Category Filter
+  if (selectedCategory !== "all") {
+    filteredProducts = filteredProducts.filter(
+      (p) =>
+        p.category === selectedCategory ||
+        (p.category && p.category.name === selectedCategory),
+    );
+  }
 
-    // Pagination
-    if (resultsPerPage !== "all") {
-      result = result.slice(0, resultsPerPage);
-    }
+  // Sorting
+  if (sortOption === "price-low") {
+    filteredProducts.sort((a, b) => a.price - b.price);
+  } else if (sortOption === "price-high") {
+    filteredProducts.sort((a, b) => b.price - a.price);
+  }
 
-    setFilteredProducts(result);
-  }, [selectedCategory, sortOption, products, resultsPerPage]);
+  // Pagination
+  if (resultsPerPage !== "all") {
+    filteredProducts = filteredProducts.slice(0, resultsPerPage);
+  }
 
   const handleAddToCart = async (product) => {
     try {
@@ -141,6 +146,7 @@ export default function BulkOrder() {
             productId: product._id,
             title: product.title,
             price: product.price,
+            discountPrice: product.discountPrice,
             image: product.images?.[0] || "",
             quantity: 1,
           });
@@ -159,6 +165,7 @@ export default function BulkOrder() {
           productId: product._id,
           title: product.title,
           price: product.price,
+          discountPrice: product.discountPrice,
           image: product.images?.[0] || "",
         },
         { headers: { Authorization: token } },
@@ -280,21 +287,23 @@ export default function BulkOrder() {
                       onClick={() => router.push(`/product/${p._id}`)}
                       className={`relative bg-gray-50 flex items-center justify-center cursor-pointer ${viewMode === "list" ? "w-48 h-48 rounded-lg" : "h-52 sm:h-64"}`}>
                       {p.images && p.images.length > 0 ? (
-                        <img
+                        <Image
                           src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${p.images[0]}`}
                           alt={p.title}
                           className="w-full h-full object-contain p-4 group-hover:scale-105 transition-transform duration-500"
+                          width={300}
+                          height={300}
                         />
                       ) : (
                         <Package className="w-16 h-16 text-gray-300" />
                       )}
 
                       {/* Discount Badge */}
-                      {p.discountPrice && (
-                        <div className="absolute top-3 left-3 bg-[#be1e2d] text-white text-[10px] font-bold px-2 py-1 rounded shadow-sm uppercase tracking-wider">
+                      {p.discountPrice && p.discountPrice > p.price && (
+                        <div className="absolute top-3 left-3 bg-[#be1e2d] text-white text-[10px] font-bold px-2 py-1 rounded shadow-sm uppercase tracking-wider z-10">
                           YOU SAVE{" "}
                           {Math.round(
-                            ((p.price - p.discountPrice) / p.price) * 100,
+                            ((p.discountPrice - p.price) / p.discountPrice) * 100,
                           )}
                           %
                         </div>
@@ -344,8 +353,7 @@ export default function BulkOrder() {
                           </>
                         ) : (
                           <>
-                            <Plus size={14} />
-                            Add
+                            Add to Cart
                           </>
                         )}
                       </button>

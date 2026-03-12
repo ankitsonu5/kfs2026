@@ -58,19 +58,19 @@ export default function Contact() {
     {
       icon: <Phone size={24} className="text-green-600" />,
       title: "Phone Number",
-      details: ["+1 8800145844", "+1 909969 0383"],
+      details: ["+1 8800145844"],
       bg: "bg-green-50",
     },
     {
       icon: <Mail size={24} className="text-blue-600" />,
       title: "Email Address",
-      details: ["infokfs24x7@gmail.com", "support@kfs24x7.com"],
+      details: ["infokfs24x7@gmail.com"],
       bg: "bg-blue-50",
     },
     {
       icon: <MapPin size={24} className="text-red-600" />,
       title: "Office Address",
-      details: ["123 Market St, Suite 456", "San Francisco, CA 94103"],
+      details: ["N 8/180, Y1, Number 2, Rajendra Vihar Colony, Varanasi-221005, Uttar Pradesh"],
       bg: "bg-red-50",
     },
     {

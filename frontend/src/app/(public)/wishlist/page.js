@@ -104,6 +104,7 @@ export default function WishlistPage() {
           productId: product.productId,
           title: product.title,
           price: product.price,
+          discountPrice: product.discountPrice,
           image: product.image,
         },
         { headers: { Authorization: token } },
@@ -168,14 +169,16 @@ export default function WishlistPage() {
             {wishlistItems.map((item) => (
               <div
                 key={item.productId}
-                className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-md transition duration-300 group">
+                className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-md transition duration-300 group flex flex-col h-full">
                 <div
                   onClick={() => router.push(`/product/${item.productId}`)}
-                  className="h-48 bg-gray-50 relative flex items-center justify-center p-4 cursor-pointer overflow-hidden">
+                  className="h-48 bg-gray-50 relative flex items-center justify-center p-4 cursor-pointer overflow-hidden flex-shrink-0">
                   <Image
                     src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${item.image}`}
                     alt={item.title}
                     className="w-full h-full object-contain group-hover:scale-105 transition duration-500"
+                    width={200}
+                    height={200}
                   />
                   <button
                     onClick={(e) => {
@@ -186,10 +189,10 @@ export default function WishlistPage() {
                     <Trash2 size={18} />
                   </button>
                 </div>
-                <div className="p-4">
+                <div className="p-4 flex-grow flex flex-col">
                   <h3
                     onClick={() => router.push(`/product/${item.productId}`)}
-                    className="font-bold text-gray-800 mb-1 hover:text-green-600 cursor-pointer truncate">
+                    className="font-bold text-gray-800 mb-1 hover:text-green-600 cursor-pointer line-clamp-2 min-h-[3rem]">
                     {item.title}
                   </h3>
                   <div className="flex items-center justify-between mb-4">

@@ -93,6 +93,7 @@ function ShopContent() {
 
     const fetchCart = async () => {
       try {
+        await Promise.resolve(); // Defers the synchronous branch execution to avoid "setState during effect" warning
         const token = localStorage.getItem("token");
         if (!token) {
           const guestCart = JSON.parse(
@@ -199,6 +200,7 @@ function ShopContent() {
         _id: product._id,
         title: product.title,
         price: product.price,
+        discountPrice: product.discountPrice,
         image: product.images?.[0] || "",
       },
       qty: 1,
@@ -223,6 +225,7 @@ function ShopContent() {
             productId: miniCart.product._id,
             title: miniCart.product.title,
             price: miniCart.product.price,
+            discountPrice: miniCart.product.discountPrice,
             image: miniCart.product.image,
             quantity: miniCart.qty,
           });
@@ -239,7 +242,13 @@ function ShopContent() {
 
       await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}/add-cart`,
-        { productId: miniCart.product._id, quantity: miniCart.qty },
+        { 
+          productId: miniCart.product._id, 
+          title: miniCart.product.title, 
+          price: miniCart.product.price, 
+          discountPrice: miniCart.product.discountPrice, 
+          image: miniCart.product.image 
+        },
         { headers: { Authorization: token } },
       );
       setCartItems((prev) => ({
@@ -348,40 +357,68 @@ function ShopContent() {
                 {filteredProducts.map((product) => (
                   <div
                     key={product._id}
-                    className="bg-white border border-gray-100 rounded-3xl p-3 md:p-4 hover:shadow-xl transition-all group relative animate-in fade-in zoom-in duration-300">
+                    className="bg-white border border-gray-100 rounded-3xl p-3 md:p-4 hover:shadow-xl transition-all group relative animate-in fade-in zoom-in duration-300 flex flex-col h-full">
                     <div
                       onClick={() => router.push(`/product/${product._id}`)}
-                      className="aspect-square flex items-center justify-center bg-gray-50 rounded-2xl mb-4 overflow-hidden cursor-pointer relative">
+                      className="aspect-square flex items-center justify-center bg-gray-50 rounded-2xl mb-4 overflow-hidden cursor-pointer relative flex-shrink-0">
                       {product.images && product.images.length > 0 ? (
                         <Image
                           src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${product.images[0]}`}
                           alt={product.title}
-                          className="w-full h-full object-cover group-hover:scale-110 transition duration-500"
+                          className="w-full h-full object-contain p-2 group-hover:scale-110 transition duration-500"
                           width={300}
                           height={300}
                         />
                       ) : (
                         <Package className="w-10 h-10 text-gray-300" />
                       )}
+                      {product.discountPrice > product.price && (
+                        <div className="absolute top-2 left-2 z-10">
+                          <span className="bg-red-500/10 backdrop-blur-md border border-red-500/20 text-red-600 text-[10px] font-black px-2 py-1 rounded-lg uppercase tracking-wider shadow-sm">
+                            SAVE {Math.round(((product.discountPrice - product.price) / product.discountPrice) * 100)}%
+                          </span>
+                        </div>
+                      )}
                     </div>
-                    <h3
-                      onClick={() => router.push(`/product/${product._id}`)}
-                      className="text-sm md:text-base font-bold text-gray-800 mb-1 hover:text-green-600 cursor-pointer line-clamp-2 min-h-[40px]">
-                      {product.title}
-                    </h3>
+                    <div className="flex-grow">
+                      <h3
+                        onClick={() => router.push(`/product/${product._id}`)}
+                        className="text-sm md:text-base font-bold text-gray-800 mb-1 hover:text-green-600 cursor-pointer line-clamp-2 min-h-[3rem]">
+                        {product.title}
+                      </h3>
+                    </div>
                     <div className="flex justify-between items-center mt-3">
-                      <span className="font-extrabold text-base md:text-lg text-gray-900">
-                        ₹{product.price}
-                      </span>
+                      <div>
+                        <span className="font-extrabold text-base md:text-lg text-gray-900">
+                          ₹{product.price}
+                        </span>
+                        {product.discountPrice > product.price && (
+                          <div className="flex items-center gap-1.5 mt-0.5">
+                            <span className="text-gray-400 line-through text-[11px] font-semibold">
+                              ₹{product.discountPrice}
+                            </span>
+                          </div>
+                        )}
+                      </div>
                       <button
-                        onClick={() => openMiniCart(product)}
-                        className={`p-2.5 md:p-3 rounded-2xl transition-all active:scale-90 ${
-                          cartItems[product._id]
-                            ? "bg-green-600 text-white shadow-lg shadow-green-100"
-                            : "bg-green-50 text-green-600 hover:bg-green-600 hover:text-white"
-                        }`}>
-                        <Plus className="w-5 h-5" />
-                      </button>
+                    onClick={() => openMiniCart(product)}
+                    className={`w-30 py-2 border-2 font-semibold rounded-lg transition flex items-center justify-center gap-2 ${
+                      cartItems[product._id]
+                        ? "bg-green-600 border-green-600 text-white hover:bg-green-700"
+                        : "border-green-600 text-green-600 hover:bg-green-600 hover:text-white"
+                    }`}
+                    style={{ cursor: "pointer" }}>
+                    {cartItems[product._id] ? (
+                      <>
+                        <span>Add to Cart</span>
+                        <span className="bg-white/20 px-2 py-0.5 rounded-full text-[10px] font-bold">
+                          {cartItems[product._id]}
+                        </span>
+                      </>
+                    ) : (
+                      "Add to Cart"
+                    )}
+                  </button>
                     </div>
                   </div>
                 ))}

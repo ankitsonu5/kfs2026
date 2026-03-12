@@ -89,6 +89,7 @@ export default function Cart() {
           productId: item.productId,
           title: item.title,
           price: item.price,
+          discountPrice: item.discountPrice,
           image: item.image,
         },
         { headers: { Authorization: token } },
@@ -220,6 +221,17 @@ export default function Cart() {
     );
   }
 
+  const subtotal = cart.items.reduce((sum, item) => sum + (Number(item.price) * item.quantity), 0);
+  const totalMrp = cart.items.reduce((sum, item) => {
+    const p = Number(item.price);
+    const dp = Number(item.discountPrice);
+    const mrp = (dp && dp > p) ? dp : p;
+    return sum + (mrp * item.quantity);
+  }, 0);
+  const totalSavings = totalMrp - subtotal;
+  const deliveryCharge = subtotal > 1000 || subtotal === 0 ? 0 : 50;
+  const grandTotal = subtotal + deliveryCharge;
+
   return (
     <>
     <Header />
@@ -272,9 +284,21 @@ export default function Cart() {
                     <h3 className="font-semibold text-gray-800 truncate">
                       {item.title}
                     </h3>
-                    <p className="text-green-600 font-bold text-lg">
-                      ₹{item.price}
-                    </p>
+                    <div className="flex flex-col items-start gap-1">
+                      <p className="text-green-600 font-bold text-lg">
+                        ₹{item.price}
+                      </p>
+                      {item.discountPrice && item.discountPrice > item.price && (
+                        <div className="flex items-center gap-2">
+                          <p className="text-gray-400 line-through text-sm">
+                            ₹{item.discountPrice}
+                          </p>
+                          <span className="bg-red-100 text-red-600 text-[10px] font-bold px-1.5 py-0.5 rounded uppercase">
+                            Save {Math.round(((item.discountPrice - item.price) / item.discountPrice) * 100)}%
+                          </span>
+                        </div>
+                      )}
+                    </div>
 
                     {/* Quantity Controls */}
                     <div className="flex items-center gap-3 mt-2">
@@ -316,16 +340,30 @@ export default function Cart() {
 
                 <div className="space-y-3 mb-6">
                   <div className="flex justify-between text-gray-600">
-                    <span>Subtotal ({cart.items.length} items)</span>
-                    <span>₹{cart.totalAmount}</span>
+                    <span>Total MRP ({cart.items.length} items)</span>
+                    <span className="line-through text-gray-400">₹{totalMrp}</span>
                   </div>
                   <div className="flex justify-between text-gray-600">
-                    <span>Delivery</span>
-                    <span className="text-green-600 font-semibold">FREE</span>
+                    <span>Selling Price</span>
+                    <span>₹{subtotal}</span>
+                  </div>
+                  {totalSavings > 0 && (
+                    <div className="flex justify-between text-gray-600 font-semibold">
+                      <span>You Save</span>
+                      <span>-₹{totalSavings}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between text-gray-600">
+                    <span>Delivery Charges <span className="text-xs text-gray-400">(Free above ₹1000)</span></span>
+                    {deliveryCharge === 0 ? (
+                      <span className="text-green-600 font-semibold">FREE</span>
+                    ) : (
+                      <span>₹{deliveryCharge}</span>
+                    )}
                   </div>
                   <div className="border-t border-gray-200 pt-3 flex justify-between font-bold text-gray-800 text-lg">
-                    <span>Total</span>
-                    <span>₹{cart.totalAmount}</span>
+                    <span>Grand Total</span>
+                    <span>₹{grandTotal}</span>
                   </div>
                 </div>
 

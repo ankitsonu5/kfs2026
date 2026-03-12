@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import axios from "axios";
+import Image from "next/image";
+import Link from "next/link";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
@@ -31,72 +33,84 @@ export default function ForgotPassword() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center dark:bg-green-100">
-      <div className="bg-[#111827] p-8 rounded-xl shadow-lg w-full max-w-md border border-gray-700">
-        <h2 className="text-2xl font-bold text-center mb-2 text-white">
-          Forgot Password?
-        </h2>
-        <p className="text-center text-gray-400 text-sm mb-6">
-          Enter your email and we’ll send reset link
-        </p>
+    <>
+      <section className="bg-gray-50 dark:bg-green-100 min-h-screen">
+        <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
+          <Link
+            href="/"
+            className="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white">
+            <Image src="/kfslogo.webp" alt="logo" width={250} height={250} />
+          </Link>
+          <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
+            <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
+              <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
+                Forgot Password?
+              </h1>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">
+                Enter your email and we’ll send reset link
+              </p>
 
-        {!emailSent ? (
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-sm text-gray-300 mb-1">
-                Email Address
-              </label>
+              {!emailSent ? (
+                <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
+                  <div>
+                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                      Your email
+                    </label>
+                    <input
+                      type="email"
+                      placeholder="name@email.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    />
+                  </div>
 
-              <input
-                type="email"
-                placeholder="name@email.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="w-full px-3 py-2 bg-[#1f2937] border border-gray-600 rounded-md 
-                text-white placeholder-gray-400
-                focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition duration-200 disabled:bg-blue-400"
+                    style={{ cursor: loading ? "not-allowed" : "pointer" }}>
+                    {loading ? "Sending..." : "Send Reset Link"}
+                  </button>
+                </form>
+              ) : (
+                <div className="text-center py-4">
+                  <h3 className="text-lg font-semibold text-green-600 mb-2">
+                    Email Sent!
+                  </h3>
+                  <p className="text-gray-500 dark:text-gray-400 text-sm mb-4 leading-relaxed">
+                    Reset link email par bhej diya hai.
+                    <br />
+                    <span className="text-xs text-yellow-600 font-bold block mt-2">
+                      Development Mode:{" "}
+                      <Link
+                        href={`/resetpassword/${resetToken}`}
+                        className="underline">
+                        Click here to reset password
+                      </Link>
+                    </span>
+                  </p>
+
+                  <button
+                    onClick={() => setEmailSent(false)}
+                    className="text-blue-600 hover:underline text-sm">
+                    Resend Email
+                  </button>
+                </div>
+              )}
+
+              <div className="text-center mt-4">
+                <Link
+                  href="/login"
+                  className="text-sm text-blue-600 hover:underline">
+                  ← Back to Login
+                </Link>
+              </div>
             </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition disabled:bg-gray-600"
-              style={{ cursor: loading ? "not-allowed" : "pointer" }}>
-              {loading ? "Sending..." : "Send Reset Link"}
-            </button>
-          </form>
-        ) : (
-          <div className="text-center py-4">
-            <h3 className="text-lg font-semibold text-green-400 mb-2">
-              Email Sent!
-            </h3>
-            <p className="text-gray-400 text-sm mb-4 leading-relaxed">
-              Reset link email par bhej diya hai.
-              <br />
-              <span className="text-xs text-yellow-500 font-bold block mt-2">
-                Development Mode:{" "}
-                <a href={`/resetpassword/${resetToken}`} className="underline">
-                  Click here to reset password
-                </a>
-              </span>
-            </p>
-
-            <button
-              onClick={() => setEmailSent(false)}
-              className="text-blue-400 hover:underline text-sm">
-              Resend Email
-            </button>
           </div>
-        )}
-
-        <div className="text-center mt-6">
-          <a href="/login" className="text-sm text-blue-400 hover:underline">
-            ← Back to Login
-          </a>
         </div>
-      </div>
-    </div>
+      </section>
+    </>
   );
 }
