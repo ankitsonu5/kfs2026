@@ -530,43 +530,46 @@ export default function GroceryRedesign() {
                       <Package className="w-16 h-16 text-gray-300" />
                     )}
                   </div>
-                  <div className="flex-grow flex flex-col">
-                    <h3
-                      onClick={() => router.push(`/product/${product._id}`)}
-                      className="font-semibold text-gray-800 mb-1 cursor-pointer hover:text-green-600 transition-colors line-clamp-2 min-h-[3rem]">
-                      {product.title}
-                    </h3>
-                    <div className="flex items-baseline gap-2 mb-4">
-                      <span className="font-bold text-lg text-green-700">
-                        ₹{product.price}
-                      </span>
-                      {product.discountPrice && product.discountPrice > product.price && (
-                        <span className="text-xs text-gray-400 line-through font-medium">
-                          ₹{product.discountPrice}
-                        </span>
-                      )}
+                    <div className="flex-grow">
+                      <h3
+                        onClick={() => router.push(`/product/${product._id}`)}
+                        className="text-xs md:text-base font-semibold md:font-bold text-gray-800 mb-1 cursor-pointer hover:text-green-600 transition-colors line-clamp-2 min-h-[3rem] leading-tight break-words">
+                        {product.title}
+                      </h3>
+                    </div>
+                    <div className="mt-auto pt-3">
+                      <div className="flex flex-col gap-2">
+                         <div className="flex items-baseline gap-1">
+                          <span className="font-extrabold text-base md:text-lg text-gray-900">
+                            ₹{product.price}
+                          </span>
+                          {product.discountPrice && product.discountPrice > product.price && (
+                            <span className="text-gray-400 line-through text-[10px] font-semibold">
+                              ₹{product.discountPrice}
+                            </span>
+                          )}
+                        </div>
+                      <button
+                        onClick={() => openMiniCart(product)}
+                        className={`w-full py-2 border-2 text-[11px] md:text-sm font-bold rounded-xl transition flex items-center justify-center gap-1 ${
+                          cartItems[product._id]
+                            ? "bg-green-600 border-green-600 text-white shadow-md shadow-green-100"
+                            : "border-green-600 text-green-600 bg-white hover:bg-green-600 hover:text-white"
+                        }`}
+                        style={{ cursor: "pointer" }}>
+                        {cartItems[product._id] ? (
+                          <>
+                            <span>Added</span>
+                            <span className="bg-white text-green-600 px-1.5 py-0.5 rounded-full text-[9px] font-black">
+                              {cartItems[product._id]}
+                            </span>
+                          </>
+                        ) : (
+                          "Add to Cart"
+                        )}
+                      </button>
                     </div>
                   </div>
-
-                  <button
-                    onClick={() => openMiniCart(product)}
-                    className={`w-full py-2 border-2 font-semibold rounded-lg transition flex items-center justify-center gap-2 ${
-                      cartItems[product._id]
-                        ? "bg-green-600 border-green-600 text-white hover:bg-green-700"
-                        : "border-green-600 text-green-600 hover:bg-green-600 hover:text-white"
-                    }`}
-                    style={{ cursor: "pointer" }}>
-                    {cartItems[product._id] ? (
-                      <>
-                        <span>Add to Cart</span>
-                        <span className="bg-white/20 px-2 py-0.5 rounded-full text-[10px] font-bold">
-                          {cartItems[product._id]}
-                        </span>
-                      </>
-                    ) : (
-                      "Add to Cart"
-                    )}
-                  </button>
                 </div>
               ))
           ) : (
@@ -688,43 +691,45 @@ export default function GroceryRedesign() {
                       <Package className="w-12 h-12 text-gray-300" />
                     )}
                   </div>
-                  <div className="flex-grow">
-                    <h3
-                      onClick={() => router.push(`/product/${product._id}`)}
-                      className="font-semibold text-gray-800 mb-1 line-clamp-2 min-h-[3rem] hover:text-green-600 cursor-pointer">
-                      {product.title}
-                    </h3>
-                  </div>
-                  <div className="flex justify-between items-end mb-1">
-                    <div className="flex flex-col">
-                      <span className="font-bold text-lg text-green-700 leading-none">
-                        ₹{product.price}
-                      </span>
-                      {product.discountPrice && product.discountPrice > product.price && (
-                        <span className="text-[11px] text-gray-400 line-through font-medium mt-1 leading-none">
-                          ₹{product.discountPrice}
-                        </span>
-                      )}
+                    <div className="flex-grow">
+                      <h3
+                        onClick={() => router.push(`/product/${product._id}`)}
+                        className="text-xs md:text-base font-semibold md:font-bold text-gray-800 mb-1 line-clamp-2 min-h-[3rem] hover:text-green-600 cursor-pointer leading-tight break-words">
+                        {product.title}
+                      </h3>
                     </div>
-                    <button
-                    onClick={() => openMiniCart(product)}
-                    className={`w-30 py-2 border-2 font-semibold rounded-lg transition flex items-center justify-center gap-2 ${
-                      cartItems[product._id]
-                        ? "bg-green-600 border-green-600 text-white hover:bg-green-700"
-                        : "border-green-600 text-green-600 hover:bg-green-600 hover:text-white"
-                    }`}
-                    style={{ cursor: "pointer" }}>
-                    {cartItems[product._id] ? (
-                      <>
-                        <span>Add to Cart</span>
-                        <span className="bg-white/20 px-2 py-0.5 rounded-full text-[10px] font-bold">
-                          {cartItems[product._id]}
-                        </span>
-                      </>
-                    ) : (
-                      "Add to Cart"
-                    )}
-                  </button>
+                    <div className="mt-auto pt-3">
+                      <div className="flex flex-col gap-2">
+                         <div className="flex items-baseline gap-1">
+                          <span className="font-extrabold text-base md:text-lg text-gray-900 leading-none">
+                            ₹{product.price}
+                          </span>
+                          {product.discountPrice && product.discountPrice > product.price && (
+                            <span className="text-gray-400 line-through text-[10px] font-semibold mt-1 leading-none">
+                              ₹{product.discountPrice}
+                            </span>
+                          )}
+                        </div>
+                      <button
+                        onClick={() => openMiniCart(product)}
+                        className={`w-full py-2 border-2 text-[11px] md:text-sm font-bold rounded-xl transition flex items-center justify-center gap-1 ${
+                          cartItems[product._id]
+                            ? "bg-green-600 border-green-600 text-white shadow-md shadow-green-100"
+                            : "border-green-600 text-green-600 bg-white hover:bg-green-600 hover:text-white"
+                        }`}
+                        style={{ cursor: "pointer" }}>
+                        {cartItems[product._id] ? (
+                          <>
+                            <span>Added</span>
+                            <span className="bg-white text-green-600 px-1.5 py-0.5 rounded-full text-[9px] font-black">
+                              {cartItems[product._id]}
+                            </span>
+                          </>
+                        ) : (
+                          "Add to Cart"
+                        )}
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))
@@ -787,44 +792,46 @@ export default function GroceryRedesign() {
                       <Package className="w-12 h-12 text-gray-300" />
                     )}
                   </div>
-                  <div className="flex-grow">
-                    <h3
-                      onClick={() => router.push(`/product/${product._id}`)}
-                      className="font-semibold text-gray-800 mb-1 line-clamp-2 min-h-[3rem] hover:text-green-600 cursor-pointer">
-                      {product.title}
-                    </h3>
-                  </div>
-                  <div className="flex justify-between items-end mb-1">
-                    <div className="flex flex-col">
-                      <span className="font-bold text-lg text-green-700 leading-none">
-                        ₹{product.price}
-                      </span>
-                      {product.discountPrice && product.discountPrice > product.price && (
-                        <span className="text-[11px] text-gray-400 line-through font-medium mt-1 leading-none">
-                          ₹{product.discountPrice}
-                        </span>
-                      )}
+                    <div className="flex-grow">
+                      <h3
+                        onClick={() => router.push(`/product/${product._id}`)}
+                        className="text-xs md:text-base font-semibold md:font-bold text-gray-800 mb-1 line-clamp-2 min-h-[3rem] hover:text-green-600 cursor-pointer leading-tight break-words">
+                        {product.title}
+                      </h3>
                     </div>
-                    <button
-                    onClick={() => openMiniCart(product)}
-                    className={`w-30 py-2 border-2 font-semibold rounded-lg transition flex items-center justify-center gap-2 ${
-                      cartItems[product._id]
-                        ? "bg-green-600 border-green-600 text-white hover:bg-green-700"
-                        : "border-green-600 text-green-600 hover:bg-green-600 hover:text-white"
-                    }`}
-                    style={{ cursor: "pointer" }}>
-                    {cartItems[product._id] ? (
-                      <>
-                        <span>Add to Cart</span>
-                        <span className="bg-white/20 px-2 py-0.5 rounded-full text-[10px] font-bold">
-                          {cartItems[product._id]}
-                        </span>
-                      </>
-                    ) : (
-                      "Add to Cart"
-                    )}
-                  </button>
-                  </div>
+                    <div className="mt-auto pt-3">
+                      <div className="flex flex-col gap-2">
+                        <div className="flex items-baseline gap-1">
+                          <span className="font-extrabold text-base md:text-lg text-gray-900 leading-none">
+                            ₹{product.price}
+                          </span>
+                          {product.discountPrice && product.discountPrice > product.price && (
+                            <span className="text-[10px] text-gray-400 line-through font-medium mt-1 leading-none">
+                              ₹{product.discountPrice}
+                            </span>
+                          )}
+                        </div>
+                        <button
+                          onClick={() => openMiniCart(product)}
+                          className={`w-full py-2 border-2 text-[11px] md:text-sm font-bold rounded-xl transition flex items-center justify-center gap-1 ${
+                            cartItems[product._id]
+                              ? "bg-green-600 border-green-600 text-white shadow-md shadow-green-100"
+                              : "border-green-600 text-green-600 bg-white hover:bg-green-600 hover:text-white"
+                          }`}
+                          style={{ cursor: "pointer" }}>
+                          {cartItems[product._id] ? (
+                            <>
+                              <span>Added</span>
+                              <span className="bg-white text-green-600 px-1.5 py-0.5 rounded-full text-[9px] font-black">
+                                {cartItems[product._id]}
+                              </span>
+                            </>
+                          ) : (
+                            "Add to Cart"
+                          )}
+                        </button>
+                      </div>
+                    </div>
                 </div>
               ))}
             </div>
@@ -836,104 +843,110 @@ export default function GroceryRedesign() {
 
       <Footer />
 
-      {/* Mini Cart Popup */}
-      {miniCart && (
-        <>
-          {/* Backdrop */}
-          <div
-            onClick={() => setMiniCart(null)}
-            className="fixed inset-0 bg-black/30 z-50"
-          />
-          {/* Popup */}
-          <div className="fixed top-4 right-4 w-80 bg-white rounded-2xl shadow-2xl z-50 overflow-hidden border border-gray-200 animate-in">
-            {/* Header */}
-            <div className="bg-green-600 text-white px-4 py-3 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <ShoppingCart className="w-4 h-4" />
-                <span className="font-bold text-sm">Add to Cart</span>
-              </div>
-              <button
-                onClick={() => setMiniCart(null)}
-                className="text-white hover:text-green-200 transition-colors cursor-pointer">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Product Info */}
-            <div className="p-4">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-16 h-16 bg-gray-50 rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center">
-                  {miniCart.product.image ? (
-                    <Image
-                      src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${miniCart.product.image}`}
-                      alt={miniCart.product.title}
-                      width={100}
-                      height={100}
-                      className="w-full h-full object-contain p-2"
-                    />
-                  ) : (
-                    <Package className="w-8 h-8 text-gray-300" />
-                  )}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h4 className="font-semibold text-gray-800 text-sm truncate">
-                    {miniCart.product.title}
-                  </h4>
-                  <p className="text-green-600 font-bold">
-                    ₹{miniCart.product.price}
-                  </p>
-                </div>
-              </div>
-
-              {/* Quantity Controls */}
-              <div className="flex items-center justify-between bg-gray-50 rounded-xl p-3 mb-4">
-                <span className="text-sm font-medium text-gray-600">
-                  Quantity
-                </span>
-                <div className="flex items-center gap-3">
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setMiniCart((prev) => ({
-                        ...prev,
-                        qty: Math.max(1, prev.qty - 1),
-                      }))
-                    }
-                    className="w-8 h-8 rounded-full bg-green-100 text-green-700 font-bold flex items-center justify-center hover:bg-green-200 transition cursor-pointer">
-                    <Minus className="w-4 h-4" />
-                  </button>
-                  <span className="font-bold text-lg text-gray-800 w-8 text-center">
-                    {miniCart.qty}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setMiniCart((prev) => ({ ...prev, qty: prev.qty + 1 }))
-                    }
-                    className="w-8 h-8 rounded-full bg-green-100 text-green-700 font-bold flex items-center justify-center hover:bg-green-200 transition cursor-pointer">
-                    <Plus className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-
-              {/* Total */}
-              <div className="flex items-center justify-between mb-4 px-1">
-                <span className="text-sm text-gray-500">Total</span>
-                <span className="font-bold text-lg text-gray-800">
-                  ₹{miniCart.product.price * miniCart.qty}
-                </span>
-              </div>
-
-              {/* Add to Cart Button */}
-              <button
-                onClick={confirmMiniCart}
-                className="w-full bg-green-600 text-white py-3 rounded-xl font-bold hover:bg-green-700 transition shadow-lg cursor-pointer flex items-center justify-center gap-2">
-                <ShoppingCart className="w-5 h-5" /> Add to Cart
-              </button>
-            </div>
+    {/* Mini Cart Popup - Desktop (top-right) & Mobile (bottom-sheet) */}
+    {miniCart && (
+      <>
+        {/* Backdrop */}
+        <div
+          onClick={() => setMiniCart(null)}
+          className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[160] transition-opacity duration-300"
+        />
+        {/* Container */}
+        <div className="fixed bottom-0 left-0 right-0 md:top-6 md:right-6 md:left-auto md:bottom-auto w-full md:w-96 bg-white rounded-t-[2.5rem] md:rounded-2xl shadow-[0_-8px_30px_rgba(0,0,0,0.1)] md:shadow-2xl z-[170] overflow-hidden animate-in slide-in-from-bottom md:slide-in-from-right duration-300 border-t md:border border-gray-100">
+          
+          {/* Mobile Handle */}
+          <div className="md:hidden flex justify-center pt-3 pb-1">
+            <div className="w-12 h-1.5 bg-gray-200 rounded-full" />
           </div>
-        </>
-      )}
+
+          {/* Header */}
+          <div className="bg-white md:bg-green-600 text-gray-900 md:text-white px-6 py-4 flex items-center justify-between border-b md:border-none">
+            <div className="flex items-center gap-2">
+              <ShoppingCart className="w-5 h-5 text-green-600 md:text-white" />
+              <span className="font-extrabold text-lg md:text-sm tracking-tight md:tracking-normal">Add to Cart</span>
+            </div>
+            <button
+              onClick={() => setMiniCart(null)}
+              className="p-1 hover:bg-gray-100 md:hover:bg-white/20 rounded-full transition-colors">
+              <X className="w-6 h-6 md:w-5 md:h-5 text-gray-400 md:text-white" />
+            </button>
+          </div>
+
+          {/* Product Info */}
+          <div className="p-6">
+            <div className="flex items-center gap-5 mb-8">
+              <div className="w-20 h-20 md:w-16 md:h-16 bg-gray-50 rounded-2xl md:rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center border border-gray-100">
+                {miniCart.product.image ? (
+                  <Image
+                    src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${miniCart.product.image}`}
+                    alt={miniCart.product.title}
+                    width={100}
+                    height={100}
+                    className="w-full h-full object-contain p-2"
+                  />
+                ) : (
+                  <Package className="w-8 h-8 text-gray-300" />
+                )}
+              </div>
+              <div className="flex-1 min-w-0">
+                <h4 className="font-bold text-gray-800 text-base md:text-sm truncate">
+                  {miniCart.product.title}
+                </h4>
+                <p className="text-green-600 font-black text-xl md:text-base">
+                  ₹{miniCart.product.price}
+                </p>
+              </div>
+            </div>
+
+            {/* Quantity Controls */}
+            <div className="flex items-center justify-between bg-gray-50 rounded-[2rem] md:rounded-xl p-4 md:p-3 mb-8 md:mb-4 border border-gray-100">
+              <span className="text-xs font-bold text-gray-400 md:text-gray-600 uppercase tracking-widest md:tracking-normal">
+                Quantity
+              </span>
+              <div className="flex items-center gap-5 md:gap-3">
+                <button
+                  type="button"
+                  onClick={() =>
+                    setMiniCart((prev) => ({
+                      ...prev,
+                      qty: Math.max(1, prev.qty - 1),
+                    }))
+                  }
+                  className="w-10 h-10 md:w-8 md:h-8 rounded-2xl md:rounded-full bg-white md:bg-green-100 text-green-700 font-bold flex items-center justify-center hover:shadow-md md:hover:bg-green-200 transition-all active:scale-90 border border-gray-100 md:border-none">
+                  <Minus className="w-5 h-5 md:w-4 md:h-4" />
+                </button>
+                <span className="font-black md:font-bold text-xl md:text-lg text-gray-800 w-8 text-center">
+                  {miniCart.qty}
+                </span>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setMiniCart((prev) => ({ ...prev, qty: prev.qty + 1 }))
+                  }
+                  className="w-10 h-10 md:w-8 md:h-8 rounded-2xl md:rounded-full bg-green-600 md:bg-green-100 text-white md:text-green-700 font-bold flex items-center justify-center shadow-lg md:shadow-none hover:bg-green-700 md:hover:bg-green-200 transition-all active:scale-90">
+                  <Plus className="w-5 h-5 md:w-4 md:h-4" />
+                </button>
+              </div>
+            </div>
+
+            {/* Total */}
+            <div className="flex items-center justify-between mb-8 md:mb-4 px-1">
+              <span className="text-sm font-bold text-gray-400 md:text-gray-500 uppercase md:normal-case">Total</span>
+              <span className="font-black text-2xl md:text-lg text-gray-800">
+                ₹{miniCart.product.price * miniCart.qty}
+              </span>
+            </div>
+
+            {/* Add to Cart Button */}
+            <button
+              onClick={confirmMiniCart}
+              className="w-full bg-green-600 text-white py-4 md:py-3 rounded-[1.5rem] md:rounded-xl font-bold hover:bg-green-700 transition shadow-xl md:shadow-lg cursor-pointer flex items-center justify-center gap-2 text-base md:text-sm uppercase md:normal-case tracking-widest md:tracking-normal">
+              <ShoppingCart className="w-5 h-5 md:w-5 md:h-5" /> Confirm Add
+            </button>
+          </div>
+        </div>
+      </>
+    )}
     </div>
   );
 }

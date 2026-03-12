@@ -23,7 +23,7 @@ export default function MobileBottomNav({ user, cartCount, handleLogout }) {
 
   const navItems = [
     { label: "Home", icon: Home, path: "/" },
-    { label: "Collections", icon: LayoutGrid, path: "/shop" },
+    { label: "Categories", icon: LayoutGrid, path: "/categories" },
     {
       label: user ? "Account" : "Login",
       icon: user ? User : LogIn,

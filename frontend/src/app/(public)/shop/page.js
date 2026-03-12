@@ -15,44 +15,68 @@ import {
   Minus,
   ArrowUpDown,
   Check,
+  LayoutGrid,
 } from "lucide-react";
 import Image from "next/image";
 import Header from "../../components/header";
 import Navbar from "../../components/redesign/Navbar";
 import Footer from "../../components/redesign/Footer";
 
-const SidebarContent = ({ categories, categoryFilter, flagFilter, router, setIsSidebarOpen }) => (
-  <div className="bg-white p-6 md:rounded-2xl md:shadow-sm md:border md:border-gray-100 h-full overflow-y-auto">
-    <div className="flex items-center justify-between mb-6 md:mb-4">
-      <h3 className="font-bold text-gray-800 flex items-center gap-2 text-lg md:text-base">
-        <Filter className="w-5 h-5 md:w-4 md:h-4 text-green-600" />
-        Categories
-      </h3>
-      <button 
-        onClick={() => setIsSidebarOpen(false)}
-        className="md:hidden p-2 hover:bg-gray-100 rounded-full"
-      >
-        <X className="w-6 h-6 text-gray-400" />
-      </button>
-    </div>
-    <ul className="space-y-1">
+const SidebarContent = ({ categories, categoryFilter, flagFilter, router, setIsSidebarOpen, isMobileSidebar = false }) => (
+  <div className={`bg-white ${isMobileSidebar ? 'p-1.5 border-r border-gray-200' : 'p-6 md:rounded-2xl md:shadow-sm md:border md:border-gray-100'} h-full overflow-y-auto no-scrollbar`}>
+    {!isMobileSidebar && (
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="font-bold text-gray-800 flex items-center gap-2 text-lg md:text-base">
+          <Filter className="w-5 h-5 md:w-4 md:h-4 text-green-600" />
+          Categories
+        </h3>
+        <button 
+          onClick={() => setIsSidebarOpen(false)}
+          className="md:hidden p-2 hover:bg-gray-100 rounded-full"
+        >
+          <X className="w-6 h-6 text-gray-400" />
+        </button>
+      </div>
+    )}
+    <ul className={`space-y-4 ${isMobileSidebar ? 'flex flex-col items-center pt-2' : ''}`}>
       <li
-        className={`text-sm cursor-pointer hover:bg-green-50 px-3 py-2.5 rounded-xl transition-all ${!categoryFilter && !flagFilter ? "bg-green-50 text-green-600 font-bold" : "text-gray-600 font-medium"}`}
+        className={`cursor-pointer transition-all flex flex-col items-center justify-center text-center
+          ${isMobileSidebar ? 'w-full py-2 px-1 rounded-lg' : 'text-sm hover:bg-green-50 px-3 py-2.5 rounded-xl'}
+          ${!categoryFilter && !flagFilter ? "bg-green-50 text-green-600 font-bold" : "text-gray-600 font-medium"}`}
         onClick={() => {
           router.push("/shop");
-          setIsSidebarOpen(false);
+          if(setIsSidebarOpen) setIsSidebarOpen(false);
         }}>
-        All Categories
+        <div className={`bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-1 shadow-sm
+          ${isMobileSidebar ? 'w-12 h-12' : 'hidden'}`}>
+          <LayoutGrid className="w-6 h-6" />
+        </div>
+        <span className={isMobileSidebar ? "text-[10px] font-bold leading-tight" : ""}>{isMobileSidebar ? "All" : "All Categories"}</span>
       </li>
       {categories.map((cat) => (
         <li
           key={cat._id}
-          className={`text-sm cursor-pointer hover:bg-green-50 px-3 py-2.5 rounded-xl transition-all ${categoryFilter === cat.name ? "bg-green-50 text-green-600 font-bold" : "text-gray-600 font-medium"}`}
+          className={`cursor-pointer transition-all flex flex-col items-center justify-center text-center
+            ${isMobileSidebar ? 'w-full py-2 px-1 rounded-lg' : 'text-sm hover:bg-green-50 px-3 py-2.5 rounded-xl'}
+            ${categoryFilter === cat.name ? "text-green-600 font-bold" : "text-gray-600 font-medium"}`}
           onClick={() => {
-            router.push(`/shop?category=${cat.name}`);
-            setIsSidebarOpen(false);
+            router.push(`/shop?category=${encodeURIComponent(cat.name)}`);
+            if(setIsSidebarOpen) setIsSidebarOpen(false);
           }}>
-          {cat.name}
+          <div className={`${isMobileSidebar ? 'w-12 h-12' : 'hidden'} rounded-full overflow-hidden mb-1 border-2 ${categoryFilter === cat.name ? 'border-green-500 shadow-md' : 'border-gray-100'} bg-white flex items-center justify-center flex-shrink-0 transition-all`}>
+             {cat.image ? (
+                <Image
+                  src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${cat.image}`}
+                  alt={cat.name}
+                  width={48}
+                  height={48}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <LayoutGrid className="w-6 h-6 text-gray-300" />
+              )}
+          </div>
+          <span className={isMobileSidebar ? "text-[10px] font-bold leading-tight line-clamp-2 px-0.5" : ""}>{cat.name}</span>
         </li>
       ))}
     </ul>
@@ -275,26 +299,8 @@ function ShopContent() {
       <Header cartCount={Object.values(cartItems).reduce((a, b) => a + b, 0)} />
       <Navbar />
 
-      <main className="flex-1 container mx-auto px-4 py-4 md:py-8">
-        {/* Mobile Filter & Sort Bar */}
-        <div className="md:hidden flex gap-3 mb-6 sticky top-[68px] z-40 bg-gray-50/90 backdrop-blur-md py-3 mt-[-4px]">
-          <button 
-            onClick={() => setIsSidebarOpen(true)}
-            className="flex-1 flex items-center justify-center gap-2 bg-white border border-gray-100 py-3 rounded-2xl text-sm font-bold text-gray-800 shadow-sm active:scale-95 transition-all"
-          >
-            <Filter className="w-4 h-4 text-green-600" />
-            Filter
-          </button>
-          <button 
-            onClick={() => setIsSortOpen(true)}
-            className="flex-1 flex items-center justify-center gap-2 bg-white border border-gray-100 py-3 rounded-2xl text-sm font-bold text-gray-800 shadow-sm active:scale-95 transition-all"
-          >
-            <ArrowUpDown className="w-4 h-4 text-green-600" />
-            Sort
-          </button>
-        </div>
-
-        <div className="flex flex-col md:flex-row gap-8">
+      <main className="flex-1 container mx-auto px-4 py-4 md:py-8 overflow-hidden">
+        <div className="flex flex-row md:flex-row gap-2 md:gap-8 relative h-[calc(100vh-140px)] md:h-auto overflow-hidden">
           {/* Desktop Sidebar */}
           <aside className="hidden md:block w-64 space-y-8">
             <SidebarContent 
@@ -306,27 +312,20 @@ function ShopContent() {
             />
           </aside>
 
-          {/* Mobile Sidebar Overlay */}
-          {isSidebarOpen && (
-            <div className="fixed inset-0 z-[120] md:hidden">
-              <div 
-                className="absolute inset-0 bg-black/40 backdrop-blur-sm"
-                onClick={() => setIsSidebarOpen(false)}
-              />
-              <div className="absolute left-0 top-0 bottom-0 w-[80%] max-w-[300px] animate-in slide-in-from-left duration-300">
-                <SidebarContent 
-                  categories={categories} 
-                  categoryFilter={categoryFilter}
-                  flagFilter={flagFilter}
-                  router={router}
-                  setIsSidebarOpen={setIsSidebarOpen}
-                />
-              </div>
-            </div>
-          )}
+          {/* Mobile Left Sidebar (Persistent Category List) */}
+          <aside className="md:hidden w-24 flex-shrink-0 h-full overflow-y-auto no-scrollbar order-1 -ml-4">
+            <SidebarContent 
+              categories={categories} 
+              categoryFilter={categoryFilter}
+              flagFilter={flagFilter}
+              router={router}
+              setIsSidebarOpen={null}
+              isMobileSidebar={true}
+            />
+          </aside>
 
           {/* Product Grid Area */}
-          <div className="flex-1">
+          <div className="flex-1 order-2 pl-2 h-full overflow-y-auto no-scrollbar">
             <div className="flex justify-between items-center mb-6">
               <div>
                 <h1 className="text-xl md:text-2xl font-bold text-gray-800">
@@ -337,6 +336,17 @@ function ShopContent() {
                 </p>
               </div>
               
+              {/* Mobile Sort Button */}
+              <div className="md:hidden flex items-center">
+                <button 
+                  onClick={() => setIsSortOpen(true)}
+                  className="flex items-center gap-1.5 bg-white border border-gray-200 px-3 py-2 rounded-xl text-xs font-black text-gray-800 shadow-sm active:scale-95 transition-all"
+                >
+                  <ArrowUpDown className="w-4 h-4 text-green-600" />
+                  Sort
+                </button>
+              </div>
+
               {/* Desktop Sort Dropdown */}
               <div className="hidden md:flex items-center gap-3">
                 <span className="text-sm text-gray-500 font-medium">Sort by:</span>
@@ -383,42 +393,42 @@ function ShopContent() {
                     <div className="flex-grow">
                       <h3
                         onClick={() => router.push(`/product/${product._id}`)}
-                        className="text-sm md:text-base font-bold text-gray-800 mb-1 hover:text-green-600 cursor-pointer line-clamp-2 min-h-[3rem]">
+                        className="text-xs md:text-base font-semibold md:font-bold text-gray-800 mb-1 hover:text-green-600 cursor-pointer line-clamp-2 min-h-[3rem] leading-tight break-words">
                         {product.title}
                       </h3>
                     </div>
-                    <div className="flex justify-between items-center mt-3">
-                      <div>
-                        <span className="font-extrabold text-base md:text-lg text-gray-900">
-                          ₹{product.price}
-                        </span>
-                        {product.discountPrice > product.price && (
-                          <div className="flex items-center gap-1.5 mt-0.5">
-                            <span className="text-gray-400 line-through text-[11px] font-semibold">
+                    <div className="mt-auto pt-3">
+                      <div className="flex flex-col gap-2">
+                        <div className="flex items-baseline gap-1">
+                          <span className="font-extrabold text-base md:text-lg text-gray-900">
+                            ₹{product.price}
+                          </span>
+                          {product.discountPrice > product.price && (
+                            <span className="text-gray-400 line-through text-[10px] font-semibold">
                               ₹{product.discountPrice}
                             </span>
-                          </div>
-                        )}
+                          )}
+                        </div>
+                        <button
+                          onClick={() => openMiniCart(product)}
+                          className={`w-full py-2 border-2 text-[11px] md:text-sm font-bold rounded-xl transition flex items-center justify-center gap-1 ${
+                            cartItems[product._id]
+                              ? "bg-green-600 border-green-600 text-white shadow-md shadow-green-100"
+                              : "border-green-600 text-green-600 bg-white hover:bg-green-600 hover:text-white"
+                          }`}
+                          style={{ cursor: "pointer" }}>
+                          {cartItems[product._id] ? (
+                            <>
+                              <span>Added</span>
+                              <span className="bg-white text-green-600 px-1.5 py-0.5 rounded-full text-[9px] font-black">
+                                {cartItems[product._id]}
+                              </span>
+                            </>
+                          ) : (
+                            "Add to Cart"
+                          )}
+                        </button>
                       </div>
-                      <button
-                    onClick={() => openMiniCart(product)}
-                    className={`w-30 py-2 border-2 font-semibold rounded-lg transition flex items-center justify-center gap-2 ${
-                      cartItems[product._id]
-                        ? "bg-green-600 border-green-600 text-white hover:bg-green-700"
-                        : "border-green-600 text-green-600 hover:bg-green-600 hover:text-white"
-                    }`}
-                    style={{ cursor: "pointer" }}>
-                    {cartItems[product._id] ? (
-                      <>
-                        <span>Add to Cart</span>
-                        <span className="bg-white/20 px-2 py-0.5 rounded-full text-[10px] font-bold">
-                          {cartItems[product._id]}
-                        </span>
-                      </>
-                    ) : (
-                      "Add to Cart"
-                    )}
-                  </button>
                     </div>
                   </div>
                 ))}
@@ -493,21 +503,26 @@ function ShopContent() {
             onClick={() => setMiniCart(null)}
             className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[160]"
           />
-          <div className="fixed bottom-0 md:top-1/2 md:left-1/2 md:bottom-auto md:-translate-x-1/2 md:-translate-y-1/2 w-full md:max-w-md bg-white rounded-t-[2.5rem] md:rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.2)] z-[170] overflow-hidden animate-in slide-in-from-bottom md:zoom-in duration-300">
-            <div className="bg-green-600 text-white px-6 py-4 flex items-center justify-between">
+          <div className="fixed bottom-0 md:top-1/2 md:left-1/2 md:bottom-auto md:-translate-x-1/2 md:-translate-y-1/2 w-full md:max-w-md bg-white rounded-t-[2.5rem] md:rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.2)] z-[170] overflow-hidden animate-in slide-in-from-bottom md:zoom-in duration-300 border-t md:border border-gray-100">
+            {/* Handle for Mobile */}
+            <div className="md:hidden flex justify-center pt-3 pb-1">
+              <div className="w-12 h-1.5 bg-gray-200 rounded-full" />
+            </div>
+
+            <div className="bg-white md:bg-green-600 text-gray-900 md:text-white px-6 py-4 flex items-center justify-between border-b md:border-none">
               <div className="flex items-center gap-3">
-                <ShoppingCart className="w-5 h-5" />
+                <ShoppingCart className="w-5 h-5 text-green-600 md:text-white" />
                 <span className="font-extrabold text-lg tracking-tight">Add to Cart</span>
               </div>
               <button
                 onClick={() => setMiniCart(null)}
-                className="p-1 hover:bg-white/20 rounded-full transition-colors">
-                <X className="w-6 h-6" />
+                className="p-1 hover:bg-gray-100 md:hover:bg-white/20 rounded-full transition-colors">
+                <X className="w-6 h-6 text-gray-400 md:text-white" />
               </button>
             </div>
             <div className="p-6">
               <div className="flex items-center gap-5 mb-8">
-                <div className="w-24 h-24 bg-gray-50 rounded-2xl overflow-hidden flex items-center justify-center p-2 border border-gray-100">
+                <div className="w-20 h-20 md:w-24 md:h-24 bg-gray-50 rounded-2xl overflow-hidden flex items-center justify-center p-2 border border-blue-50/50">
                   {miniCart.product.image ? (
                     <Image
                       src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${miniCart.product.image}`}
@@ -521,17 +536,17 @@ function ShopContent() {
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h4 className="font-extrabold text-gray-800 text-lg leading-tight mb-2">
+                  <h4 className="font-bold md:font-extrabold text-gray-800 text-base md:text-lg leading-tight mb-2 line-clamp-2">
                     {miniCart.product.title}
                   </h4>
-                  <p className="text-green-600 font-black text-2xl">
+                  <p className="text-green-600 font-black text-xl md:text-2xl">
                     ₹{miniCart.product.price}
                   </p>
                 </div>
               </div>
 
-              <div className="bg-gray-50 rounded-[2rem] p-4 flex items-center justify-between mb-8 border border-gray-100">
-                <span className="text-sm font-bold text-gray-500 pl-4 uppercase tracking-widest">
+              <div className="bg-gray-50/80 rounded-[2rem] p-4 flex items-center justify-between mb-8 border border-gray-100/50">
+                <span className="text-[11px] font-black text-gray-400 pl-4 uppercase tracking-[0.2em]">
                   Quantity
                 </span>
                 <div className="flex items-center gap-5">
@@ -542,32 +557,32 @@ function ShopContent() {
                         qty: Math.max(1, p.qty - 1),
                       }))
                     }
-                    className="w-12 h-12 rounded-2xl bg-white text-green-700 font-bold flex items-center justify-center hover:shadow-md transition-all active:scale-90 border border-gray-100">
-                    <Minus className="w-5 h-5" />
+                    className="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-white text-green-700 font-bold flex items-center justify-center shadow-sm hover:shadow-md transition-all active:scale-90 border border-gray-100">
+                    <Minus className="w-5 h-5 md:w-5 md:h-5" />
                   </button>
-                  <span className="font-black text-2xl text-gray-900 w-10 text-center">
+                  <span className="font-black text-xl md:text-2xl text-gray-900 w-8 md:w-10 text-center">
                     {miniCart.qty}
                   </span>
                   <button
                     onClick={() =>
                       setMiniCart((p) => ({ ...p, qty: p.qty + 1 }))
                     }
-                    className="w-12 h-12 rounded-2xl bg-green-600 text-white font-bold flex items-center justify-center hover:bg-green-700 shadow-lg shadow-green-100 transition-all active:scale-90">
-                    <Plus className="w-5 h-5" />
+                    className="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-green-600 text-white font-bold flex items-center justify-center shadow-lg shadow-green-100 hover:bg-green-700 transition-all active:scale-90">
+                    <Plus className="w-5 h-5 md:w-5 md:h-5" />
                   </button>
                 </div>
               </div>
 
-              <div className="flex items-center justify-between mb-8 px-2 font-bold">
-                <span className="text-gray-500">Subtotal</span>
-                <span className="text-2xl text-gray-900 font-extrabold">
+              <div className="flex items-center justify-between mb-8 px-2">
+                <span className="text-sm font-bold text-gray-400 uppercase tracking-widest">Subtotal</span>
+                <span className="text-xl md:text-2xl text-gray-900 font-black">
                   ₹{miniCart.product.price * miniCart.qty}
                 </span>
               </div>
 
               <button
                 onClick={confirmMiniCart}
-                className="w-full bg-green-600 hover:bg-green-700 text-white font-black py-5 rounded-[2rem] transition-all shadow-2xl shadow-green-200 active:scale-[0.98] text-lg uppercase tracking-widest">
+                className="w-full bg-green-600 hover:bg-green-700 text-white font-black py-4 md:py-5 rounded-[1.5rem] md:rounded-[2rem] transition-all shadow-xl shadow-green-100 active:scale-[0.98] text-base md:text-lg uppercase tracking-widest">
                 Add to Cart
               </button>
             </div>
