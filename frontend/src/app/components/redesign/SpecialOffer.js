@@ -1,4 +1,6 @@
-import Link from 'next/link';
+"use client";
+
+import Image from 'next/image';
 import { CheckCircle } from 'lucide-react';
 
 export default function SpecialOffer() {
@@ -8,16 +10,18 @@ export default function SpecialOffer() {
           {/* Left Images */}
           <div className="flex-1 grid grid-cols-2 gap-4 w-full h-[400px] lg:h-[500px]">
             <div className="relative h-full rounded-2xl overflow-hidden mt-8 shadow-xl">
-              <img
+              <Image
                 src="/aboutus/aboutus1.webp"
                 alt="Shopping"
+                fill
                 className="absolute inset-0 w-full h-full object-cover"
               />
             </div>
             <div className="relative h-full rounded-2xl overflow-hidden mb-8 shadow-xl">
-              <img
+              <Image
                 src="/aboutus/aboutus2.webp"
                 alt="Planning"
+                fill
                 className="absolute inset-0 w-full h-full object-cover"
               />
             </div>

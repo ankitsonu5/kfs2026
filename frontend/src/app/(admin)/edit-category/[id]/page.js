@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { FaChevronLeft, FaSave, FaImage, FaUpload } from "react-icons/fa";
 import { MdOutlineCategory, MdToggleOn } from "react-icons/md";
+import Image from "next/image";
 
 export default function EditCategory() {
   const router = useRouter();
@@ -83,10 +84,9 @@ export default function EditCategory() {
         },
       );
 
-      alert("Category Updated Successfully");
       router.push("/admindashboard");
     } catch (error) {
-      alert("Server Error: " + error.message);
+      console.error("Update error:", error);
     }
   };
 
@@ -182,10 +182,11 @@ export default function EditCategory() {
 
               {preview && (
                 <div className="relative w-full md:w-24 h-24 rounded-2xl overflow-hidden border border-white/10 shadow-lg group">
-                  <img
+                  <Image
                     src={preview}
                     alt="preview"
-                    className="w-full h-full object-cover"
+                    fill
+                    className="object-cover"
                   />
                 </div>
               )}

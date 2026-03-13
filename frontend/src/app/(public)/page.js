@@ -131,7 +131,6 @@ export default function GroceryRedesign() {
       setCartCount((c) => c + 1);
     } catch (error) {
       console.log("Add to cart error:", error);
-      alert("Failed to add to cart!");
     }
   };
 
@@ -269,7 +268,6 @@ export default function GroceryRedesign() {
       setMiniCart(null);
     } catch (error) {
       console.log("Mini cart error:", error);
-      alert("Failed to add to cart!");
     }
   };
 

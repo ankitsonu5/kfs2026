@@ -114,7 +114,6 @@ export default function AddProducts() {
       );
 
       if (res.data.success) {
-        alert("Product Added Successfully");
         setForm({
           title: "",
           price: "",

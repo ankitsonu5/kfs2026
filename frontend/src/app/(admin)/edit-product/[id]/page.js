@@ -4,6 +4,7 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { X, ImageIcon, Package } from "lucide-react";
+import Image from "next/image";
 
 export default function EditProduct() {
   const router = useRouter();
@@ -154,13 +155,12 @@ export default function EditProduct() {
       );
 
       if (res.data.success) {
-        alert("Product Updated Successfully");
         router.push("/admindashboard");
       } else {
-        alert("Error: " + res.data.error);
+        console.error("Update error:", error);
       }
     } catch (error) {
-      alert("Server Error: " + error.message);
+      console.error("Server Error:", error);
     }
   };
 
@@ -341,10 +341,11 @@ export default function EditProduct() {
                 <div
                   key={index}
                   className="relative aspect-square rounded-2xl overflow-hidden border border-gray-700 shadow-xl group">
-                  <img
+                  <Image
                     src={src}
                     alt={`preview-${index}`}
-                    className="w-full h-full object-cover"
+                    fill
+                    className="object-cover"
                   />
                   {index === 0 && (
                     <div className="absolute top-1 left-1 bg-green-500 text-white text-[8px] font-bold px-1.5 py-0.5 rounded shadow-sm z-20">

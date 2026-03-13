@@ -51,7 +51,6 @@ export default function MyOrders() {
   };
 
   const handleCancel = async (id) => {
-    if (!confirm("Are you sure you want to cancel this order?")) return;
     try {
       const token = localStorage.getItem("token");
       const res = await axios.put(
@@ -62,7 +61,6 @@ export default function MyOrders() {
         },
       );
       if (res.data.success) {
-        alert("Order cancelled successfully");
         fetchOrders();
       }
     } catch (error) {
@@ -72,7 +70,6 @@ export default function MyOrders() {
   };
 
   const handleDelete = async (id) => {
-    if (!confirm("Remove this order from your history?")) return;
     try {
       const token = localStorage.getItem("token");
       const res = await axios.delete(
@@ -83,7 +80,6 @@ export default function MyOrders() {
       );
       if (res.data.success) {
         setOrders(orders.filter((o) => o._id !== id));
-        alert("Order deleted from history");
       }
     } catch (error) {
       console.log("Delete order error:", error);

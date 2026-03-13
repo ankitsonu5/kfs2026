@@ -1,3 +1,5 @@
+"use client";
+
 export default function StatCard({ number, label, suffix = "+" }) {
     return (
         <div className="text-center text-white py-8">

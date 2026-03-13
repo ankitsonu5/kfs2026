@@ -42,7 +42,6 @@ export default function AdminOrders() {
     } catch (error) {
       console.error("Fetch orders error:", error);
       if (error.response?.status === 403) {
-        alert("Access denied. Admin only.");
         router.push("/");
       }
     } finally {
@@ -67,17 +66,10 @@ export default function AdminOrders() {
       }
     } catch (error) {
       console.error("Update status error:", error);
-      alert("Failed to update status");
     }
   };
 
   const handleDelete = async (id) => {
-    if (
-      !confirm(
-        "Are you sure you want to delete this order? This action cannot be undone.",
-      )
-    )
-      return;
     try {
       const token = localStorage.getItem("token");
       const res = await axios.delete(
@@ -85,12 +77,10 @@ export default function AdminOrders() {
         { headers: { Authorization: `Bearer ${token}` } },
       );
       if (res.data.success) {
-        alert("Order deleted successfully");
         fetchOrders();
       }
     } catch (error) {
       console.error("Delete order error:", error);
-      alert("Failed to delete order");
     }
   };
 

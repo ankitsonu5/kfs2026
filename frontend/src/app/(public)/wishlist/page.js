@@ -110,10 +110,8 @@ export default function WishlistPage() {
         { headers: { Authorization: token } },
       );
       setCartCount((prev) => prev + 1);
-      alert("Added to Cart!");
     } catch (error) {
       console.error("Add to cart error:", error);
-      alert("Failed to add to cart");
     }
   };
 

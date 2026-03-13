@@ -76,7 +76,6 @@ export default function AdminDashboard() {
   }, []);
 
   const handleDelete = async (id) => {
-    if (!confirm("Delete product?")) return;
 
     try {
       const token = localStorage.getItem("token");
@@ -86,10 +85,8 @@ export default function AdminDashboard() {
       });
 
       setProducts(products.filter((p) => p._id !== id));
-      alert("Product deleted");
     } catch (error) {
       console.log(error);
-      alert("Delete failed");
     }
   };
 
@@ -155,12 +152,6 @@ export default function AdminDashboard() {
   }, [active]);
 
   const handleDeleteUser = async (id) => {
-    if (
-      !confirm(
-        "Are you sure you want to delete this user? This action cannot be undone.",
-      )
-    )
-      return;
     try {
       const token = localStorage.getItem("token");
       const res = await axios.delete(
@@ -170,18 +161,14 @@ export default function AdminDashboard() {
         },
       );
       if (res.data.success) {
-        alert("User deleted successfully");
         setAllUsers(allUsers.filter((u) => u._id !== id));
       }
     } catch (error) {
       console.log("Delete user error:", error);
-      alert("Failed to delete user");
     }
   };
 
   const handleDeleteCategory = async (id) => {
-    if (!confirm("Delete category?")) return;
-
     try {
       const token = localStorage.getItem("token");
 
@@ -193,10 +180,8 @@ export default function AdminDashboard() {
       );
 
       setCategories(categories.filter((c) => c._id !== id));
-      alert("Category deleted");
     } catch (error) {
       console.log(error);
-      alert("Delete failed");
     }
   };
 
@@ -238,7 +223,6 @@ export default function AdminDashboard() {
             },
           },
         );
-        alert("Banner updated successfully");
       } else {
         await axios.post(
           `${process.env.NEXT_PUBLIC_API_URL}/add-banner`,
@@ -250,7 +234,6 @@ export default function AdminDashboard() {
             },
           },
         );
-        alert("Banner added successfully");
       }
       setShowBannerForm(false);
       setEditingBannerId(null);
@@ -268,22 +251,18 @@ export default function AdminDashboard() {
       setBanners(response.data);
     } catch (error) {
       console.log("Banner submit error:", error);
-      alert("Failed to save banner");
     }
   };
 
   const handleDeleteBanner = async (id) => {
-    if (!confirm("Are you sure you want to delete this banner?")) return;
     const token = localStorage.getItem("token");
     try {
       await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/banners/${id}`, {
         headers: { Authorization: token },
       });
       setBanners(banners.filter((b) => b._id !== id));
-      alert("Banner deleted");
     } catch (error) {
       console.log("Delete banner error:", error);
-      alert("Failed to delete banner");
     }
   };
 

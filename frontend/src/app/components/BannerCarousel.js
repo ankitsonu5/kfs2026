@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import axios from "axios";
 import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import Image from "next/image";
 
 export default function BannerCarousel({ fallback = null }) {
     const [banners, setBanners] = useState([]);
@@ -32,7 +33,7 @@ export default function BannerCarousel({ fallback = null }) {
         setSelectedIndex(emblaApi.selectedScrollSnap());
     }, []);
 
-    const defaultBanners = [
+    const defaultBanners = useMemo(() => [
         {
             _id: "default-1",
             image: "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=1000",
@@ -54,7 +55,7 @@ export default function BannerCarousel({ fallback = null }) {
             subtitle: "Shop your daily needs now.",
             isDefault: true
         }
-    ];
+    ], []);
 
     useEffect(() => {
         if (!emblaApi) return;
@@ -94,10 +95,11 @@ export default function BannerCarousel({ fallback = null }) {
                 <div className="flex touch-pan-y">
                     {displayBanners.map((banner) => (
                         <div className="relative flex-[0_0_100%] min-w-0 h-[250px] sm:h-[350px] md:h-[450px]" key={banner._id}>
-                            <img
+                            <Image
                                 src={banner.isDefault ? banner.image : `${process.env.NEXT_PUBLIC_API_URL}${banner.image}`}
                                 alt={banner.title || "Banner"}
-                                className="w-full h-full object-cover"
+                                fill
+                                className="object-cover"
                             />
                             {/* Overlay Content */}
                             <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/20 to-transparent flex items-center px-8 md:px-16">

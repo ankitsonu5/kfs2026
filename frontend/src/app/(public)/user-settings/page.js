@@ -72,9 +72,7 @@ export default function UserSettings() {
         settings,
         { headers: { Authorization: token } },
       );
-      alert(res.data.message);
     } catch (error) {
-      alert("Error saving settings");
     }
   };
 
@@ -90,10 +88,8 @@ export default function UserSettings() {
         { password },
         { headers: { Authorization: token } },
       );
-      alert(res.data.message);
       setPassword("");
     } catch (error) {
-      alert("Error updating password");
     }
   };
 
@@ -110,10 +106,8 @@ export default function UserSettings() {
         headers: { Authorization: token },
       });
       localStorage.removeItem("token");
-      alert("Account deleted. Sorry to see you go!");
       router.push("/");
     } catch (error) {
-      alert("Error deleting account");
     }
   };
 

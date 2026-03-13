@@ -56,11 +56,9 @@ export default function UserProfile() {
         form,
         { headers: { Authorization: token } },
       );
-      alert(res.data.message);
       setUser({ ...user, ...form });
       setEditing(false);
     } catch (error) {
-      alert("Error updating profile");
     }
   };
 

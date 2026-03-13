@@ -45,7 +45,6 @@ export default function Checkout() {
         });
         setCart(res.data);
         if (!res.data || res.data.items.length === 0) {
-          alert("Cart is empty! Add items first.");
           router.push("/");
         }
       } catch (error) {
@@ -131,7 +130,6 @@ export default function Checkout() {
       );
 
       if (res.data.success) {
-        alert("🎉 Order placed successfully! Thank you for shopping with us.");
         router.push("/my-orders");
       }
     } catch (error) {

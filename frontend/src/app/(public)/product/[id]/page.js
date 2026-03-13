@@ -105,7 +105,6 @@ export default function ProductDetail() {
   const toggleWishlist = async () => {
     const token = localStorage.getItem("token");
     if (!token) {
-      alert("Please login to add items to wishlist");
       router.push("/login");
       return;
     }
@@ -179,10 +178,8 @@ export default function ProductDetail() {
         }
         setCartCount((prev) => prev + quantity);
       }
-      alert("Added to cart!");
     } catch (error) {
       console.error("Add to cart error:", error);
-      alert("Failed to add to cart");
     }
   };
 

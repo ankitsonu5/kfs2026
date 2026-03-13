@@ -1,3 +1,5 @@
+"use client";
+
 import Link from 'next/link';
 
 export default function FeatureCard({ title, description, linkText, color = "green" }) {

@@ -43,11 +43,9 @@ export default function AdminProfile() {
         { ...admin, password },
         { headers: { Authorization: token } },
       );
-      alert(res.data.message || "Profile updated successfully!");
       setPassword("");
     } catch (err) {
       console.error("Update error:", err);
-      alert(err.response?.data?.message || "Error updating profile");
     } finally {
       setLoading(false);
     }
