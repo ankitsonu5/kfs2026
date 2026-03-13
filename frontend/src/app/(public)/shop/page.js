@@ -226,6 +226,7 @@ function ShopContent() {
         price: product.price,
         discountPrice: product.discountPrice,
         image: product.images?.[0] || "",
+        stock: product.stock ?? 999,
       },
       qty: 1,
     });
@@ -242,6 +243,16 @@ function ShopContent() {
         const index = guestCart.items.findIndex(
           (i) => i.productId === miniCart.product._id,
         );
+
+        const currentQtyInCart = index > -1 ? guestCart.items[index].quantity : 0;
+        const totalRequestedQty = currentQtyInCart + miniCart.qty;
+        const availableStock = miniCart.product.stock;
+
+        if (totalRequestedQty > availableStock) {
+          alert(`Only ${availableStock} items available in stock. You already have ${currentQtyInCart} in cart.`);
+          return;
+        }
+
         if (index > -1) {
           guestCart.items[index].quantity += miniCart.qty;
         } else {
@@ -565,7 +576,15 @@ function ShopContent() {
                   </span>
                   <button
                     onClick={() =>
-                      setMiniCart((p) => ({ ...p, qty: p.qty + 1 }))
+                      setMiniCart((p) => {
+                        const nextQty = p.qty + 1;
+                        const available = p.product.stock ?? 999;
+                        if (nextQty > available) {
+                          alert(`Only ${available} items available in stock.`);
+                          return p;
+                        }
+                        return { ...p, qty: nextQty };
+                      })
                     }
                     className="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-green-600 text-white font-bold flex items-center justify-center shadow-lg shadow-green-100 hover:bg-green-700 transition-all active:scale-90">
                     <Plus className="w-5 h-5 md:w-5 md:h-5" />

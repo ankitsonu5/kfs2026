@@ -66,8 +66,11 @@ export default function GroceryRedesign() {
         if (res.data && res.data.items) {
           const qtyMap = {};
           let total = 0;
-          res.data.items.forEach((item) => {
-            qtyMap[item.productId] = item.quantity;
+          // Filter out items with null productId (defensive check)
+          const validItems = res.data.items.filter(item => item.productId !== null);
+          validItems.forEach((item) => {
+            const pid = item.productId?._id || item.productId;
+            qtyMap[pid] = item.quantity;
             total += item.quantity;
           });
           setCartItems(qtyMap);
@@ -91,6 +94,15 @@ export default function GroceryRedesign() {
         const index = guestCart.items.findIndex(
           (i) => i.productId === product._id,
         );
+
+        const currentQty = index > -1 ? guestCart.items[index].quantity : 0;
+        const availableStock = product.stock ?? 999;
+
+        if (currentQty + 1 > availableStock) {
+          alert(`Only ${availableStock} items available in stock. You already have ${currentQty} in cart.`);
+          return;
+        }
+
         if (index > -1) {
           guestCart.items[index].quantity += 1;
         } else {
@@ -206,6 +218,7 @@ export default function GroceryRedesign() {
         price: product.price,
         discountPrice: product.discountPrice,
         image: product.images?.[0] || "",
+        stock: product.stock ?? 999,
       },
       qty: 1,
     });
@@ -216,6 +229,15 @@ export default function GroceryRedesign() {
     if (!miniCart) return;
     try {
       const token = localStorage.getItem("token");
+      const currentQtyInCart = cartItems[miniCart.product._id] || 0;
+      const totalRequestedQty = currentQtyInCart + miniCart.qty;
+      const availableStock = miniCart.product.stock;
+
+      if (totalRequestedQty > availableStock) {
+        alert(`Only ${availableStock} items available in stock. You already have ${currentQtyInCart} in cart.`);
+        return;
+      }
+
       if (!token) {
         // Guest Confirm Mini Cart
         let guestCart = JSON.parse(
@@ -239,30 +261,30 @@ export default function GroceryRedesign() {
         localStorage.setItem("guestCart", JSON.stringify(guestCart));
         setCartItems((prev) => ({
           ...prev,
-          [miniCart.product._id]:
-            (prev[miniCart.product._id] || 0) + miniCart.qty,
+          [miniCart.product._id]: (prev[miniCart.product._id] || 0) + miniCart.qty,
         }));
         setCartCount((c) => c + miniCart.qty);
         setMiniCart(null);
         return;
       }
-      for (let i = 0; i < miniCart.qty; i++) {
-        await axios.post(
-          `${process.env.NEXT_PUBLIC_API_URL}/add-cart`,
-          {
-            productId: miniCart.product._id,
-            title: miniCart.product.title,
-            price: miniCart.product.price,
-            discountPrice: miniCart.product.discountPrice,
-            image: miniCart.product.image,
-          },
-          { headers: { Authorization: token } },
-        );
-      }
+      
+      // For logged in user, send count in one call
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/add-cart`,
+        {
+          productId: miniCart.product._id,
+          title: miniCart.product.title,
+          price: miniCart.product.price,
+          discountPrice: miniCart.product.discountPrice,
+          image: miniCart.product.image,
+          quantity: miniCart.qty,
+        },
+        { headers: { Authorization: token } },
+      );
+
       setCartItems((prev) => ({
         ...prev,
-        [miniCart.product._id]:
-          (prev[miniCart.product._id] || 0) + miniCart.qty,
+        [miniCart.product._id]: (prev[miniCart.product._id] || 0) + miniCart.qty,
       }));
       setCartCount((c) => c + miniCart.qty);
       setMiniCart(null);
@@ -921,11 +943,21 @@ export default function GroceryRedesign() {
                   onClick={() =>
                     setMiniCart((prev) => ({ ...prev, qty: prev.qty + 1 }))
                   }
-                  className="w-10 h-10 md:w-8 md:h-8 rounded-2xl md:rounded-full bg-green-600 md:bg-green-100 text-white md:text-green-700 font-bold flex items-center justify-center shadow-lg md:shadow-none hover:bg-green-700 md:hover:bg-green-200 transition-all active:scale-90">
+                  disabled={ (cartItems[miniCart.product._id] || 0) + miniCart.qty >= miniCart.product.stock }
+                  className={`w-10 h-10 md:w-8 md:h-8 rounded-2xl md:rounded-full font-bold flex items-center justify-center transition-all active:scale-90 ${
+                    (cartItems[miniCart.product._id] || 0) + miniCart.qty >= miniCart.product.stock
+                      ? "bg-gray-200 text-gray-400 cursor-not-allowed shadow-none"
+                      : "bg-green-600 md:bg-green-100 text-white md:text-green-700 shadow-lg md:shadow-none hover:bg-green-700 md:hover:bg-green-200"
+                  }`}>
                   <Plus className="w-5 h-5 md:w-4 md:h-4" />
                 </button>
               </div>
             </div>
+            { (cartItems[miniCart.product._id] || 0) + miniCart.qty >= miniCart.product.stock && (
+              <p className="text-[10px] text-red-500 font-bold mt-[-1rem] mb-4 text-right">
+                Max stock reached ({miniCart.product.stock} available)
+              </p>
+            )}
 
             {/* Total */}
             <div className="flex items-center justify-between mb-8 md:mb-4 px-1">

@@ -16,6 +16,7 @@ const userProfileRoutes = require("./routes/userProfile");
 const orderRoutes = require("./routes/orderRoutes");
 const bannerRoutes = require("./routes/bannerRoutes");
 const wishlistRoutes = require("./routes/wishlistRoutes");
+const serviceAreaRoutes = require("./routes/serviceAreaRoutes");
 
 app.use(express.json());
 app.use("/uploads", express.static("uploads"));
@@ -33,6 +34,7 @@ app.use("/", userProfileRoutes);
 app.use("/", orderRoutes);
 app.use("/", bannerRoutes);
 app.use("/", wishlistRoutes);
+app.use("/", serviceAreaRoutes);
 
 app.listen(process.env.PORT || 8080, () => {
   console.log(`Server started on port ${process.env.PORT || 8080}`);

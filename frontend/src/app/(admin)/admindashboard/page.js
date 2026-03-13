@@ -18,6 +18,7 @@ import {
   MoreVertical,
   Plus,
   ArrowRight,
+  MapPin,
   Image as ImageIcon,
 } from "lucide-react";
 import { AreaChart, Area, ResponsiveContainer, Tooltip, XAxis } from "recharts";
@@ -56,6 +57,15 @@ export default function AdminDashboard() {
   });
   const [showBannerForm, setShowBannerForm] = useState(false);
   const [editingBannerId, setEditingBannerId] = useState(null);
+  
+  const [areas, setAreas] = useState([]);
+  const [showAreaForm, setShowAreaForm] = useState(false);
+  const [editingAreaId, setEditingAreaId] = useState(null);
+  const [areaForm, setAreaForm] = useState({
+    city: "",
+    pincode: "",
+    isActive: true,
+  });
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -288,6 +298,75 @@ export default function AdminDashboard() {
     }
   };
 
+  useEffect(() => {
+    const fetchAreas = async () => {
+      if (active !== "areas") return;
+      try {
+        const token = localStorage.getItem("token");
+        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/service-areas-all`, {
+          headers: { Authorization: token },
+        });
+        if (res.data.success) {
+          setAreas(res.data.areas);
+        }
+      } catch (error) {
+        console.log("Fetch areas error:", error);
+      }
+    };
+    fetchAreas();
+  }, [active]);
+
+  const handleAreaSubmit = async (e) => {
+    e.preventDefault();
+    const token = localStorage.getItem("token");
+    try {
+      if (editingAreaId) {
+        await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/service-areas/${editingAreaId}`, areaForm, {
+          headers: { Authorization: token },
+        });
+      } else {
+        await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/service-areas`, areaForm, {
+          headers: { Authorization: token },
+        });
+      }
+      setShowAreaForm(false);
+      setEditingAreaId(null);
+      setAreaForm({ city: "", pincode: "", isActive: true });
+      // Refresh
+      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/service-areas-all`, {
+        headers: { Authorization: token },
+      });
+      setAreas(res.data.areas);
+    } catch (error) {
+      alert(error.response?.data?.message || "Error saving area");
+    }
+  };
+
+  const handleDeleteArea = async (id) => {
+    if (!confirm("Are you sure?")) return;
+    const token = localStorage.getItem("token");
+    try {
+      await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/service-areas/${id}`, {
+        headers: { Authorization: token },
+      });
+      setAreas(areas.filter(a => a._id !== id));
+    } catch (error) {
+      console.log("Delete area error:", error);
+    }
+  };
+
+  const handleToggleArea = async (id, currentStatus) => {
+    const token = localStorage.getItem("token");
+    try {
+      await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/service-areas/${id}`, { isActive: !currentStatus }, {
+        headers: { Authorization: token },
+      });
+      setAreas(areas.map(a => a._id === id ? { ...a, isActive: !currentStatus } : a));
+    } catch (error) {
+      console.log("Toggle area error:", error);
+    }
+  };
+
   return (
     <div className="min-h-screen flex bg-[#0b1a2b] text-white overflow-x-hidden">
       <style
@@ -392,6 +471,14 @@ export default function AdminDashboard() {
                       setOpen(false);
                     }}>
                     <ImageIcon size={16} /> Banners
+                  </li>
+                  <li
+                    className={`text-sm py-1.5 px-3 rounded-md transition flex items-center gap-2 ${active === "areas" ? "text-blue-400" : "text-gray-400 hover:text-white hover:bg-white/5"}`}
+                    onClick={() => {
+                      setActive("areas");
+                      setOpen(false);
+                    }}>
+                    <MapPin size={16} /> Service Areas
                   </li>
                   {/* <li
                     className="text-sm text-gray-300 hover:text-blue-400 cursor-pointer py-1"
@@ -1231,6 +1318,132 @@ export default function AdminDashboard() {
                   )}
                 </tbody>
               </table>
+            </div>
+          </Section>
+        )}
+
+        {active === "areas" && (
+          <Section title="Service Area Management">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+              <p className="text-gray-400 text-sm">
+                Control delivery availability by Pincode (Fixed ₹50 charge for orders under ₹1000)
+              </p>
+              <button
+                onClick={() => {
+                  setEditingAreaId(null);
+                  setAreaForm({ city: "", pincode: "", isActive: true });
+                  setShowAreaForm(true);
+                }}
+                className="w-full md:w-auto bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-lg flex items-center justify-center gap-2 font-semibold shadow-lg shadow-emerald-600/20 transition-all active:scale-95 cursor-pointer text-sm">
+                <Plus size={18} /> Add New Area
+              </button>
+            </div>
+
+            {showAreaForm && (
+              <div className="bg-white/5 border border-gray-700 rounded-xl p-6 mb-8 animate-in fade-in slide-in-from-top-4 duration-300">
+                <h4 className="text-lg font-bold mb-4 text-blue-400">
+                  {editingAreaId ? "Edit Service Area" : "New Service Area"}
+                </h4>
+                <form onSubmit={handleAreaSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-gray-500 uppercase">City Name</label>
+                    <input
+                      type="text" required
+                      value={areaForm.city}
+                      onChange={(e) => setAreaForm({ ...areaForm, city: e.target.value })}
+                      className="w-full bg-[#111827] border border-gray-700 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="e.g. New Delhi"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-gray-500 uppercase">Pincode</label>
+                    <input
+                      type="text" required
+                      value={areaForm.pincode}
+                      onChange={(e) => setAreaForm({ ...areaForm, pincode: e.target.value })}
+                      className="w-full bg-[#111827] border border-gray-700 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="e.g. 110001"
+                    />
+                  </div>
+                  <div className="md:col-span-2 flex justify-end gap-3 mt-4">
+                    <button
+                      type="button"
+                      onClick={() => setShowAreaForm(false)}
+                      className="px-6 py-2 rounded-lg border border-gray-700 text-sm font-bold hover:bg-white/5 cursor-pointer">
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-8 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-sm font-bold shadow-lg shadow-blue-600/20 cursor-pointer">
+                      {editingAreaId ? "Update Area" : "Save Area"}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            )}
+
+            <div className="bg-[#111827] rounded-xl border border-gray-700 overflow-hidden shadow-2xl">
+              <div className="overflow-x-auto no-scrollbar">
+                <table className="w-full text-sm">
+                  <thead className="text-gray-400 bg-white/5 uppercase tracking-wider text-[11px] font-bold">
+                    <tr>
+                      <th className="py-4 text-left px-6">Location (City & Pincode)</th>
+                      <th className="py-4 text-center px-6">Status</th>
+                      <th className="py-4 text-right px-6">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-800">
+                    {areas.length === 0 ? (
+                      <tr>
+                        <td colSpan="3" className="py-12 text-center text-gray-500 italic">No service areas found.</td>
+                      </tr>
+                    ) : (
+                      areas.map((area) => (
+                        <tr key={area._id} className="hover:bg-white/[0.03] transition-colors group">
+                          <td className="py-4 px-6 text-left">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-400">
+                                <MapPin size={20} />
+                              </div>
+                              <div>
+                                <p className="font-bold text-gray-100">{area.pincode}</p>
+                                <p className="text-xs text-gray-500">{area.city}</p>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="py-4 px-6 text-center">
+                            <button 
+                              onClick={() => handleToggleArea(area._id, area.isActive)}
+                              className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase transition-colors ${area.isActive ? "bg-green-500/10 text-green-500 hover:bg-green-500/20" : "bg-red-500/10 text-red-500 hover:bg-red-500/20"}`}>
+                              {area.isActive ? "Active" : "Inactive"}
+                            </button>
+                          </td>
+                          <td className="py-4 px-6 text-right">
+                            <div className="flex justify-end gap-2">
+                              <button
+                                onClick={() => {
+                                  setEditingAreaId(area._id);
+                                  setAreaForm({ city: area.city, pincode: area.pincode, isActive: area.isActive });
+                                  setShowAreaForm(true);
+                                }}
+                                className="p-2 bg-blue-500/10 text-blue-400 hover:bg-blue-500 hover:text-white rounded-lg transition-all"
+                                title="Edit">
+                                <Pencil size={16} />
+                              </button>
+                              <button
+                                onClick={() => handleDeleteArea(area._id)}
+                                className="p-2 bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white rounded-lg transition-all"
+                                title="Delete">
+                                <Trash2 size={16} />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </Section>
         )}

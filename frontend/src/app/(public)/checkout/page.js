@@ -31,6 +31,8 @@ export default function Checkout() {
     pincode: "",
     paymentMethod: "cod",
   });
+  const [service, setService] = useState(null);
+  const [serviceLoading, setServiceLoading] = useState(false);
 
   useEffect(() => {
     const fetchCart = async () => {
@@ -54,7 +56,7 @@ export default function Checkout() {
       }
     };
     fetchCart();
-  }, []);
+  }, [router]);
 
   // Auto-fill saved address from settings + profile
   useEffect(() => {
@@ -90,12 +92,43 @@ export default function Checkout() {
     fetchSavedAddress();
   }, []);
 
+  // Fetch service area info when pincode changes
+  useEffect(() => {
+    const checkService = async () => {
+      if (form.pincode.length >= 6) {
+        setServiceLoading(true);
+        try {
+          const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/service-areas/${form.pincode}`);
+          if (res.data.success) {
+            setService(res.data.area);
+          } else {
+            setService(null);
+          }
+        } catch (error) {
+          console.log("Service check error:", error);
+          setService(null);
+        } finally {
+          setServiceLoading(false);
+        }
+      } else {
+        setService(null);
+      }
+    };
+    const timer = setTimeout(checkService, 500);
+    return () => clearTimeout(timer);
+  }, [form.pincode]);
+
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const handlePlaceOrder = async (e) => {
     e.preventDefault();
+
+    if (!service) {
+      alert("Sorry, we do not provide delivery service in this area yet.");
+      return;
+    }
 
     if (
       !form.fullName ||
@@ -162,8 +195,10 @@ export default function Checkout() {
     return sum + (mrp * item.quantity);
   }, 0);
   const totalSavings = totalMrp - subtotal;
-  const deliveryCharge = subtotal > 1000 || subtotal === 0 ? 0 : 50;
+  
+  const deliveryCharge = subtotal >= 1000 || subtotal === 0 ? 0 : 50;
   const grandTotal = subtotal + deliveryCharge;
+
 
   return (
     <>
@@ -254,14 +289,28 @@ export default function Checkout() {
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Pincode *
                     </label>
-                    <input
-                      type="text"
-                      name="pincode"
-                      value={form.pincode}
-                      onChange={handleChange}
-                      placeholder="Enter pincode"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-black"
-                    />
+                    <div className="relative">
+                      <input
+                        type="text"
+                        name="pincode"
+                        value={form.pincode}
+                        onChange={handleChange}
+                        placeholder="Enter pincode"
+                        className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-black ${
+                          form.pincode.length >= 6 
+                            ? (service ? "border-green-500" : "border-red-500") 
+                            : "border-gray-300"
+                        }`}
+                      />
+                      {serviceLoading && (
+                        <div className="absolute right-3 top-3.5 w-5 h-5 border-2 border-green-600 border-t-transparent rounded-full animate-spin"></div>
+                      )}
+                      {form.pincode.length >= 6 && !serviceLoading && (
+                        <p className={`text-[10px] mt-1 font-bold ${service ? "text-green-600" : "text-red-500"}`}>
+                          {service ? `✓ Service available in ${service.city}` : "✗ Service not available in this area"}
+                        </p>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -331,11 +380,13 @@ export default function Checkout() {
               {/* Place Order Button (mobile) */}
               <button
                 type="submit"
-                disabled={placing}
+                disabled={placing || !service}
                 className="lg:hidden w-full bg-green-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-green-700 transition shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed cursor-pointer">
                 {placing
                   ? "Placing Order..."
-                  : `Place Order — ₹${grandTotal}`}
+                  : !service 
+                    ? "Service Not Available"
+                    : `Place Order — ₹${grandTotal}`}
               </button>
             </form>
           </div>
@@ -399,7 +450,9 @@ export default function Checkout() {
                 )}
                 <div className="flex justify-between text-gray-600 text-sm">
                   <span>Delivery Charges <span className="text-[10px] text-gray-400 font-normal ml-1">(Free above ₹1000)</span></span>
-                  {deliveryCharge === 0 ? (
+                  {!service && form.pincode.length >= 6 ? (
+                    <span className="text-red-500 font-semibold tracking-tighter text-xs">Service Unavailable</span>
+                  ) : deliveryCharge === 0 ? (
                     <span className="text-green-600 font-semibold">FREE</span>
                   ) : (
                     <span>₹{deliveryCharge}</span>
@@ -414,9 +467,9 @@ export default function Checkout() {
               {/* Place Order Button (desktop) */}
               <button
                 onClick={handlePlaceOrder}
-                disabled={placing}
+                disabled={placing || !service}
                 className="hidden lg:block w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed cursor-pointer">
-                {placing ? "Placing Order..." : "Place Order"}
+                {placing ? "Placing Order..." : !service ? "Service Not Available" : "Place Order"}
               </button>
 
               <p className="text-center text-gray-400 text-xs mt-3 flex items-center justify-center gap-1">

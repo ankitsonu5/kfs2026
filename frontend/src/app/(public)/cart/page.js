@@ -47,6 +47,9 @@ export default function Cart() {
       const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/cart`, {
         headers: { Authorization: token },
       });
+      if (res.data && res.data.items) {
+        res.data.items = res.data.items.filter(item => item.productId !== null);
+      }
       setCart(res.data);
     } catch (error) {
       console.log("Cart fetch error:", error);
@@ -60,44 +63,70 @@ export default function Cart() {
       const token = localStorage.getItem("token");
       if (!token) {
         // Guest Increment
-        let guestCart = JSON.parse(
-          localStorage.getItem("guestCart") || '{"items":[]}',
-        );
-        const index = guestCart.items.findIndex(
-          (i) => i.productId === item.productId,
-        );
-        if (index > -1) {
-          guestCart.items[index].quantity += 1;
-        }
-        localStorage.setItem("guestCart", JSON.stringify(guestCart));
+        // For guest, we need to fetch product to check stock
+        const productId = item.productId?._id || item.productId;
+        try {
+          const prodRes = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/products/${productId}`);
+          const product = prodRes.data.product;
+          const currentQty = item.quantity;
+          const availableStock = product.stock ?? 999;
 
-        const updatedItems = cart.items.map((i) =>
-          i.productId === item.productId
-            ? { ...i, quantity: i.quantity + 1 }
-            : i,
-        );
-        const updatedTotal = updatedItems.reduce(
-          (sum, i) => sum + i.price * i.quantity,
-          0,
-        );
-        setCart({ items: updatedItems, totalAmount: updatedTotal });
+          if (currentQty + 1 > availableStock) {
+            alert(`Only ${availableStock} items available in stock.`);
+            return;
+          }
+
+          let guestCart = JSON.parse(
+            localStorage.getItem("guestCart") || '{"items":[]}',
+          );
+          const index = guestCart.items.findIndex(
+            (i) => (i.productId?._id || i.productId) === productId,
+          );
+          if (index > -1) {
+            guestCart.items[index].quantity += 1;
+            localStorage.setItem("guestCart", JSON.stringify(guestCart));
+
+            const updatedItems = cart.items.map((i) => {
+              const i_id = i.productId?._id || i.productId;
+              return i_id === productId
+                ? { ...i, quantity: i.quantity + 1 }
+                : i;
+            });
+            const updatedTotal = updatedItems.reduce(
+              (sum, i) => sum + i.price * i.quantity,
+              0,
+            );
+            setCart({ items: updatedItems, totalAmount: updatedTotal });
+          }
+        } catch (err) {
+          console.log("Guest increment stock check error:", err);
+        }
         return;
       }
+      const stock = item.productId?.stock ?? 999;
+      if (item.quantity + 1 > stock) {
+        alert(`Only ${stock} items available in stock`);
+        return;
+      }
+
       await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}/add-cart`,
         {
-          productId: item.productId,
+          productId: item.productId._id || item.productId, // Handle populated or unpopulated
           title: item.title,
           price: item.price,
           discountPrice: item.discountPrice,
           image: item.image,
+          quantity: 1
         },
         { headers: { Authorization: token } },
       );
 
-      const updatedItems = cart.items.map((i) =>
-        i.productId === item.productId ? { ...i, quantity: i.quantity + 1 } : i,
-      );
+      const updatedItems = cart.items.map((i) => {
+        const i_id = i.productId?._id || i.productId;
+        const item_id = item.productId?._id || item.productId;
+        return i_id === item_id ? { ...i, quantity: i.quantity + 1 } : i;
+      });
       const updatedTotal = updatedItems.reduce(
         (sum, i) => sum + i.price * i.quantity,
         0,
@@ -111,7 +140,10 @@ export default function Cart() {
   const handleDecrement = async (productId) => {
     try {
       const token = localStorage.getItem("token");
-      const item = cart.items.find((i) => i.productId === productId);
+      const item = cart.items.find((i) => {
+        const i_id = i.productId?._id || i.productId;
+        return i_id === productId;
+      });
       if (!item) return;
 
       if (!token) {
@@ -126,11 +158,12 @@ export default function Cart() {
           if (guestCart.items[index].quantity > 1) {
             guestCart.items[index].quantity -= 1;
             localStorage.setItem("guestCart", JSON.stringify(guestCart));
-            const updatedItems = cart.items.map((i) =>
-              i.productId === productId
+            const updatedItems = cart.items.map((i) => {
+              const i_id = i.productId?._id || i.productId;
+              return i_id === productId
                 ? { ...i, quantity: i.quantity - 1 }
-                : i,
-            );
+                : i;
+            });
             const updatedTotal = updatedItems.reduce(
               (sum, i) => sum + i.price * i.quantity,
               0,
@@ -154,9 +187,10 @@ export default function Cart() {
         { headers: { Authorization: token } },
       );
 
-      const updatedItems = cart.items.map((i) =>
-        i.productId === productId ? { ...i, quantity: i.quantity - 1 } : i,
-      );
+      const updatedItems = cart.items.map((i) => {
+        const i_id = i.productId?._id || i.productId;
+        return i_id === productId ? { ...i, quantity: i.quantity - 1 } : i;
+      });
       const updatedTotal = updatedItems.reduce(
         (sum, i) => sum + i.price * i.quantity,
         0,
@@ -175,14 +209,16 @@ export default function Cart() {
         let guestCart = JSON.parse(
           localStorage.getItem("guestCart") || '{"items":[]}',
         );
-        guestCart.items = guestCart.items.filter(
-          (i) => i.productId !== productId,
-        );
+        guestCart.items = guestCart.items.filter((i) => {
+          const i_id = i.productId?._id || i.productId;
+          return i_id !== productId;
+        });
         localStorage.setItem("guestCart", JSON.stringify(guestCart));
 
-        const updatedItems = cart.items.filter(
-          (item) => item.productId !== productId,
-        );
+        const updatedItems = cart.items.filter((item) => {
+          const item_id = item.productId?._id || item.productId;
+          return item_id !== productId;
+        });
         const updatedTotal = updatedItems.reduce(
           (sum, item) => sum + item.price * item.quantity,
           0,
@@ -196,9 +232,10 @@ export default function Cart() {
           headers: { Authorization: token },
         },
       );
-      const updatedItems = cart.items.filter(
-        (item) => item.productId !== productId,
-      );
+      const updatedItems = cart.items.filter((item) => {
+        const item_id = item.productId?._id || item.productId;
+        return item_id !== productId;
+      });
       const updatedTotal = updatedItems.reduce(
         (sum, item) => sum + item.price * item.quantity,
         0,
@@ -208,6 +245,13 @@ export default function Cart() {
       console.log("Remove error:", error);
       alert("Remove failed!");
     }
+  };
+
+  const getUpdatedItemsAfterDecrement = (productId) => {
+    return cart.items.map((i) => {
+      const i_id = i.productId?._id || i.productId;
+      return i_id === productId ? { ...i, quantity: i.quantity - 1 } : i;
+    });
   };
 
   if (loading) {
@@ -262,10 +306,12 @@ export default function Cart() {
                 Cart Items ({cart.items.length})
               </h2>
 
-              {cart.items.map((item) => (
-                <div
-                  key={item.productId}
-                  className="bg-white rounded-xl border border-gray-200 p-4 flex items-center gap-4 hover:shadow-md transition">
+              {cart.items.map((item) => {
+                const productId = item.productId?._id || item.productId;
+                return (
+                  <div
+                    key={productId}
+                    className="bg-white rounded-xl border border-gray-200 p-4 flex items-center gap-4 hover:shadow-md transition">
                   <div className="w-20 h-20 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0">
                     {item.image ? (
                       <Image
@@ -303,7 +349,7 @@ export default function Cart() {
                     {/* Quantity Controls */}
                     <div className="flex items-center gap-3 mt-2">
                       <button
-                        onClick={() => handleDecrement(item.productId)}
+                        onClick={() => handleDecrement(productId)}
                         className="w-8 h-8 flex items-center justify-center rounded-full border border-gray-300 hover:border-green-600 hover:text-green-600 transition cursor-pointer">
                         <Minus className="w-4 h-4" />
                       </button>
@@ -312,7 +358,8 @@ export default function Cart() {
                       </span>
                       <button
                         onClick={() => handleIncrement(item)}
-                        className="w-8 h-8 flex items-center justify-center rounded-full border border-gray-300 hover:border-green-600 hover:text-green-600 transition cursor-pointer">
+                        disabled={item.quantity >= (item.productId?.stock ?? 999)}
+                        className={`w-8 h-8 flex items-center justify-center rounded-full border border-gray-300 transition ${item.quantity >= (item.productId?.stock ?? 999) ? "opacity-50 cursor-not-allowed" : "hover:border-green-600 hover:text-green-600 cursor-pointer"}`}>
                         <Plus className="w-4 h-4" />
                       </button>
                     </div>
@@ -323,13 +370,14 @@ export default function Cart() {
                       ₹{item.price * item.quantity}
                     </p>
                     <button
-                      onClick={() => handleRemove(item.productId)}
+                      onClick={() => handleRemove(productId)}
                       className="text-red-500 text-sm font-semibold hover:text-red-700 transition mt-1 cursor-pointer flex items-center gap-1">
                       <Trash2 className="w-4 h-4" /> Remove
                     </button>
                   </div>
                 </div>
-              ))}
+              );
+            })}
             </div>
 
             <div className="lg:col-span-1">

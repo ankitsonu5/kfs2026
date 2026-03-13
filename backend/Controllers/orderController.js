@@ -1,5 +1,7 @@
 const Order = require("../models/Order");
 const Cart = require("../models/Cart");
+const ServiceArea = require("../models/ServiceArea");
+const Product = require("../models/Products");
 
 exports.placeOrder = async (req, res) => {
   try {
@@ -13,6 +15,46 @@ exports.placeOrder = async (req, res) => {
       return res.status(400).json({ message: "Cart empty" });
     }
 
+    // --- STOCK VALIDATION AND DECREMENT ---
+    for (const item of cart.items) {
+      if (!item.productId) {
+        return res.status(400).json({ 
+          success: false, 
+          message: `Product ${item.title} no longer exists.` 
+        });
+      }
+      if (item.productId.stock < item.quantity) {
+        return res.status(400).json({ 
+          success: false, 
+          message: `Insufficient stock for ${item.productId.title}. Only ${item.productId.stock} left.` 
+        });
+      }
+    }
+
+    const service = await ServiceArea.findOne({
+      pincode: req.body.shippingAddress.pincode,
+      isActive: true,
+    });
+
+    if (!service) {
+      return res.status(400).json({ success: false, message: "Delivery not available for this pincode" });
+    }
+
+    // Actually decrement stock
+    for (const item of cart.items) {
+      // Use Product.findById to get the latest document and update it safely
+      const product = await Product.findById(item.productId._id);
+      if (product) {
+        const currentStock = Number(product.stock) || 0;
+        const purchaseQty = Number(item.quantity) || 0;
+        
+        await Product.findByIdAndUpdate(item.productId._id, {
+          $set: { stock: currentStock - purchaseQty }
+        });
+      }
+    }
+    // -------------------------------------
+
     const orderItems = cart.items.map((item) => ({
       productId: item.productId._id,
       name: item.productId.title,
@@ -25,7 +67,7 @@ exports.placeOrder = async (req, res) => {
           : ""),
     }));
 
-    const deliveryCharge = cart.totalAmount > 1000 ? 0 : 50;
+    const deliveryCharge = cart.totalAmount >= 1000 ? 0 : 50;
     const totalAmount = cart.totalAmount + deliveryCharge;
 
     const order = new Order({
@@ -44,10 +86,10 @@ exports.placeOrder = async (req, res) => {
     cart.markModified("items");
     await cart.save();
 
-    res.json({ success: true, message: "Order placed", order });
+    res.json({ success: true, message: "Order placed successfully", order });
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Server error" });
+    console.log("Place order error:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 
@@ -121,6 +163,18 @@ exports.cancelOrder = async (req, res) => {
       return res.status(400).json({
         message: `Order cannot be cancelled as it is already ${order.orderStatus}`,
       });
+    }
+
+    // RESTORE STOCK
+    for (const item of order.items) {
+      const product = await Product.findById(item.productId);
+      if (product) {
+        const currentStock = Number(product.stock) || 0;
+        const refundQty = Number(item.quantity) || 0;
+        await Product.findByIdAndUpdate(item.productId, {
+          $set: { stock: currentStock + refundQty }
+        });
+      }
     }
 
     order.orderStatus = "Cancelled";

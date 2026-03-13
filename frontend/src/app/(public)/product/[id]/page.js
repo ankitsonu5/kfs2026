@@ -146,6 +146,16 @@ export default function ProductDetail() {
         const index = guestCart.items.findIndex(
           (i) => i.productId === product._id,
         );
+
+        const currentQtyInCart = index > -1 ? guestCart.items[index].quantity : 0;
+        const totalRequestedQty = currentQtyInCart + quantity;
+        const availableStock = product.stock ?? 999;
+
+        if (totalRequestedQty > availableStock) {
+          alert(`Only ${availableStock} items available in stock. You already have ${currentQtyInCart} in cart.`);
+          return;
+        }
+
         if (index > -1) {
           guestCart.items[index].quantity += quantity;
         } else {
@@ -161,25 +171,29 @@ export default function ProductDetail() {
         localStorage.setItem("guestCart", JSON.stringify(guestCart));
         setCartCount((prev) => prev + quantity);
       } else {
-        for (let i = 0; i < quantity; i++) {
-          await axios.post(
-            `${process.env.NEXT_PUBLIC_API_URL}/add-cart`,
-            {
-              productId: product._id,
-              title: product.title,
-              price: product.price,
-              discountPrice: product.discountPrice,
-              image: product.images?.[0] || "",
-            },
-            {
-              headers: { Authorization: token },
-            },
-          );
+        const res = await axios.post(
+          `${process.env.NEXT_PUBLIC_API_URL}/add-cart`,
+          {
+            productId: product._id,
+            title: product.title,
+            price: product.price,
+            discountPrice: product.discountPrice,
+            image: product.images?.[0] || "",
+            quantity: quantity,
+          },
+          {
+            headers: { Authorization: token },
+          },
+        );
+        if (res.data.success) {
+          setCartCount((prev) => prev + quantity);
+        } else {
+          alert(res.data.message || "Failed to add to cart");
         }
-        setCartCount((prev) => prev + quantity);
       }
     } catch (error) {
       console.error("Add to cart error:", error);
+      alert(error.response?.data?.message || "Something went wrong");
     }
   };
 
@@ -325,8 +339,8 @@ export default function ProductDetail() {
           {/* Details Section */}
           <div className="flex flex-col">
             <div className="mb-6">
-              <span className="text-sm font-bold text-green-600 uppercase tracking-widest bg-green-50 px-3 py-1 rounded-full mb-3 inline-block">
-                In Stock
+              <span className={`text-sm font-bold uppercase tracking-widest px-3 py-1 rounded-full mb-3 inline-block ${product.stock > 0 ? "text-green-600 bg-green-50" : "text-red-600 bg-red-50"}`}>
+                {product.stock > 0 ? `In Stock (${product.stock})` : "Out of Stock"}
               </span>
               <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-2 leading-tight">
                 {product.title}
@@ -374,7 +388,8 @@ export default function ProductDetail() {
                   </span>
                   <button
                     onClick={() => setQuantity((q) => q + 1)}
-                    className="w-10 h-10 rounded-xl bg-white text-green-700 font-bold flex items-center justify-center hover:bg-green-50 transition shadow-sm border border-gray-200 cursor-pointer">
+                    disabled={quantity >= product.stock}
+                    className={`w-10 h-10 rounded-xl bg-white text-green-700 font-bold flex items-center justify-center transition shadow-sm border border-gray-200 ${quantity >= product.stock ? "opacity-50 cursor-not-allowed" : "hover:bg-green-50 cursor-pointer"}`}>
                     <Plus size={16} />
                   </button>
                 </div>
@@ -383,12 +398,14 @@ export default function ProductDetail() {
               <div className="flex flex-col sm:flex-row gap-4 pt-4 border-t border-gray-100">
                 <button
                   onClick={handleAddToCart}
-                  className="flex-1 bg-white border-2 border-green-600 text-green-600 py-4 rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-green-50 transition shadow-lg shadow-green-600/5 active:scale-95 cursor-pointer">
+                  disabled={product.stock <= 0}
+                  className={`flex-1 bg-white border-2 border-green-600 text-green-600 py-4 rounded-2xl font-bold flex items-center justify-center gap-2 transition shadow-lg shadow-green-600/5 active:scale-95 ${product.stock <= 0 ? "opacity-50 cursor-not-allowed" : "hover:bg-green-50 cursor-pointer"}`}>
                   <ShoppingCart size={20} /> Add to Cart
                 </button>
                 <button
                   onClick={handleBuyNow}
-                  className="flex-1 bg-green-600 text-white py-4 rounded-2xl font-bold hover:bg-green-700 transition shadow-xl shadow-green-600/20 active:scale-95 cursor-pointer">
+                  disabled={product.stock <= 0}
+                  className={`flex-1 bg-green-600 text-white py-4 rounded-2xl font-bold transition shadow-xl shadow-green-600/20 active:scale-95 ${product.stock <= 0 ? "opacity-50 cursor-not-allowed" : "hover:bg-green-700 cursor-pointer"}`}>
                   Buy Now
                 </button>
               </div>

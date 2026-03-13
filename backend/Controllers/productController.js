@@ -23,12 +23,12 @@ exports.addProducts = async (req, res) => {
 
     const product = new Product({
       title,
-      price,
-      discountPrice,
+      price: Number(price) || 0,
+      discountPrice: Number(discountPrice) || 0,
       description,
       images,
       category,
-      stock,
+      stock: Number(stock) || 0,
       isTopSellingProducts,
       isDealsOfDay,
       isRice,
@@ -90,11 +90,11 @@ exports.updateProduct = async (req, res) => {
     } = req.body;
     const updateData = {
       title,
-      price,
-      discountPrice,
+      price: Number(price) || 0,
+      discountPrice: Number(discountPrice) || 0,
       description,
       category,
-      stock,
+      stock: Number(stock) || 0,
       isTopSellingProducts,
       isDealsOfDay,
       isRice,
