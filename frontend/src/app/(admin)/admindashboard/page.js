@@ -454,7 +454,7 @@ export default function AdminDashboard() {
                       setActive("products");
                       setOpen(false);
                     }}>
-                    🛒 Products
+                    Products
                   </li> */}
                   <li
                     className={`text-sm py-1.5 px-3 rounded-md transition flex items-center gap-2 ${active === "category" ? "text-blue-400" : "text-gray-400 hover:text-white hover:bg-white/5"}`}
@@ -486,7 +486,7 @@ export default function AdminDashboard() {
                       setActive("orders");
                       setOpen(false);
                     }}>
-                    📦 Orders
+                    Orders
                   </li> */}
                   {/* <li
                     className="text-sm text-gray-300 hover:text-blue-400 cursor-pointer py-1"
@@ -494,7 +494,7 @@ export default function AdminDashboard() {
                       setActive("users");
                       setOpen(false);
                     }}>
-                    👥 Users
+                    Users
                   </li> */}
                 </ul>
               )}
@@ -535,7 +535,6 @@ export default function AdminDashboard() {
         </div>
 
       </div>
-
 
       {open && (
         <div
@@ -917,7 +916,7 @@ export default function AdminDashboard() {
                             </div>
 
                             {openMenuId === category._id && (
-                              <div className="absolute top-0 right-16 w-36 bg-[#1f2937] border border-gray-700 rounded-xl shadow-2xl z-[100] overflow-hidden animate-in fade-in slide-in-from-right-1 duration-200">
+                              <div className="absolute top-0 right-10 md:right-16 w-36 bg-[#1f2937] border border-gray-700 rounded-xl shadow-2xl z-[100] overflow-hidden animate-in fade-in slide-in-from-right-1 duration-200">
                                 <button
                                   className="w-full px-4 py-2.5 hover:bg-blue-600 flex items-center gap-3 text-left text-xs font-semibold"
                                   onClick={() =>
@@ -925,7 +924,7 @@ export default function AdminDashboard() {
                                       `/edit-category/${category._id}`,
                                     )
                                   }>
-                                  ✏️ Edit
+                                  <Pencil size={14} /> Edit
                                 </button>
                                 <div className="border-t border-gray-700"></div>
                                 <button
@@ -933,7 +932,7 @@ export default function AdminDashboard() {
                                   onClick={() =>
                                     handleDeleteCategory(category._id)
                                   }>
-                                  🗑️ Delete
+                                  <Trash2 size={14} /> Delete
                                 </button>
                               </div>
                             )}
@@ -1013,8 +1012,8 @@ export default function AdminDashboard() {
               <div className="p-4 text-center border-t border-gray-800 bg-white/5">
                 <button
                   onClick={() => router.push("/admin-orders")}
-                  className="text-blue-500 hover:text-blue-400 text-sm font-bold transition-colors">
-                  Full Management View →
+                  className="text-blue-500 hover:text-blue-400 text-sm font-bold transition-colors flex items-center justify-center gap-2">
+                  Full Management View <ArrowRight size={16} />
                 </button>
               </div>
             </div>
@@ -1387,9 +1386,9 @@ export default function AdminDashboard() {
                 <table className="w-full text-sm">
                   <thead className="text-gray-400 bg-white/5 uppercase tracking-wider text-[11px] font-bold">
                     <tr>
-                      <th className="py-4 text-left px-6">Location (City & Pincode)</th>
-                      <th className="py-4 text-center px-6">Status</th>
-                      <th className="py-4 text-right px-6">Actions</th>
+                      <th className="py-4 text-left px-3 md:px-6">Location (City & Pincode)</th>
+                      <th className="py-4 text-center px-2 md:px-6">Status</th>
+                      <th className="py-4 text-right px-3 md:px-6">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-800">
@@ -1400,43 +1399,62 @@ export default function AdminDashboard() {
                     ) : (
                       areas.map((area) => (
                         <tr key={area._id} className="hover:bg-white/[0.03] transition-colors group">
-                          <td className="py-4 px-6 text-left">
-                            <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-400">
-                                <MapPin size={20} />
+                          <td className="py-4 px-3 md:px-6 text-left">
+                            <div className="flex items-center gap-2 md:gap-3">
+                              <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-400 shrink-0">
+                                <MapPin size={16} className="md:w-5 md:h-5" />
                               </div>
-                              <div>
-                                <p className="font-bold text-gray-100">{area.pincode}</p>
-                                <p className="text-xs text-gray-500">{area.city}</p>
+                              <div className="min-w-0">
+                                <p className="font-bold text-gray-100 text-xs md:text-sm">{area.pincode}</p>
+                                <p className="text-[10px] md:text-xs text-gray-500 truncate">{area.city}</p>
                               </div>
                             </div>
                           </td>
-                          <td className="py-4 px-6 text-center">
+                          <td className="py-4 px-2 md:px-6 text-center">
                             <button 
                               onClick={() => handleToggleArea(area._id, area.isActive)}
-                              className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase transition-colors ${area.isActive ? "bg-green-500/10 text-green-500 hover:bg-green-500/20" : "bg-red-500/10 text-red-500 hover:bg-red-500/20"}`}>
+                              className={`px-2 md:px-3 py-1 rounded-full text-[9px] md:text-[10px] font-bold uppercase transition-colors ${area.isActive ? "bg-green-500/10 text-green-500 hover:bg-green-500/20" : "bg-red-500/10 text-red-500 hover:bg-red-500/20"}`}>
                               {area.isActive ? "Active" : "Inactive"}
                             </button>
                           </td>
-                          <td className="py-4 px-6 text-right">
-                            <div className="flex justify-end gap-2">
+                          <td className="py-4 px-3 md:px-6 text-right relative">
+                            <div className="flex justify-end">
                               <button
-                                onClick={() => {
-                                  setEditingAreaId(area._id);
-                                  setAreaForm({ city: area.city, pincode: area.pincode, isActive: area.isActive });
-                                  setShowAreaForm(true);
-                                }}
-                                className="p-2 bg-blue-500/10 text-blue-400 hover:bg-blue-500 hover:text-white rounded-lg transition-all"
-                                title="Edit">
-                                <Pencil size={16} />
-                              </button>
-                              <button
-                                onClick={() => handleDeleteArea(area._id)}
-                                className="p-2 bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white rounded-lg transition-all"
-                                title="Delete">
-                                <Trash2 size={16} />
+                                onClick={() =>
+                                  setOpenMenuId(
+                                    openMenuId === area._id
+                                      ? null
+                                      : area._id,
+                                  )
+                                }
+                                className="p-2 hover:bg-gray-700 rounded-full transition-colors text-gray-400 hover:text-white">
+                                <MoreVertical size={20} />
                               </button>
                             </div>
+
+                            {openMenuId === area._id && (
+                              <div className="absolute top-0 right-10 md:right-16 w-36 bg-[#1f2937] border border-gray-700 rounded-xl shadow-2xl z-[100] overflow-hidden animate-in fade-in slide-in-from-right-1 duration-200">
+                                <button
+                                  className="w-full px-4 py-2.5 hover:bg-blue-600 flex items-center gap-3 text-left text-xs font-semibold cursor-pointer"
+                                  onClick={() => {
+                                    setEditingAreaId(area._id);
+                                    setAreaForm({ city: area.city, pincode: area.pincode, isActive: area.isActive });
+                                    setShowAreaForm(true);
+                                    setOpenMenuId(null);
+                                  }}>
+                                  <Pencil size={14} /> Edit
+                                </button>
+                                <div className="border-t border-gray-700"></div>
+                                <button
+                                  className="w-full px-4 py-2.5 hover:bg-red-600 flex items-center gap-3 text-left text-xs font-semibold text-red-400 hover:text-white cursor-pointer"
+                                  onClick={() => {
+                                    handleDeleteArea(area._id);
+                                    setOpenMenuId(null);
+                                  }}>
+                                  <Trash2 size={14} /> Delete
+                                </button>
+                              </div>
+                            )}
                           </td>
                         </tr>
                       ))

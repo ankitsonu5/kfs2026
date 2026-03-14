@@ -1,3 +1,5 @@
+"use client";
+
 import Navbar from '../../components/redesign/Navbar';
 import Hero from '../../components/redesign/Hero';
 import FeatureCard from '../../components/redesign/FeatureCard';

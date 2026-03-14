@@ -117,6 +117,10 @@ export default function Checkout() {
     const timer = setTimeout(checkService, 500);
     return () => clearTimeout(timer);
   }, [form.pincode]);
+  
+  // Validate city matches service area city
+  const isCityValid = !service || (form.city.trim().toLowerCase() === service.city?.trim().toLowerCase());
+  const isServiceAvailable = !!service && isCityValid;
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -125,8 +129,10 @@ export default function Checkout() {
   const handlePlaceOrder = async (e) => {
     e.preventDefault();
 
-    if (!service) {
-      alert("Sorry, we do not provide delivery service in this area yet.");
+    if (!isServiceAvailable) {
+      alert(service && !isCityValid 
+        ? `Sorry, we only provide service in ${service.city} for this pincode.` 
+        : "Sorry, we do not provide delivery service in this area yet.");
       return;
     }
 
@@ -199,7 +205,6 @@ export default function Checkout() {
   const deliveryCharge = subtotal >= 1000 || subtotal === 0 ? 0 : 50;
   const grandTotal = subtotal + deliveryCharge;
 
-
   return (
     <>
     <Header />
@@ -209,11 +214,6 @@ export default function Checkout() {
       <header className="bg-white shadow-sm sticky top-16 md:top-[124px] z-40">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            {/* <button
-              onClick={() => router.back()}
-              className="text-gray-500 hover:text-green-600 transition p-2 hover:bg-gray-100 rounded-full cursor-pointer">
-              <ArrowLeft className="w-6 h-6" />
-            </button> */}
             <div className="flex items-center gap-2">
               <ClipboardList className="w-6 h-6 text-green-600" />
               <h1 className="text-2xl font-bold text-gray-800">Checkout</h1>
@@ -282,8 +282,24 @@ export default function Checkout() {
                       value={form.city}
                       onChange={handleChange}
                       placeholder="Enter city"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-black"
+                      className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-black ${
+                        form.city.length >= 3 
+                          ? (isServiceAvailable ? "border-green-500" : "border-red-500") 
+                          : "border-gray-300"
+                      }`}
                     />
+                    {serviceLoading && (
+                        <div className="absolute right-3 top-3.5 w-5 h-5 border-2 border-green-600 border-t-transparent rounded-full animate-spin"></div>
+                      )}
+                      {form.city.length >= 3 && !serviceLoading && (
+                        <p className={`text-[10px] mt-1 font-bold ${isServiceAvailable ? "text-green-600" : "text-red-500"}`}>
+                          {isServiceAvailable 
+                            ? `✓ Service available in ${service.city}` 
+                            : service && !isCityValid 
+                              ? `✗ City must be ${service.city} for this pincode`
+                              : "✗ Service not available in this area"}
+                        </p>
+                      )}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -306,8 +322,12 @@ export default function Checkout() {
                         <div className="absolute right-3 top-3.5 w-5 h-5 border-2 border-green-600 border-t-transparent rounded-full animate-spin"></div>
                       )}
                       {form.pincode.length >= 6 && !serviceLoading && (
-                        <p className={`text-[10px] mt-1 font-bold ${service ? "text-green-600" : "text-red-500"}`}>
-                          {service ? `✓ Service available in ${service.city}` : "✗ Service not available in this area"}
+                        <p className={`text-[10px] mt-1 font-bold ${isServiceAvailable ? "text-green-600" : "text-red-500"}`}>
+                          {isServiceAvailable 
+                            ? `✓ Service available in ${service.city}` 
+                            : service && !isCityValid 
+                              ? `✗ City must be ${service.city} for this pincode`
+                              : "✗ Service not available in this area"}
                         </p>
                       )}
                     </div>
@@ -380,11 +400,11 @@ export default function Checkout() {
               {/* Place Order Button (mobile) */}
               <button
                 type="submit"
-                disabled={placing || !service}
+                disabled={placing || !isServiceAvailable}
                 className="lg:hidden w-full bg-green-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-green-700 transition shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed cursor-pointer">
                 {placing
                   ? "Placing Order..."
-                  : !service 
+                  : !isServiceAvailable 
                     ? "Service Not Available"
                     : `Place Order — ₹${grandTotal}`}
               </button>
@@ -450,7 +470,7 @@ export default function Checkout() {
                 )}
                 <div className="flex justify-between text-gray-600 text-sm">
                   <span>Delivery Charges <span className="text-[10px] text-gray-400 font-normal ml-1">(Free above ₹1000)</span></span>
-                  {!service && form.pincode.length >= 6 ? (
+                  {!isServiceAvailable && form.pincode.length >= 6 ? (
                     <span className="text-red-500 font-semibold tracking-tighter text-xs">Service Unavailable</span>
                   ) : deliveryCharge === 0 ? (
                     <span className="text-green-600 font-semibold">FREE</span>
@@ -467,9 +487,9 @@ export default function Checkout() {
               {/* Place Order Button (desktop) */}
               <button
                 onClick={handlePlaceOrder}
-                disabled={placing || !service}
+                disabled={placing || !isServiceAvailable}
                 className="hidden lg:block w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed cursor-pointer">
-                {placing ? "Placing Order..." : !service ? "Service Not Available" : "Place Order"}
+                {placing ? "Placing Order..." : !isServiceAvailable ? "Service Not Available" : "Place Order"}
               </button>
 
               <p className="text-center text-gray-400 text-xs mt-3 flex items-center justify-center gap-1">

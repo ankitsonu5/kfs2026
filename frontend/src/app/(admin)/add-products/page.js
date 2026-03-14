@@ -14,6 +14,7 @@ import {
   X,
   Image as ImageIcon,
 } from "lucide-react";
+import Image from "next/image";
 
 export default function AddProducts() {
   const [previews, setPreviews] = useState([]);
@@ -343,10 +344,12 @@ export default function AddProducts() {
                     <div
                       key={index}
                       className="relative aspect-square rounded-2xl overflow-hidden border border-gray-700 shadow-xl group">
-                      <img
+                      <Image
                         src={src}
                         alt={`preview-${index}`}
                         className="w-full h-full object-cover"
+                        width={500}
+                        height={500}
                       />
                       {index === 0 && (
                         <div className="absolute top-1 left-1 bg-green-500 text-white text-[8px] font-bold px-1.5 py-0.5 rounded shadow-sm z-20">

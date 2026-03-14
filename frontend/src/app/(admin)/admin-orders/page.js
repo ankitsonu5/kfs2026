@@ -11,6 +11,7 @@ import {
   Inbox,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 export default function AdminOrders() {
   const [orders, setOrders] = useState([]);
@@ -271,10 +272,12 @@ export default function AdminOrders() {
                             className="flex items-center gap-5 bg-[#0f172a]/40 p-3 rounded-2xl border border-[#334155]/30 hover:bg-[#0f172a]/60 transition">
                             <div className="w-14 h-14 bg-white rounded-xl flex items-center justify-center overflow-hidden border border-[#334155]/50 flex-shrink-0 p-1 shadow-sm">
                               {item.image ? (
-                                <img
+                                <Image
                                   src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${item.image}`}
                                   alt={item.name}
                                   className="w-full h-full object-contain"
+                                  width={50}
+                                  height={50}
                                 />
                               ) : (
                                 <Package className="w-6 h-6 text-gray-400" />

@@ -640,7 +640,7 @@ export default function GroceryRedesign() {
             {
               icon: Truck,
               title: "Free Delivery",
-              desc: "On orders ₹500+",
+              desc: "On orders ₹1000+",
             },
             {
               icon: RotateCcw,

@@ -29,8 +29,6 @@ export default function BulkOrder() {
   const [cartItems, setCartItems] = useState({});
   const [viewMode, setViewMode] = useState("grid"); // 'grid' or 'list'
 
-
-
   function initializeCart() {
     const fetchCart = async () => {
       try {
