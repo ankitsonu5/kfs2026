@@ -35,7 +35,7 @@ export default function EditCategory() {
           });
           if (res.data.image) {
             setPreview(
-              `${process.env.NEXT_PUBLIC_API_URL}/uploads/${res.data.image}`,
+              `${process.env.NEXT_PUBLIC_API_URL}/uploads/categories/${res.data.image}`,
             );
           }
         }

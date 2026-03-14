@@ -361,7 +361,7 @@ export default function GroceryRedesign() {
             {/* Background Image with Overlay */}
             <div className="absolute inset-0 z-0">
               <Image
-                src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${banners[currentBannerIndex].image}`}
+                src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/banners/${banners[currentBannerIndex].image}`}
                 alt={banners[currentBannerIndex].title}
                 width={1920}
                 height={1080}
@@ -479,7 +479,7 @@ export default function GroceryRedesign() {
                   <div className="w-20 h-20 md:w-24 md:h-24 flex items-center justify-center overflow-hidden mb-1 md:mb-2">
                     {category.image ? (
                       <Image
-                        src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${category.image}`}
+                        src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/categories/${category.image}`}
                         alt={category.name}
                         width={200}
                         height={200}
@@ -540,7 +540,7 @@ export default function GroceryRedesign() {
                     )}
                     {product.images && product.images.length > 0 ? (
                       <Image
-                        src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${product.images[0]}`}
+                        src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/products/${product.images[0]}`}
                         alt={product.title}
                         width={400}
                         height={400}
@@ -701,7 +701,7 @@ export default function GroceryRedesign() {
                     )}
                     {product.images && product.images.length > 0 ? (
                       <Image
-                        src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${product.images[0]}`}
+                        src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/products/${product.images[0]}`}
                         alt={product.title}
                         width={400}
                         height={400}
@@ -802,7 +802,7 @@ export default function GroceryRedesign() {
                     )}
                     {product.images && product.images.length > 0 ? (
                       <Image
-                        src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${product.images[0]}`}
+                        src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/products/${product.images[0]}`}
                         alt={product.title}
                         width={400}
                         height={400}
@@ -898,7 +898,7 @@ export default function GroceryRedesign() {
               <div className="w-20 h-20 md:w-16 md:h-16 bg-gray-50 rounded-2xl md:rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center border border-gray-100">
                 {miniCart.product.image ? (
                   <Image
-                    src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${miniCart.product.image}`}
+                    src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/products/${miniCart.product.image}`}
                     alt={miniCart.product.title}
                     width={100}
                     height={100}

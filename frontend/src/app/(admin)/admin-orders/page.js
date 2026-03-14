@@ -273,7 +273,7 @@ export default function AdminOrders() {
                             <div className="w-14 h-14 bg-white rounded-xl flex items-center justify-center overflow-hidden border border-[#334155]/50 flex-shrink-0 p-1 shadow-sm">
                               {item.image ? (
                                 <Image
-                                  src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${item.image}`}
+                                  src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/products/${item.image}`}
                                   alt={item.name}
                                   className="w-full h-full object-contain"
                                   width={50}

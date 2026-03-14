@@ -61,7 +61,7 @@ export default function EditProduct() {
           if (p.images && p.images.length > 0) {
             setPreviews(
               p.images.map(
-                (img) => `${process.env.NEXT_PUBLIC_API_URL}/uploads/${img}`,
+                (img) => `${process.env.NEXT_PUBLIC_API_URL}/uploads/products/${img}`,
               ),
             );
           }

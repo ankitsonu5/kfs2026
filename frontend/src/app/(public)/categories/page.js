@@ -69,7 +69,7 @@ export default function CategoriesPage() {
                   <div className="w-14 h-14 sm:w-20 sm:h-20 rounded-full overflow-hidden bg-gray-50 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform border border-gray-100">
                     {category.image ? (
                       <Image
-                        src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${category.image}`}
+                        src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/categories/${category.image}`}
                         alt={category.name}
                         width={80}
                         height={80}

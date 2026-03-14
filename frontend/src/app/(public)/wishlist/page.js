@@ -172,7 +172,7 @@ export default function WishlistPage() {
                   onClick={() => router.push(`/product/${item.productId}`)}
                   className="h-48 bg-gray-50 relative flex items-center justify-center p-4 cursor-pointer overflow-hidden flex-shrink-0">
                   <Image
-                    src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${item.image}`}
+                    src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/products/${item.image}`}
                     alt={item.title}
                     className="w-full h-full object-contain group-hover:scale-105 transition duration-500"
                     width={200}

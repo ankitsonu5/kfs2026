@@ -258,7 +258,7 @@ export default function ProductDetail() {
                       : "border-gray-100 opacity-70 hover:opacity-100"
                   }`}>
                   <Image
-                    src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${img}`}
+                    src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/products/${img}`}
                     alt={`pic-${idx}`}
                     className="w-full h-full object-cover"
                     width={100}
@@ -273,7 +273,7 @@ export default function ProductDetail() {
               {/* Desktop Main Image */}
               <div className="hidden md:flex bg-gray-50 rounded-3xl overflow-hidden aspect-square flex items-center justify-center border border-gray-100 shadow-sm relative">
                 <Image
-                  src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${mainImage}`}
+                  src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/products/${mainImage}`}
                   alt={product.title}
                   className="w-full h-full object-contain p-6 group-hover:scale-110 transition-transform duration-700"
                   width={100}
@@ -299,7 +299,7 @@ export default function ProductDetail() {
                       key={idx}
                       className="flex-shrink-0 w-full h-full snap-center flex items-center justify-center">
                       <Image
-                        src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${img}`}
+                        src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/products/${img}`}
                         alt={`slide-${idx}`}
                         className="w-full h-full object-contain p-6"
                         width={100}

@@ -286,7 +286,7 @@ export default function BulkOrder() {
                       className={`relative bg-gray-50 flex items-center justify-center cursor-pointer ${viewMode === "list" ? "w-48 h-48 rounded-lg" : "h-52 sm:h-64"}`}>
                       {p.images && p.images.length > 0 ? (
                         <Image
-                          src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${p.images[0]}`}
+                          src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/products/${p.images[0]}`}
                           alt={p.title}
                           className="w-full h-full object-contain p-4 group-hover:scale-105 transition-transform duration-500"
                           width={300}

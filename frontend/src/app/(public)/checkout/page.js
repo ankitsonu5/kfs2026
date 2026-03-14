@@ -427,7 +427,7 @@ export default function Checkout() {
                     <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0">
                       {item.image ? (
                         <Image
-                          src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${item.image}`}
+                          src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/products/${item.image}`}
                           alt={item.title}
                           width={100}
                           height={100}

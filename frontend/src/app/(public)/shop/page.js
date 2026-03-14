@@ -66,7 +66,7 @@ const SidebarContent = ({ categories, categoryFilter, flagFilter, router, setIsS
           <div className={`${isMobileSidebar ? 'w-12 h-12' : 'hidden'} rounded-full overflow-hidden mb-1 border-2 ${categoryFilter === cat.name ? 'border-green-500 shadow-md' : 'border-gray-100'} bg-white flex items-center justify-center flex-shrink-0 transition-all`}>
              {cat.image ? (
                 <Image
-                  src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${cat.image}`}
+                  src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/categories/${cat.image}`}
                   alt={cat.name}
                   width={48}
                   height={48}
@@ -384,7 +384,7 @@ function ShopContent() {
                       className="aspect-square flex items-center justify-center bg-gray-50 rounded-2xl mb-4 overflow-hidden cursor-pointer relative flex-shrink-0">
                       {product.images && product.images.length > 0 ? (
                         <Image
-                          src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${product.images[0]}`}
+                          src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/products/${product.images[0]}`}
                           alt={product.title}
                           className="w-full h-full object-contain p-2 group-hover:scale-110 transition duration-500"
                           width={300}
@@ -536,7 +536,7 @@ function ShopContent() {
                 <div className="w-20 h-20 md:w-24 md:h-24 bg-gray-50 rounded-2xl overflow-hidden flex items-center justify-center p-2 border border-blue-50/50">
                   {miniCart.product.image ? (
                     <Image
-                      src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${miniCart.product.image}`}
+                      src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/products/${miniCart.product.image}`}
                       alt={miniCart.product.title}
                       className="w-full h-full object-contain"
                       width={100}

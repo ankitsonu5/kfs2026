@@ -745,7 +745,7 @@ export default function AdminDashboard() {
                               <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-gray-800 flex items-center justify-center overflow-hidden border border-gray-700 group-hover:border-blue-500/50 transition-colors flex-shrink-0">
                                 {product.images && product.images.length > 0 ? (
                                   <Image
-                                    src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${product.images[0]}`}
+                                    src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/products/${product.images[0]}`}
                                     alt={product.title}
                                     width={48}
                                     height={48}
@@ -872,7 +872,7 @@ export default function AdminDashboard() {
                               <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-gray-800 flex items-center justify-center overflow-hidden border border-gray-700 group-hover:border-emerald-500/50 transition-colors flex-shrink-0">
                                 {category.image ? (
                                   <Image
-                                    src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${category.image}`}
+                                    src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/categories/${category.image}`}
                                     alt={category.name}
                                     width={40}
                                     height={40}
@@ -1155,7 +1155,7 @@ export default function AdminDashboard() {
                     className="bg-[#111827] border border-gray-700 rounded-xl md:rounded-2xl overflow-hidden group hover:border-blue-500 transition-all shadow-xl">
                     <div className="relative aspect-video bg-gray-900 border-b border-gray-800 flex items-center justify-center overflow-hidden">
                       <Image
-                        src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${banner.image}`}
+                        src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/banners/${banner.image}`}
                         alt={banner.title}
                         width={100}
                         height={100}
