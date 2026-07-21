@@ -28,6 +28,7 @@ import Navbar from "../components/redesign/Navbar";
 import Footer from "../components/redesign/Footer";
 import axios from "axios";
 import Image from "next/image";
+import { safePush } from "@/lib/safe-navigation";
 
 export default function GroceryRedesign() {
   const [cartCount, setCartCount] = useState(0);
@@ -385,7 +386,7 @@ export default function GroceryRedesign() {
                 {banners[currentBannerIndex].link && (
                   <button
                     onClick={() =>
-                      router.push(banners[currentBannerIndex].link)
+                      safePush(router, banners[currentBannerIndex].link)
                     }
                     className="bg-green-600 text-white px-4 py-2 md:px-10 md:py-4 rounded-lg md:rounded-xl text-[10px] md:text-lg font-extrabold hover:bg-green-700 transition shadow-xl shadow-green-600/20 active:scale-95 cursor-pointer">
                     Shop Now
@@ -474,7 +475,7 @@ export default function GroceryRedesign() {
               return (
                 <div
                   key={category._id}
-                  onClick={() => router.push(`/shop?category=${category.name}`)}
+                  onClick={() => safePush(router, `/shop?category=${category.name}`)}
                   className="min-w-[130px] md:min-w-[200px] p-4 md:p-6 rounded-2xl bg-white border border-gray-50 flex flex-col items-center justify-center cursor-pointer hover:shadow-xl hover:border-green-100 transition transform hover:-translate-y-1 gap-2 md:gap-3 snap-start">
                   <div className="w-20 h-20 md:w-24 md:h-24 flex items-center justify-center overflow-hidden mb-1 md:mb-2">
                     {category.image ? (
@@ -516,7 +517,7 @@ export default function GroceryRedesign() {
             </p>
           </div>
           <button
-            onClick={() => router.push("/shop?flag=isTopSellingProducts")}
+            onClick={() => safePush(router, "/shop?flag=isTopSellingProducts")}
             className="text-green-600 font-semibold hover:underline cursor-pointer">
             View All &rarr;
           </button>
@@ -531,11 +532,11 @@ export default function GroceryRedesign() {
                   key={product._id}
                   className="border border-gray-100 rounded-xl p-4 hover:shadow-lg transition bg-white relative group flex flex-col h-full">
                   <div
-                    onClick={() => router.push(`/product/${product._id}`)}
+                    onClick={() => safePush(router, `/product/${product._id}`)}
                     className="relative h-56 flex items-center justify-center bg-gray-50 rounded-lg mb-4 overflow-hidden cursor-pointer">
                     {product.discountPrice && product.discountPrice > product.price && (
                       <div className="absolute top-2 left-2 bg-[#be1e2d] text-white text-[10px] font-bold px-2 py-1 rounded shadow-sm uppercase tracking-wider z-10">
-                        YOU SAVE {Math.round(((product.discountPrice - product.price) / product.discountPrice) * 100)}%
+                        YOU SAVE ₹{Number((product.discountPrice - product.price).toFixed(2))}
                       </div>
                     )}
                     {product.images && product.images.length > 0 ? (
@@ -552,7 +553,7 @@ export default function GroceryRedesign() {
                   </div>
                     <div className="flex-grow">
                       <h3
-                        onClick={() => router.push(`/product/${product._id}`)}
+                        onClick={() => safePush(router, `/product/${product._id}`)}
                         className="text-xs md:text-base font-semibold md:font-bold text-gray-800 mb-1 cursor-pointer hover:text-green-600 transition-colors line-clamp-2 min-h-[3rem] leading-tight break-words">
                         {product.title}
                       </h3>
@@ -678,7 +679,7 @@ export default function GroceryRedesign() {
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold text-gray-800">Deals of Day</h2>
           <button
-            onClick={() => router.push("/shop?flag=isDealsOfDay")}
+          onClick={() => safePush(router, "/shop?flag=isDealsOfDay")}
             className="text-green-600 font-semibold hover:underline cursor-pointer">
             View All &rarr;
           </button>
@@ -692,11 +693,11 @@ export default function GroceryRedesign() {
                   key={product._id}
                   className="bg-white border border-gray-100 rounded-xl p-4 hover:shadow-lg transition group relative flex flex-col h-full">
                   <div
-                    onClick={() => router.push(`/product/${product._id}`)}
+                    onClick={() => safePush(router, `/product/${product._id}`)}
                     className="relative h-48 flex items-center justify-center bg-gray-50 rounded-lg mb-4 overflow-hidden cursor-pointer">
                     {product.discountPrice && product.discountPrice > product.price && (
                       <div className="absolute top-2 left-2 bg-[#be1e2d] text-white text-[10px] font-bold px-2 py-1 rounded shadow-sm uppercase tracking-wider z-10">
-                        YOU SAVE {Math.round(((product.discountPrice - product.price) / product.discountPrice) * 100)}%
+                        YOU SAVE ₹{Number((product.discountPrice - product.price).toFixed(2))}
                       </div>
                     )}
                     {product.images && product.images.length > 0 ? (
@@ -713,7 +714,7 @@ export default function GroceryRedesign() {
                   </div>
                     <div className="flex-grow">
                       <h3
-                        onClick={() => router.push(`/product/${product._id}`)}
+                        onClick={() => safePush(router, `/product/${product._id}`)}
                         className="text-xs md:text-base font-semibold md:font-bold text-gray-800 mb-1 line-clamp-2 min-h-[3rem] hover:text-green-600 cursor-pointer leading-tight break-words">
                         {product.title}
                       </h3>
@@ -782,7 +783,7 @@ export default function GroceryRedesign() {
                 {section.title}
               </h2>
               <button
-                onClick={() => router.push(`/shop?flag=${section.flag}`)}
+                onClick={() => safePush(router, `/shop?flag=${section.flag}`)}
                 className="text-green-600 font-semibold hover:underline cursor-pointer">
                 View All &rarr;
               </button>
@@ -793,11 +794,11 @@ export default function GroceryRedesign() {
                   key={product._id}
                   className="bg-white border border-gray-100 rounded-xl p-4 hover:shadow-lg transition group relative flex flex-col h-full">
                   <div
-                    onClick={() => router.push(`/product/${product._id}`)}
+                    onClick={() => safePush(router, `/product/${product._id}`)}
                     className="relative h-48 flex items-center justify-center bg-gray-50 rounded-lg mb-4 overflow-hidden cursor-pointer">
                     {product.discountPrice && product.discountPrice > product.price && (
                       <div className="absolute top-2 left-2 bg-[#be1e2d] text-white text-[10px] font-bold px-2 py-1 rounded shadow-sm uppercase tracking-wider z-10">
-                        YOU SAVE {Math.round(((product.discountPrice - product.price) / product.discountPrice) * 100)}%
+                        YOU SAVE ₹{Number((product.discountPrice - product.price).toFixed(2))}
                       </div>
                     )}
                     {product.images && product.images.length > 0 ? (
@@ -814,7 +815,7 @@ export default function GroceryRedesign() {
                   </div>
                     <div className="flex-grow">
                       <h3
-                        onClick={() => router.push(`/product/${product._id}`)}
+                        onClick={() => safePush(router, `/product/${product._id}`)}
                         className="text-xs md:text-base font-semibold md:font-bold text-gray-800 mb-1 line-clamp-2 min-h-[3rem] hover:text-green-600 cursor-pointer leading-tight break-words">
                         {product.title}
                       </h3>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { safePush } from "@/lib/safe-navigation";
 import { useState } from "react";
 import axios from "axios";
 import {
@@ -39,7 +40,7 @@ export default function AddCategory() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("adminToken");
 
     const formData = new FormData();
     formData.append("name", form.title);
@@ -60,7 +61,7 @@ export default function AddCategory() {
         },
       );
 
-      router.push("/admindashboard");
+      safePush(router, "/admindashboard");
     } catch (error) {
       console.error(error);
     } finally {
@@ -77,7 +78,7 @@ export default function AddCategory() {
       <div className="w-full max-w-md z-10 animate-in fade-in slide-in-from-bottom-10 duration-700">
         {/* Back Button */}
         <button
-          onClick={() => router.push("/admindashboard")}
+          onClick={() => safePush(router, "/admindashboard")}
           className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-8 group">
           <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-white/10 border border-white/10 transition-all">
             <FaChevronLeft size={12} />

@@ -9,12 +9,18 @@ export default function AdminLayout({ children }) {
 
   useEffect(() => {
     const checkAuth = () => {
-      const token = localStorage.getItem("token");
-      const role = localStorage.getItem("role");
+      const token = localStorage.getItem("adminToken");
+      const role = localStorage.getItem("adminRole");
+      
+      const hasSessionCookie = document.cookie.split('; ').some(row => row.startsWith('adminToken='));
 
-      if (!token || role !== "admin") {
+      if (!token || role !== "admin" || (role === "admin" && !hasSessionCookie)) {
+        if (role === "admin" && !hasSessionCookie) {
+          localStorage.removeItem("adminToken");
+          localStorage.removeItem("adminRole");
+        }
         setIsAuthorized(false);
-        router.replace("/login");
+        router.replace("/admin-login");
       } else {
         setIsAuthorized(true);
       }

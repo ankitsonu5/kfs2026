@@ -20,6 +20,7 @@ import {
   ArrowRight,
   MapPin,
   Image as ImageIcon,
+  MessageSquare,
 } from "lucide-react";
 import { AreaChart, Area, ResponsiveContainer, Tooltip, XAxis } from "recharts";
 
@@ -70,7 +71,7 @@ export default function AdminDashboard() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const token = localStorage.getItem("token");
+        const token = localStorage.getItem("adminToken");
         const response = await axios.get(
           `${process.env.NEXT_PUBLIC_API_URL}/products`,
           {
@@ -88,7 +89,7 @@ export default function AdminDashboard() {
   const handleDelete = async (id) => {
 
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("adminToken");
 
       await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/products/${id}`, {
         headers: { Authorization: token },
@@ -103,7 +104,7 @@ export default function AdminDashboard() {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const token = localStorage.getItem("token");
+        const token = localStorage.getItem("adminToken");
         const response = await axios.get(
           `${process.env.NEXT_PUBLIC_API_URL}/categories`,
           {
@@ -123,7 +124,7 @@ export default function AdminDashboard() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const token = localStorage.getItem("token");
+        const token = localStorage.getItem("adminToken");
         const res = await axios.get(
           `${process.env.NEXT_PUBLIC_API_URL}/dashboard-stats?range=${range}`,
           {
@@ -144,7 +145,7 @@ export default function AdminDashboard() {
     const fetchUsers = async () => {
       if (active !== "users") return;
       try {
-        const token = localStorage.getItem("token");
+        const token = localStorage.getItem("adminToken");
         const res = await axios.get(
           `${process.env.NEXT_PUBLIC_API_URL}/all-users`,
           {
@@ -163,7 +164,7 @@ export default function AdminDashboard() {
 
   const handleDeleteUser = async (id) => {
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("adminToken");
       const res = await axios.delete(
         `${process.env.NEXT_PUBLIC_API_URL}/delete-user/${id}`,
         {
@@ -180,7 +181,7 @@ export default function AdminDashboard() {
 
   const handleDeleteCategory = async (id) => {
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("adminToken");
 
       await axios.delete(
         `${process.env.NEXT_PUBLIC_API_URL}/categories/${id}`,
@@ -211,7 +212,7 @@ export default function AdminDashboard() {
 
   const handleBannerSubmit = async (e) => {
     e.preventDefault();
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("adminToken");
     const formData = new FormData();
     formData.append("title", bannerForm.title);
     formData.append("subtitle", bannerForm.subtitle);
@@ -265,7 +266,7 @@ export default function AdminDashboard() {
   };
 
   const handleDeleteBanner = async (id) => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("adminToken");
     try {
       await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/banners/${id}`, {
         headers: { Authorization: token },
@@ -277,7 +278,7 @@ export default function AdminDashboard() {
   };
 
   const handleToggleBanner = async (id) => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("adminToken");
     try {
       await axios.patch(
         `${process.env.NEXT_PUBLIC_API_URL}/banners/${id}/toggle`,
@@ -302,7 +303,7 @@ export default function AdminDashboard() {
     const fetchAreas = async () => {
       if (active !== "areas") return;
       try {
-        const token = localStorage.getItem("token");
+        const token = localStorage.getItem("adminToken");
         const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/service-areas-all`, {
           headers: { Authorization: token },
         });
@@ -318,7 +319,7 @@ export default function AdminDashboard() {
 
   const handleAreaSubmit = async (e) => {
     e.preventDefault();
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("adminToken");
     try {
       if (editingAreaId) {
         await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/service-areas/${editingAreaId}`, areaForm, {
@@ -344,7 +345,7 @@ export default function AdminDashboard() {
 
   const handleDeleteArea = async (id) => {
     if (!confirm("Are you sure?")) return;
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("adminToken");
     try {
       await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/service-areas/${id}`, {
         headers: { Authorization: token },
@@ -356,7 +357,7 @@ export default function AdminDashboard() {
   };
 
   const handleToggleArea = async (id, currentStatus) => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("adminToken");
     try {
       await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/service-areas/${id}`, { isActive: !currentStatus }, {
         headers: { Authorization: token },
@@ -424,6 +425,14 @@ export default function AdminDashboard() {
               className={`cursor-pointer flex items-center gap-3 py-2 px-3 rounded-lg transition ${active === "users" ? "bg-blue-600 text-white" : "text-gray-400 hover:text-white hover:bg-white/5"}`}>
               <Users size={20} /> Users
             </li>
+            
+            <li
+              onClick={() => {
+                router.push("/messages");
+              }}
+              className="cursor-pointer flex items-center gap-3 py-2 px-3 rounded-lg transition text-gray-400 hover:text-white hover:bg-white/5">
+              <MessageSquare size={20} /> Messages
+            </li>
 
             <li className="cursor-pointer">
               <div
@@ -480,6 +489,13 @@ export default function AdminDashboard() {
                     }}>
                     <MapPin size={16} /> Service Areas
                   </li>
+                  <li
+                    className={`text-sm py-1.5 px-3 rounded-md transition flex items-center gap-2 text-gray-400 hover:text-white hover:bg-white/5`}
+                    onClick={() => {
+                      router.push("/about-cms");
+                    }}>
+                    <Settings size={16} /> About Us CMS
+                  </li>
                   {/* <li
                     className="text-sm text-gray-300 hover:text-blue-400 cursor-pointer py-1"
                     onClick={() => {
@@ -519,13 +535,13 @@ export default function AdminDashboard() {
             </li>
             <li
               onClick={() => {
-                localStorage.removeItem("token");
-                localStorage.removeItem("role");
+                localStorage.removeItem("adminToken");
+                localStorage.removeItem("adminRole");
                 document.cookie =
                   "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
                 document.cookie =
                   "role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-                router.push("/login");
+                router.push("/admin-login");
                 setOpen(false);
               }}
               className="cursor-pointer text-gray-400 hover:text-red-400 hover:bg-white/5 py-2 px-3 rounded-lg transition flex items-center gap-3">
@@ -672,7 +688,7 @@ export default function AdminDashboard() {
                         </p>
                       </td>
                       <td className="py-3 px-2 md:px-4 text-right font-bold text-xs md:text-sm">
-                        ₹{o.totalAmount}
+                        ₹{parseFloat(Number(o.totalAmount).toFixed(2))}
                       </td>
                       <td className="py-3 text-right hidden md:table-cell">
                         <span
@@ -990,7 +1006,7 @@ export default function AdminDashboard() {
                           {o.items.length} items
                         </td>
                         <td className="py-4 px-4 text-right font-bold text-sm">
-                          ₹{o.totalAmount}
+                          ₹{parseFloat(Number(o.totalAmount).toFixed(2))}
                         </td>
                         <td className="py-4 px-4 text-right">
                           <span

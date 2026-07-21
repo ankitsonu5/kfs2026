@@ -21,6 +21,7 @@ import Image from "next/image";
 import Header from "../../components/header";
 import Navbar from "../../components/redesign/Navbar";
 import Footer from "../../components/redesign/Footer";
+import { safePush } from "@/lib/safe-navigation";
 
 const SidebarContent = ({ categories, categoryFilter, flagFilter, router, setIsSidebarOpen, isMobileSidebar = false }) => (
   <div className={`bg-white ${isMobileSidebar ? 'p-1.5 border-r border-gray-200' : 'p-6 md:rounded-2xl md:shadow-sm md:border md:border-gray-100'} h-full overflow-y-auto no-scrollbar`}>
@@ -44,7 +45,7 @@ const SidebarContent = ({ categories, categoryFilter, flagFilter, router, setIsS
           ${isMobileSidebar ? 'w-full py-2 px-1 rounded-lg' : 'text-sm hover:bg-green-50 px-3 py-2.5 rounded-xl'}
           ${!categoryFilter && !flagFilter ? "bg-green-50 text-green-600 font-bold" : "text-gray-600 font-medium"}`}
         onClick={() => {
-          router.push("/shop");
+          safePush(router, "/shop");
           if(setIsSidebarOpen) setIsSidebarOpen(false);
         }}>
         <div className={`bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-1 shadow-sm
@@ -60,7 +61,7 @@ const SidebarContent = ({ categories, categoryFilter, flagFilter, router, setIsS
             ${isMobileSidebar ? 'w-full py-2 px-1 rounded-lg' : 'text-sm hover:bg-green-50 px-3 py-2.5 rounded-xl'}
             ${categoryFilter === cat.name ? "text-green-600 font-bold" : "text-gray-600 font-medium"}`}
           onClick={() => {
-            router.push(`/shop?category=${encodeURIComponent(cat.name)}`);
+            safePush(router, `/shop?category=${encodeURIComponent(cat.name)}`);
             if(setIsSidebarOpen) setIsSidebarOpen(false);
           }}>
           <div className={`${isMobileSidebar ? 'w-12 h-12' : 'hidden'} rounded-full overflow-hidden mb-1 border-2 ${categoryFilter === cat.name ? 'border-green-500 shadow-md' : 'border-gray-100'} bg-white flex items-center justify-center flex-shrink-0 transition-all`}>
@@ -380,7 +381,7 @@ function ShopContent() {
                     key={product._id}
                     className="bg-white border border-gray-100 rounded-3xl p-3 md:p-4 hover:shadow-xl transition-all group relative animate-in fade-in zoom-in duration-300 flex flex-col h-full">
                     <div
-                      onClick={() => router.push(`/product/${product._id}`)}
+                      onClick={() => safePush(router, `/product/${product._id}`)}
                       className="aspect-square flex items-center justify-center bg-gray-50 rounded-2xl mb-4 overflow-hidden cursor-pointer relative flex-shrink-0">
                       {product.images && product.images.length > 0 ? (
                         <Image
@@ -396,14 +397,14 @@ function ShopContent() {
                       {product.discountPrice > product.price && (
                         <div className="absolute top-2 left-2 z-10">
                           <span className="bg-red-500/10 backdrop-blur-md border border-red-500/20 text-red-600 text-[10px] font-black px-2 py-1 rounded-lg uppercase tracking-wider shadow-sm">
-                            SAVE {Math.round(((product.discountPrice - product.price) / product.discountPrice) * 100)}%
+                            SAVE ₹{Number((product.discountPrice - product.price).toFixed(2))}
                           </span>
                         </div>
                       )}
                     </div>
                     <div className="flex-grow">
                       <h3
-                        onClick={() => router.push(`/product/${product._id}`)}
+                        onClick={() => safePush(router, `/product/${product._id}`)}
                         className="text-xs md:text-base font-semibold md:font-bold text-gray-800 mb-1 hover:text-green-600 cursor-pointer line-clamp-2 min-h-[3rem] leading-tight break-words">
                         {product.title}
                       </h3>
@@ -454,7 +455,7 @@ function ShopContent() {
                   Try adjusting your filters or search query.
                 </p>
                 <button
-                  onClick={() => router.push("/shop")}
+                  onClick={() => safePush(router, "/shop")}
                   className="bg-green-600 text-white px-8 py-3 rounded-2xl text-sm font-bold hover:bg-green-700 transition-all shadow-lg shadow-green-100 active:scale-95">
                   Clear all filters
                 </button>

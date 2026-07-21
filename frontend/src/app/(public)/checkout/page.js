@@ -193,17 +193,17 @@ export default function Checkout() {
     );
   }
 
-  const subtotal = cart.items.reduce((sum, item) => sum + (Number(item.price) * item.quantity), 0);
-  const totalMrp = cart.items.reduce((sum, item) => {
+  const subtotal = parseFloat(cart.items.reduce((sum, item) => sum + (Number(item.price) * item.quantity), 0).toFixed(2));
+  const totalMrp = parseFloat(cart.items.reduce((sum, item) => {
     const p = Number(item.price);
     const dp = Number(item.discountPrice);
     const mrp = (dp && dp > p) ? dp : p;
     return sum + (mrp * item.quantity);
-  }, 0);
-  const totalSavings = totalMrp - subtotal;
+  }, 0).toFixed(2));
+  const totalSavings = parseFloat((totalMrp - subtotal).toFixed(2));
   
-  const deliveryCharge = subtotal >= 1000 || subtotal === 0 ? 0 : 50;
-  const grandTotal = subtotal + deliveryCharge;
+  const deliveryCharge = subtotal >= 500 || subtotal === 0 ? 0 : 50;
+  const grandTotal = parseFloat((subtotal + deliveryCharge).toFixed(2));
 
   return (
     <>
@@ -360,35 +360,43 @@ export default function Checkout() {
                       </p>
                     </div>
                   </label>
-                  <label className="flex items-center gap-3 p-4 border border-gray-200 rounded-lg cursor-pointer hover:border-green-500 transition">
+                  <label className="flex items-center gap-3 p-4 border border-gray-200 rounded-lg cursor-not-allowed opacity-60 bg-gray-50">
                     <input
                       type="radio"
                       name="paymentMethod"
                       value="upi"
                       checked={form.paymentMethod === "upi"}
                       onChange={handleChange}
-                      className="w-5 h-5 text-green-600"
+                      disabled
+                      className="w-5 h-5 text-gray-400 cursor-not-allowed"
                     />
-                    <div>
-                      <p className="font-semibold text-gray-800">UPI Payment</p>
+                    <div className="flex-1">
+                      <div className="flex justify-between items-center">
+                        <p className="font-semibold text-gray-800">UPI Payment</p>
+                        <span className="text-[10px] bg-gray-200 text-gray-600 px-2 py-1 rounded font-bold uppercase tracking-wider">Unavailable</span>
+                      </div>
                       <p className="text-sm text-gray-500">
                         Pay via Google Pay, PhonePe, Paytm
                       </p>
                     </div>
                   </label>
-                  <label className="flex items-center gap-3 p-4 border border-gray-200 rounded-lg cursor-pointer hover:border-green-500 transition">
+                  <label className="flex items-center gap-3 p-4 border border-gray-200 rounded-lg cursor-not-allowed opacity-60 bg-gray-50">
                     <input
                       type="radio"
                       name="paymentMethod"
                       value="card"
                       checked={form.paymentMethod === "card"}
                       onChange={handleChange}
-                      className="w-5 h-5 text-green-600"
+                      disabled
+                      className="w-5 h-5 text-gray-400 cursor-not-allowed"
                     />
-                    <div>
-                      <p className="font-semibold text-gray-800">
-                        Credit/Debit Card
-                      </p>
+                    <div className="flex-1">
+                      <div className="flex justify-between items-center">
+                        <p className="font-semibold text-gray-800">
+                          Credit/Debit Card
+                        </p>
+                        <span className="text-[10px] bg-gray-200 text-gray-600 px-2 py-1 rounded font-bold uppercase tracking-wider">Unavailable</span>
+                      </div>
                       <p className="text-sm text-gray-500">
                         Visa, Mastercard, RuPay accepted
                       </p>
@@ -446,7 +454,7 @@ export default function Checkout() {
                       </p>
                     </div>
                     <p className="font-semibold text-gray-800 text-sm">
-                      ₹{item.price * item.quantity}
+                      ₹{parseFloat((item.price * item.quantity).toFixed(2))}
                     </p>
                   </div>
                 ))}
@@ -469,7 +477,7 @@ export default function Checkout() {
                   </div>
                 )}
                 <div className="flex justify-between text-gray-600 text-sm">
-                  <span>Delivery Charges <span className="text-[10px] text-gray-400 font-normal ml-1">(Free above ₹1000)</span></span>
+                  <span>Delivery Charges <span className="text-[10px] text-gray-400 font-normal ml-1">(Free above ₹500)</span></span>
                   {!isServiceAvailable && form.pincode.length >= 6 ? (
                     <span className="text-red-500 font-semibold tracking-tighter text-xs">Service Unavailable</span>
                   ) : deliveryCharge === 0 ? (

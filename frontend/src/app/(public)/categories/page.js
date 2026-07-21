@@ -8,6 +8,7 @@ import { LayoutGrid, ArrowLeft } from "lucide-react";
 import Header from "../../components/header";
 import Navbar from "../../components/redesign/Navbar";
 import Footer from "../../components/redesign/Footer";
+import { safePush } from "@/lib/safe-navigation";
 
 export default function CategoriesPage() {
   const router = useRouter();
@@ -52,7 +53,7 @@ export default function CategoriesPage() {
             <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3 sm:gap-6">
               {/* All Products Card */}
               <button
-                onClick={() => router.push("/shop")}
+                onClick={() => safePush(router, "/shop")}
                 className="bg-white rounded-2xl p-4 flex flex-col items-center justify-center gap-3 border border-gray-100 shadow-sm hover:shadow-md hover:border-green-200 transition-all group aspect-square">
                 <div className="w-14 h-14 sm:w-20 sm:h-20 bg-green-50 rounded-full flex items-center justify-center text-green-600 group-hover:scale-110 transition-transform">
                   <LayoutGrid className="w-6 h-6 sm:w-8 sm:h-8" />
@@ -64,7 +65,7 @@ export default function CategoriesPage() {
               {categories.map((category) => (
                 <button
                   key={category._id}
-                  onClick={() => router.push(`/shop?category=${encodeURIComponent(category.name)}`)}
+                  onClick={() => safePush(router, `/shop?category=${encodeURIComponent(category.name)}`)}
                   className="bg-white rounded-2xl p-3 sm:p-4 flex flex-col items-center justify-start gap-3 border border-gray-100 shadow-sm hover:shadow-md hover:border-green-200 transition-all group aspect-square">
                   <div className="w-14 h-14 sm:w-20 sm:h-20 rounded-full overflow-hidden bg-gray-50 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform border border-gray-100">
                     {category.image ? (

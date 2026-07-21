@@ -11,6 +11,8 @@ const storage = multer.diskStorage({
       subfolder = "products";
     } else if (req.originalUrl.includes("banner")) {
       subfolder = "banners";
+    } else if (req.originalUrl.includes("aboutus")) {
+      subfolder = "aboutus";
     } else if (req.originalUrl.includes("blog")) {
       subfolder = "blogs";
     }

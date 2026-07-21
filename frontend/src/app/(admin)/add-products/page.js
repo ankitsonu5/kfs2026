@@ -3,6 +3,7 @@
 import axios from "axios";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { safePush } from "@/lib/safe-navigation";
 import {
   Upload,
   Package,
@@ -13,6 +14,8 @@ import {
   ArrowLeft,
   X,
   Image as ImageIcon,
+  FileUp,
+  FileText,
 } from "lucide-react";
 import Image from "next/image";
 
@@ -20,6 +23,8 @@ export default function AddProducts() {
   const [previews, setPreviews] = useState([]);
   const [imageFiles, setImageFiles] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [activeTab, setActiveTab] = useState("single");
+  const [csvFile, setCsvFile] = useState(null);
   const router = useRouter();
   const [form, setForm] = useState({
     title: "",
@@ -41,7 +46,7 @@ export default function AddProducts() {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const token = localStorage.getItem("token");
+        const token = localStorage.getItem("adminToken");
         const res = await axios.get(
           `${process.env.NEXT_PUBLIC_API_URL}/categories`,
           { headers: { Authorization: token } },
@@ -80,7 +85,7 @@ export default function AddProducts() {
     e.preventDefault();
 
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("adminToken");
 
       const formData = new FormData();
       formData.append("title", form.title);
@@ -131,9 +136,50 @@ export default function AddProducts() {
           isMasala: false,
           isNamkeenAndSnacks: false,
         });
-        router.push("/admindashboard");
+        safePush(router, "/admindashboard");
         setPreviews([]);
         setImageFiles([]);
+      } else {
+        alert("Error: " + res.data.error);
+      }
+    } catch (error) {
+      alert("Server Error: " + error.message);
+    }
+  };
+
+  const handleCsvChange = (e) => {
+    if (e.target.files.length > 0) {
+      setCsvFile(e.target.files[0]);
+    }
+  };
+
+  const handleCsvSubmit = async (e) => {
+    e.preventDefault();
+    if (!csvFile) {
+      alert("Please select a CSV file first.");
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("adminToken");
+      const formData = new FormData();
+      formData.append("csvFile", csvFile);
+
+      const res = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/add-products-csv`,
+        formData,
+        {
+          headers: {
+            Authorization: token,
+            "Content-Type": "multipart/form-data",
+          },
+        },
+      );
+
+      if (res.data.success) {
+        alert(res.data.message);
+        safePush(router, "/admindashboard");
+        setCsvFile(null);
       } else {
         alert("Error: " + res.data.error);
       }
@@ -150,7 +196,7 @@ export default function AddProducts() {
           <div className="md:w-1/3 bg-gradient-to-br from-blue-600/20 to-purple-600/20 p-6 md:p-8 border-r border-gray-700/50 flex flex-col justify-between">
             <div>
               <button
-                onClick={() => router.push("/admindashboard")}
+                onClick={() => safePush(router, "/admindashboard")}
                 className="flex items-center gap-2 text-blue-400 hover:text-blue-300 transition-colors mb-8 font-medium cursor-pointer">
                 <ArrowLeft size={18} /> Back to Dashboard
               </button>
@@ -177,6 +223,22 @@ export default function AddProducts() {
 
           {/* Form Content */}
           <div className="md:w-2/3 p-5 md:p-8">
+            <div className="flex gap-4 mb-6 border-b border-gray-700 pb-4">
+              <button
+                onClick={() => setActiveTab("single")}
+                className={`px-4 py-2 rounded-xl font-bold flex items-center gap-2 transition-all cursor-pointer ${activeTab === "single" ? "bg-blue-600 text-white" : "text-gray-400 hover:text-white bg-[#1f2937]/50"}`}
+              >
+                <Type size={18} /> Single Product
+              </button>
+              <button
+                onClick={() => setActiveTab("bulk")}
+                className={`px-4 py-2 rounded-xl font-bold flex items-center gap-2 transition-all cursor-pointer ${activeTab === "bulk" ? "bg-blue-600 text-white" : "text-gray-400 hover:text-white bg-[#1f2937]/50"}`}
+              >
+                <FileUp size={18} /> Bulk Upload (CSV)
+              </button>
+            </div>
+
+            {activeTab === "single" && (
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
@@ -383,6 +445,41 @@ export default function AddProducts() {
                 Publish Product
               </button>
             </form>
+            )}
+
+            {activeTab === "bulk" && (
+              <form onSubmit={handleCsvSubmit} className="space-y-6">
+                <div className="bg-[#1f2937]/30 p-6 rounded-2xl border border-gray-700/50">
+                  <h3 className="text-lg font-bold text-gray-200 flex items-center gap-2 mb-4">
+                    <FileText className="text-blue-500" size={20} /> CSV Instructions
+                  </h3>
+                  <ul className="list-disc list-inside text-sm text-gray-400 space-y-2 mb-6">
+                    <li>The CSV file must contain the following headers: <code className="text-blue-400 bg-[#111827] px-1 py-0.5 rounded">title</code>, <code className="text-blue-400 bg-[#111827] px-1 py-0.5 rounded">price</code>.</li>
+                    <li>Optional headers include: <code className="text-blue-400 bg-[#111827] px-1 py-0.5 rounded">discountPrice</code>, <code className="text-blue-400 bg-[#111827] px-1 py-0.5 rounded">description</code>, <code className="text-blue-400 bg-[#111827] px-1 py-0.5 rounded">stock</code>, <code className="text-blue-400 bg-[#111827] px-1 py-0.5 rounded">categoryName</code>.</li>
+                    <li>For display flags, use headers like <code className="text-blue-400 bg-[#111827] px-1 py-0.5 rounded">isTopSellingProducts</code>, <code className="text-blue-400 bg-[#111827] px-1 py-0.5 rounded">isDealsOfDay</code> with values <code className="text-green-400">true</code> or <code className="text-green-400">1</code>.</li>
+                  </ul>
+                  
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-2 text-sm font-semibold text-gray-300">
+                      Upload CSV File
+                    </label>
+                    <input
+                      type="file"
+                      accept=".csv"
+                      onChange={handleCsvChange}
+                      required
+                      className="w-full px-4 py-3 bg-[#111827] border border-gray-600/50 rounded-xl focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 outline-none transition-all text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer"
+                    />
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white rounded-xl font-bold shadow-lg shadow-blue-500/20 active:scale-[0.98] transition-all cursor-pointer">
+                  Upload CSV
+                </button>
+              </form>
+            )}
           </div>
         </div>
       </div>

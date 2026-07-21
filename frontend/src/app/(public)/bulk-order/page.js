@@ -299,11 +299,7 @@ export default function BulkOrder() {
                       {/* Discount Badge */}
                       {p.discountPrice && p.discountPrice > p.price && (
                         <div className="absolute top-3 left-3 bg-[#be1e2d] text-white text-[10px] font-bold px-2 py-1 rounded shadow-sm uppercase tracking-wider z-10">
-                          YOU SAVE{" "}
-                          {Math.round(
-                            ((p.discountPrice - p.price) / p.discountPrice) * 100,
-                          )}
-                          %
+                          YOU SAVE ₹{Number((p.discountPrice - p.price).toFixed(2))}
                         </div>
                       )}
                     </div>

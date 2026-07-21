@@ -6,6 +6,7 @@ import axios from "axios";
 import { ShieldCheck } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { safePush } from "@/lib/safe-navigation";
 
 export default function ResetPassword() {
   const { token } = useParams();
@@ -35,7 +36,7 @@ export default function ResetPassword() {
 
       if (res.data.success) {
         alert("Password reset successful! You can now login.");
-        router.push("/login");
+        safePush(router, "/login");
       }
     } catch (error) {
       alert(error.response?.data?.message || "Failed to reset password");

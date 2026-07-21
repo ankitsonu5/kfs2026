@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import Image from "next/image";
 import Link from "next/link";
+import { safePush } from "@/lib/safe-navigation";
 
 export default function Login() {
   const router = useRouter();
@@ -17,8 +18,8 @@ export default function Login() {
     const token = localStorage.getItem("token");
     const role = localStorage.getItem("role");
 
-    if (token && role === "admin") {
-      router.push("/admindashboard");
+    if (token && role === "user") {
+      safePush(router, "/");
     }
   }, [router]);
 
@@ -41,6 +42,11 @@ export default function Login() {
       );
 
       if (res.data.success) {
+        if (res.data.role === "admin") {
+          alert("Admin account detected. Please login through the Admin Login page.");
+          return;
+        }
+
         const token = res.data.token;
         const role = res.data.role;
 
@@ -66,11 +72,8 @@ export default function Login() {
           }
         }
 
-        if (role === "admin") {
-          router.push("/admindashboard");
-        } else {
-          router.push("/");
-        }
+        alert("Login successful!");
+        safePush(router, "/");
       }
     } catch (error) {
       alert(error.response?.data?.message || "Login failed");
@@ -135,6 +138,7 @@ export default function Login() {
                         aria-describedby="remember"
                         type="checkbox"
                         className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-primary-600 dark:ring-offset-gray-800"
+                        required=""
                       />
                     </div>
                     <div className="ml-3 text-sm">
@@ -147,21 +151,20 @@ export default function Login() {
                   </div>
                   <Link
                     href="/forgotpassword"
-                    className="text-sm text-blue-600 hover:underline">
+                    className="text-sm font-medium text-primary-600 hover:underline dark:text-primary-500 text-white">
                     Forgot password?
                   </Link>
                 </div>
                 <button
                   type="submit"
-                  className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition duration-200"
-                  style={{ cursor: "pointer" }}>
+                  className="w-full text-white bg-green-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
                   Sign in
                 </button>
                 <p className="text-sm font-light text-gray-500 dark:text-gray-400">
-                  Don’t have an account yet?{" "}
+                  Don't have an account yet?{" "}
                   <Link
                     href="/signup"
-                    className="font-medium text-blue-600 hover:underline dark:text-blue-500">
+                    className="font-medium text-primary-600 hover:underline dark:text-primary-500 text-white">
                     Sign up
                   </Link>
                 </p>

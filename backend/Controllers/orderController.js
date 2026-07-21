@@ -2,6 +2,8 @@ const Order = require("../models/Order");
 const Cart = require("../models/Cart");
 const ServiceArea = require("../models/ServiceArea");
 const Product = require("../models/Products");
+const User = require("../models/User");
+const nodemailer = require("nodemailer");
 
 exports.placeOrder = async (req, res) => {
   try {
@@ -67,7 +69,7 @@ exports.placeOrder = async (req, res) => {
           : ""),
     }));
 
-    const deliveryCharge = cart.totalAmount >= 1000 ? 0 : 50;
+    const deliveryCharge = cart.totalAmount >= 500 ? 0 : 50;
     const totalAmount = cart.totalAmount + deliveryCharge;
 
     const order = new Order({
@@ -79,6 +81,113 @@ exports.placeOrder = async (req, res) => {
     });
 
     await order.save();
+
+    // Send Email Notification in the background
+    (async () => {
+      try {
+        const adminEmail = process.env.ADMIN_EMAIL;
+        const smtpUser = process.env.SMTP_USER;
+        const smtpPass = process.env.SMTP_PASS;
+
+        if (smtpUser && smtpPass) {
+          const transporter = nodemailer.createTransport({
+            service: "gmail",
+            auth: {
+              user: smtpUser,
+              pass: smtpPass,
+            },
+          });
+
+                    const itemsHtml = orderItems.map(item => `
+            <tr>
+              <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">
+                <strong>${item.name}</strong>
+              </td>
+              <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: center;">
+                ${item.quantity}
+              </td>
+              <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: right;">
+                ₹${item.price}
+              </td>
+            </tr>
+          `).join("");
+
+          const emailTemplate = (title, headerText, isCustomer) => `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; color: #374151;">
+              <div style="background-color: #16a34a; padding: 24px; text-align: center; color: white;">
+                <h1 style="margin: 0; font-size: 24px;">KFS</h1>
+                <p style="margin: 8px 0 0 0; font-size: 16px; opacity: 0.9;">${title}</p>
+              </div>
+              
+              <div style="padding: 32px 24px;">
+                <h2 style="margin-top: 0; color: #16a34a; font-size: 20px;">${headerText}</h2>
+                ${isCustomer ? `<p style="font-size: 16px; line-height: 1.5;">We have successfully received your order. We'll send you another email when it ships.</p>` : ''}
+                
+                <div style="background-color: #f3f4f6; border-radius: 8px; padding: 16px; margin: 24px 0;">
+                  <p style="margin: 0 0 8px 0;"><strong>Order ID:</strong> ${order._id}</p>
+                  <p style="margin: 0 0 8px 0;"><strong>Payment Method:</strong> <span style="text-transform: uppercase;">${paymentMethod}</span></p>
+                  <p style="margin: 0;"><strong>Total Amount:</strong> <span style="color: #16a34a; font-size: 18px; font-weight: bold;">₹${totalAmount}</span></p>
+                </div>
+
+                <h3 style="color: #374151; font-size: 18px; margin-bottom: 16px; border-bottom: 2px solid #16a34a; padding-bottom: 8px; display: inline-block;">Shipping Details</h3>
+                <p style="margin: 0 0 4px 0;"><strong>${shippingAddress.fullName}</strong></p>
+                <p style="margin: 0 0 4px 0;">📞 ${shippingAddress.phone}</p>
+                <p style="margin: 0 0 24px 0; line-height: 1.5;">🏠 ${shippingAddress.address}, ${shippingAddress.city} - ${shippingAddress.pincode}</p>
+
+                <h3 style="color: #374151; font-size: 18px; margin-bottom: 16px; border-bottom: 2px solid #16a34a; padding-bottom: 8px; display: inline-block;">Order Summary</h3>
+                <table style="width: 100%; border-collapse: collapse; margin-bottom: 24px;">
+                  <thead>
+                    <tr style="background-color: #f9fafb;">
+                      <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Item</th>
+                      <th style="padding: 12px; text-align: center; border-bottom: 2px solid #e5e7eb;">Qty</th>
+                      <th style="padding: 12px; text-align: right; border-bottom: 2px solid #e5e7eb;">Price</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${itemsHtml}
+                  </tbody>
+                  <tfoot>
+                    <tr>
+                      <td colspan="2" style="padding: 16px 12px; text-align: right; font-weight: bold; border-bottom: 2px solid #16a34a;">Total:</td>
+                      <td style="padding: 16px 12px; text-align: right; font-weight: bold; color: #16a34a; border-bottom: 2px solid #16a34a; font-size: 18px;">₹${totalAmount}</td>
+                    </tr>
+                  </tfoot>
+                </table>
+                
+                ${isCustomer ? `<p style="text-align: center; color: #6b7280; font-size: 14px; margin-top: 32px;">Thanks for shopping with KFS!</p>` : ''}
+              </div>
+            </div>
+          `;
+
+          // 1. Send to Admin
+          if (adminEmail) {
+            const adminMailOptions = {
+              from: smtpUser,
+              to: adminEmail,
+              subject: `New Order Placed: ${order._id}`,
+              html: emailTemplate("Admin Alert", "New Order Received!", false),
+            };
+            await transporter.sendMail(adminMailOptions);
+            // console.log("Admin email notification sent successfully.");
+          }
+
+          // 2. Send to Customer
+          const user = await User.findById(userId);
+          if (user && user.email) {
+            const customerMailOptions = {
+              from: smtpUser,
+              to: user.email,
+              subject: `Order Confirmation - KFS #${order._id}`,
+              html: emailTemplate("Order Confirmation", `Thank you for your order, ${shippingAddress.fullName}!`, true),
+            };
+            await transporter.sendMail(customerMailOptions);
+            // console.log("Customer email notification sent successfully to " + user.email);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to send email notifications:", err);
+      }
+    })();
 
     // Clear cart
     cart.items = [];

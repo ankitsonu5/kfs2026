@@ -3,6 +3,7 @@
 import React from "react";
 import { PhoneCall, Facebook, Instagram } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { safePush } from "@/lib/safe-navigation";
 
 export default function Navbar() {
   const router = useRouter();
@@ -11,32 +12,32 @@ export default function Navbar() {
       <div className="container mx-auto px-4">
         <ul className="flex items-center gap-4 md:gap-8 py-2 md:py-3 text-xs md:text-sm font-medium whitespace-nowrap">
           <li
-            onClick={() => router.push("/")}
+            onClick={() => safePush(router, "/")}
             className="hover:text-green-100 cursor-pointer">
             HOME
           </li>
           <li
-            onClick={() => router.push("/aboutus")}
+            onClick={() => safePush(router, "/aboutus")}
             className="hover:text-green-100 cursor-pointer">
             ABOUT US
           </li>
           <li
-            onClick={() => router.push("/shop?flag=isDealsOfDay")}
+            onClick={() => safePush(router, "/shop?flag=isDealsOfDay")}
             className="hover:text-green-100 cursor-pointer">
             DEALS TODAY
           </li>
           <li
-            onClick={() => router.push("/shop")}
+            onClick={() => safePush(router, "/shop")}
             className="hover:text-green-100 cursor-pointer">
             SHOP
           </li>
           <li
-            onClick={() => router.push("/contact")}
+            onClick={() => safePush(router, "/contact")}
             className="hover:text-green-100 cursor-pointer">
             CONTACT
           </li>
           <li
-            onClick={() => router.push("/bulk-order")}
+            onClick={() => safePush(router, "/bulk-order")}
             className="hover:text-green-100 cursor-pointer">
             BULK ORDER
           </li>
@@ -53,7 +54,7 @@ export default function Navbar() {
             <span className="opacity-40 font-light px-1 min-h-full">|</span>
             <div className="flex items-center gap-4">
               <a
-                href="https://facebook.com"
+                href="https://www.facebook.com/kfs24x7/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-green-100 transition-colors">

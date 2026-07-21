@@ -1,4 +1,7 @@
 const Product = require("../models/Products");
+const Category = require("../models/Category");
+const csv = require("csv-parser");
+const fs = require("fs");
 
 exports.addProducts = async (req, res) => {
   try {
@@ -47,6 +50,74 @@ exports.addProducts = async (req, res) => {
   }
 };
 
+exports.addProductsCSV = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: "No CSV file uploaded." });
+    }
+
+    const results = [];
+    fs.createReadStream(req.file.path)
+      .pipe(csv())
+      .on("data", (data) => results.push(data))
+      .on("end", async () => {
+        try {
+          const productsToInsert = [];
+          
+          for (let row of results) {
+             const title = row.title;
+             const price = Number(row.price) || 0;
+             const discountPrice = Number(row.discountPrice) || 0;
+             const description = row.description || "";
+             const stock = Number(row.stock) || 0;
+             
+             const isTopSellingProducts = row.isTopSellingProducts === "true" || row.isTopSellingProducts === "1";
+             const isDealsOfDay = row.isDealsOfDay === "true" || row.isDealsOfDay === "1";
+             const isRice = row.isRice === "true" || row.isRice === "1";
+             const isAttaAndFlour = row.isAttaAndFlour === "true" || row.isAttaAndFlour === "1";
+             const isDryFruites = row.isDryFruites === "true" || row.isDryFruites === "1";
+             const isDalAndPulses = row.isDalAndPulses === "true" || row.isDalAndPulses === "1";
+             const isMasala = row.isMasala === "true" || row.isMasala === "1";
+             const isNamkeenAndSnacks = row.isNamkeenAndSnacks === "true" || row.isNamkeenAndSnacks === "1";
+
+             let categoryIds = [];
+             if (row.categoryName) {
+               let cat = await Category.findOne({ name: { $regex: new RegExp(`^${row.categoryName}$`, "i") } });
+               if (!cat) {
+                 cat = new Category({ name: row.categoryName, image: "default-category.png" });
+                 await cat.save();
+               }
+               categoryIds.push(cat._id);
+             }
+             
+             if (title && price > 0) {
+               productsToInsert.push({
+                 title, price, discountPrice, description, stock,
+                 category: categoryIds,
+                 isTopSellingProducts, isDealsOfDay, isRice, isAttaAndFlour,
+                 isDryFruites, isDalAndPulses, isMasala, isNamkeenAndSnacks,
+                 images: []
+               });
+             }
+          }
+          
+          if (productsToInsert.length > 0) {
+            await Product.insertMany(productsToInsert);
+          }
+          
+          if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+          
+          res.json({ success: true, message: `${productsToInsert.length} products added successfully from CSV.` });
+        } catch (error) {
+          if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+          res.json({ success: false, error: error.message });
+        }
+      });
+  } catch (error) {
+    res.json({ success: false, error: error.message });
+  }
+};
+
 exports.getProducts = async (req, res) => {
   try {
     const products = await Product.find();
@@ -65,6 +136,22 @@ exports.getProductById = async (req, res) => {
         .json({ success: false, message: "Product not found" });
     }
     res.json({ success: true, product });
+  } catch (error) {
+    res.json({ success: false, error: error.message });
+  }
+};
+
+exports.getRelatedProducts = async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+      return res.status(404).json({ success: false, message: "Product not found" });
+    }
+    const relatedProducts = await Product.find({
+      category: product.category,
+      _id: { $ne: product._id }
+    }).limit(4);
+    res.json({ success: true, products: relatedProducts });
   } catch (error) {
     res.json({ success: false, error: error.message });
   }

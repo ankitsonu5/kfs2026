@@ -18,7 +18,7 @@ import Header from "../../../components/header";
 import Navbar from "../../../components/redesign/Navbar";
 import Footer from "../../../components/redesign/Footer";
 import Image from "next/image";
-
+import { safePush } from "@/lib/safe-navigation";
 export default function ProductDetail() {
   const { id } = useParams();
   const router = useRouter();
@@ -28,6 +28,7 @@ export default function ProductDetail() {
   const [quantity, setQuantity] = useState(1);
   const [cartCount, setCartCount] = useState(0);
   const [isInWishlist, setIsInWishlist] = useState(false);
+  const [relatedProducts, setRelatedProducts] = useState([]);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -40,6 +41,13 @@ export default function ProductDetail() {
           if (res.data.product.images?.length > 0) {
             setMainImage(res.data.product.images[0]);
           }
+        }
+
+        const relatedRes = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_URL}/products/related/${id}`,
+        );
+        if (relatedRes.data.success) {
+          setRelatedProducts(relatedRes.data.products);
         }
       } catch (error) {
         console.error("Error fetching product:", error);
@@ -194,6 +202,59 @@ export default function ProductDetail() {
     } catch (error) {
       console.error("Add to cart error:", error);
       alert(error.response?.data?.message || "Something went wrong");
+    }
+  };
+
+  const handleAddRelatedToCart = async (relatedProduct) => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        let guestCart = JSON.parse(
+          localStorage.getItem("guestCart") || '{"items":[]}',
+        );
+        const index = guestCart.items.findIndex(
+          (i) => i.productId === relatedProduct._id,
+        );
+
+        if (index > -1) {
+          guestCart.items[index].quantity += 1;
+        } else {
+          guestCart.items.push({
+            productId: relatedProduct._id,
+            title: relatedProduct.title,
+            price: relatedProduct.price,
+            discountPrice: relatedProduct.discountPrice,
+            image: relatedProduct.images?.[0] || "",
+            quantity: 1,
+          });
+        }
+        localStorage.setItem("guestCart", JSON.stringify(guestCart));
+        setCartCount((prev) => prev + 1);
+        alert("Added to cart!");
+      } else {
+        const res = await axios.post(
+          `${process.env.NEXT_PUBLIC_API_URL}/add-cart`,
+          {
+            productId: relatedProduct._id,
+            title: relatedProduct.title,
+            price: relatedProduct.price,
+            discountPrice: relatedProduct.discountPrice,
+            image: relatedProduct.images?.[0] || "",
+            quantity: 1,
+          },
+          {
+            headers: { Authorization: token },
+          },
+        );
+        if (res.data.success) {
+          setCartCount((prev) => prev + 1);
+          alert("Added to cart!");
+        } else {
+          alert(res.data.message || "Failed to add to cart");
+        }
+      }
+    } catch (error) {
+      console.error("Cart error:", error);
     }
   };
 
@@ -447,6 +508,73 @@ export default function ProductDetail() {
             </div>
           </div>
         </div>
+
+        {/* Related Products Section */}
+        {relatedProducts && relatedProducts.length > 0 && (
+          <div className="mt-20 pt-10 border-t border-gray-100">
+            <h2 className="text-2xl font-black text-gray-900 mb-8 uppercase tracking-wide flex items-center gap-2">
+              <span className="w-8 h-1 bg-green-600 rounded-full"></span>
+              Related Products
+            </h2>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+              {relatedProducts.map((rp) => (
+                <div
+                  key={rp._id}
+                  className="bg-white border border-gray-100 rounded-3xl p-3 md:p-4 hover:shadow-xl transition-all group relative flex flex-col h-full">
+                  <div
+                    onClick={() => safePush(router, `/product/${rp._id}`)}
+                    className="aspect-square flex items-center justify-center bg-gray-50 rounded-2xl mb-4 overflow-hidden cursor-pointer relative flex-shrink-0">
+                    {rp.images && rp.images.length > 0 ? (
+                      <Image
+                        src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/products/${rp.images[0]}`}
+                        alt={rp.title}
+                        className="w-full h-full object-contain p-2 group-hover:scale-110 transition duration-500"
+                        width={300}
+                        height={300}
+                      />
+                    ) : (
+                      <Package className="w-10 h-10 text-gray-300" />
+                    )}
+                    {rp.discountPrice > rp.price && (
+                      <div className="absolute top-2 left-2 z-10">
+                        <span className="bg-red-500/10 backdrop-blur-md border border-red-500/20 text-red-600 text-[10px] font-black px-2 py-1 rounded-lg uppercase tracking-wider shadow-sm">
+                          SAVE ₹{Number((rp.discountPrice - rp.price).toFixed(2))}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex-grow">
+                    <h3
+                      onClick={() => safePush(router, `/product/${rp._id}`)}
+                      className="text-xs md:text-base font-semibold md:font-bold text-gray-800 mb-1 hover:text-green-600 cursor-pointer line-clamp-2 min-h-[3rem] leading-tight break-words">
+                      {rp.title}
+                    </h3>
+                  </div>
+                  <div className="mt-auto pt-3">
+                    <div className="flex flex-col gap-2">
+                      <div className="flex items-baseline gap-1">
+                        <span className="font-extrabold text-base md:text-lg text-gray-900">
+                          ₹{rp.price}
+                        </span>
+                        {rp.discountPrice > rp.price && (
+                          <span className="text-gray-400 line-through text-[10px] font-semibold">
+                            ₹{rp.discountPrice}
+                          </span>
+                        )}
+                      </div>
+                      <button
+                        onClick={() => handleAddRelatedToCart(rp)}
+                        className="w-full py-2 border-2 text-[11px] md:text-sm font-bold rounded-xl transition flex items-center justify-center gap-1 border-green-600 text-green-600 bg-white hover:bg-green-600 hover:text-white"
+                        style={{ cursor: "pointer" }}>
+                        Add to Cart
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </main>
 
       <Footer />

@@ -15,6 +15,7 @@ import {
   X,
 } from "lucide-react";
 import { useRouter, usePathname } from "next/navigation";
+import { safePush } from "@/lib/safe-navigation";
 
 export default function MobileBottomNav({ user, cartCount, handleLogout }) {
   const router = useRouter();
@@ -54,6 +55,7 @@ export default function MobileBottomNav({ user, cartCount, handleLogout }) {
               <h3 className="text-lg font-bold text-gray-800">My Account</h3>
               <button
                 onClick={() => setIsProfileMenuOpen(false)}
+                type="button"
                 className="p-2 bg-gray-100 rounded-full text-gray-500">
                 <X className="w-5 h-5" />
               </button>
@@ -64,9 +66,10 @@ export default function MobileBottomNav({ user, cartCount, handleLogout }) {
                 <button
                   key={option.label}
                   onClick={() => {
-                    router.push(option.path);
+                    safePush(router, option.path);
                     setIsProfileMenuOpen(false);
                   }}
+                  type="button"
                   className="w-full flex items-center gap-4 p-4 rounded-xl hover:bg-green-50 text-gray-700 font-medium transition-colors border border-transparent hover:border-green-100">
                   <div className="w-10 h-10 bg-green-50 text-green-600 flex items-center justify-center rounded-full">
                     <option.icon className="w-5 h-5" />
@@ -79,6 +82,7 @@ export default function MobileBottomNav({ user, cartCount, handleLogout }) {
                   handleLogout();
                   setIsProfileMenuOpen(false);
                 }}
+                type="button"
                 className="w-full flex items-center gap-4 p-4 rounded-xl hover:bg-red-50 text-red-500 font-medium transition-colors border border-transparent hover:border-red-100">
                 <div className="w-10 h-10 bg-red-50 text-red-500 flex items-center justify-center rounded-full">
                   <LogOut className="w-5 h-5" />
@@ -98,8 +102,9 @@ export default function MobileBottomNav({ user, cartCount, handleLogout }) {
               <button
                 key={item.label}
                 onClick={
-                  item.onClick || (() => item.path && router.push(item.path))
+                  item.onClick || (() => item.path && safePush(router, item.path))
                 }
+                type="button"
                 className={`flex flex-col items-center justify-center gap-1 transition-all duration-300 relative ${
                   isActive
                     ? "text-green-600 scale-110"

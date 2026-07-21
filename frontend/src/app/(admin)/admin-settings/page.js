@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { safePush } from "@/lib/safe-navigation";
 import axios from "axios";
 import { ArrowLeft, Globe, Headset, Truck, Save } from "lucide-react";
 
@@ -21,7 +22,7 @@ export default function Settings() {
 
   const fetchSettings = async () => {
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("adminToken");
       const res = await axios.get(
         `${process.env.NEXT_PUBLIC_API_URL}/adminsettings`,
         { headers: { Authorization: token } },
@@ -43,7 +44,7 @@ export default function Settings() {
     e.preventDefault();
     setLoading(true);
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("adminToken");
       const res = await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}/adminsettings`,
         settings,
@@ -75,7 +76,7 @@ export default function Settings() {
       <div className="w-full max-w-2xl z-10 animate-in fade-in slide-in-from-bottom-10 duration-700">
         {/* Back Button */}
         <button
-          onClick={() => router.push("/admindashboard")}
+          onClick={() => safePush(router, "/admindashboard")}
           className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-8 group cursor-pointer">
           <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-white/10 border border-white/10 transition-all">
             <ArrowLeft size={14} />

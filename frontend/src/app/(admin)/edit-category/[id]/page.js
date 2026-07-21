@@ -3,6 +3,7 @@
 import axios from "axios";
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
+import { safePush } from "@/lib/safe-navigation";
 import { FaChevronLeft, FaSave, FaImage, FaUpload } from "react-icons/fa";
 import { MdOutlineCategory, MdToggleOn } from "react-icons/md";
 import Image from "next/image";
@@ -21,7 +22,7 @@ export default function EditCategory() {
   useEffect(() => {
     const fetchCategory = async () => {
       try {
-        const token = localStorage.getItem("token");
+        const token = localStorage.getItem("adminToken");
         const res = await axios.get(
           `${process.env.NEXT_PUBLIC_API_URL}/categories/${id}`,
           {
@@ -65,7 +66,7 @@ export default function EditCategory() {
     e.preventDefault();
 
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("adminToken");
       const formData = new FormData();
       formData.append("name", form.title);
       formData.append("status", form.status);
@@ -84,7 +85,7 @@ export default function EditCategory() {
         },
       );
 
-      router.push("/admindashboard");
+      safePush(router, "/admindashboard");
     } catch (error) {
       console.error("Update error:", error);
     }
@@ -103,7 +104,7 @@ export default function EditCategory() {
       <div className="max-w-xl w-full bg-[#111827] p-8 md:p-10 rounded-3xl border border-gray-700 shadow-2xl relative overflow-hidden">
         {/* Back Button */}
         <button
-          onClick={() => router.push("/admindashboard")}
+          onClick={() => safePush(router, "/admindashboard")}
           className="absolute top-6 left-6 text-gray-500 hover:text-white transition-colors">
           <FaChevronLeft size={20} />
         </button>

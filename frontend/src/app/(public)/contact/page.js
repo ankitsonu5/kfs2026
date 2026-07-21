@@ -19,6 +19,7 @@ import {
   Tag,
 } from "lucide-react";
 import Image from "next/image";
+import axios from "axios";
 
 export default function Contact() {
   const [formData, setFormData] = useState({
@@ -43,34 +44,41 @@ export default function Contact() {
     e.preventDefault();
     setStatus({ submitting: true, success: false, error: null });
 
-    setTimeout(() => {
-      console.log("Form Data Submitted:", formData);
-      setStatus({ submitting: false, success: true, error: null });
-      setFormData({ name: "", email: "", subject: "", message: "" });
-      setTimeout(
-        () => setStatus((prev) => ({ ...prev, success: false })),
-        5000,
-      );
-    }, 1500);
+    try {
+      const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/contact`, formData);
+      if (res.data.success) {
+        setStatus({ submitting: false, success: true, error: null });
+        setFormData({ name: "", email: "", subject: "", message: "" });
+        setTimeout(
+          () => setStatus((prev) => ({ ...prev, success: false })),
+          5000,
+        );
+      } else {
+        setStatus({ submitting: false, success: false, error: res.data.message });
+      }
+    } catch (error) {
+      console.error("Error submitting contact form:", error);
+      setStatus({ submitting: false, success: false, error: "Something went wrong. Please try again." });
+    }
   };
 
   const contactInfo = [
     {
       icon: <Phone size={24} className="text-green-600" />,
       title: "Phone Number",
-      details: ["+1 8800145844"],
+      details: ["+91 8800145844"],
       bg: "bg-green-50",
     },
     {
       icon: <Mail size={24} className="text-blue-600" />,
       title: "Email Address",
-      details: ["infokfs24x7@gmail.com"],
+      details: ["kfs24x7@gmail.com"],
       bg: "bg-blue-50",
     },
     {
       icon: <MapPin size={24} className="text-red-600" />,
       title: "Office Address",
-      details: ["N 8/180, Y1, Number 2, Rajendra Vihar Colony, Varanasi-221005, Uttar Pradesh"],
+      details: ["Varanasi, Uttar Pradesh, India"],
       bg: "bg-red-50",
     },
     {
@@ -130,10 +138,15 @@ export default function Contact() {
                 and offers.
               </p>
               <div className="flex gap-4">
-                {[Facebook, Twitter, Instagram, Linkedin].map((Icon, idx) => (
+                {[
+                  { Icon: Facebook, link: "https://www.facebook.com/kfs24x7/" },
+                  { Icon: Instagram, link: "https://instagram.com" },
+                ].map(({ Icon, link }, idx) => (
                   <a
                     key={idx}
-                    href="#"
+                    href={link}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="w-10 h-10 bg-white/10 hover:bg-green-600 rounded-full flex items-center justify-center transition-all">
                     <Icon size={18} />
                   </a>
@@ -172,7 +185,7 @@ export default function Contact() {
                     onChange={handleChange}
                     required
                     placeholder="John Doe"
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all bg-gray-50"
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all bg-gray-50 text-gray-900"
                   />
                 </div>
                 <div className="space-y-2">
@@ -190,7 +203,7 @@ export default function Contact() {
                     onChange={handleChange}
                     required
                     placeholder="john@example.com"
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all bg-gray-50"
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all bg-gray-50 text-gray-900"
                   />
                 </div>
               </div>
@@ -210,7 +223,7 @@ export default function Contact() {
                   onChange={handleChange}
                   required
                   placeholder="How can we help?"
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all bg-gray-50"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all bg-gray-50 text-gray-900"
                 />
               </div>
 
@@ -229,7 +242,7 @@ export default function Contact() {
                   required
                   rows="5"
                   placeholder="Your message here..."
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all bg-gray-50 resize-none"></textarea>
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all bg-gray-50 text-gray-900 resize-none"></textarea>
               </div>
 
               <button
@@ -265,13 +278,16 @@ export default function Contact() {
       {/* Map UI Section */}
       <section className="container mx-auto px-4 mb-24">
         <div className="w-full rounded-[2.5rem] overflow-hidden shadow-2xl border border-gray-100 ring-1 ring-gray-200">
-          <Image
-            src="/map.webp"
-            alt="Location Map"
-            width={1200}
-            height={600}
-            className="w-full h-[70vh] object-cover"
-          />{" "}
+          <iframe
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d230820.68323415416!2d82.82789489671507!3d25.318540625066426!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x398e335d52ca071b%3A0xc63b47b370f559eb!2sOnline%20Grocery%20Store%3A%20KFS%2024x7!5e0!3m2!1sen!2sin!4v1784526071218!5m2!1sen!2sin"
+            width="100%"
+            height="450"
+            style={{ border: "0" }}
+            allowFullScreen=""
+            loading="lazy"
+            referrerPolicy="strict-origin-when-cross-origin">
+            {" "}
+          </iframe>{" "}
         </div>
       </section>
 

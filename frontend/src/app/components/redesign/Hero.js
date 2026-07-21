@@ -1,20 +1,20 @@
 "use client";
 
 import Image from 'next/image';
+import Link from 'next/link';
 
-export default function Hero() {
+export default function Hero({ data }) {
     return (
         <section className="relative bg-gray-50 py-16 lg:py-24 overflow-hidden">
             <div className="container mx-auto px-4 flex flex-col-reverse lg:flex-row items-center gap-12">
                 {/* Text Content */}
                 <div className="flex-1 space-y-6 z-10">
-                    <span className="text-orange-500 font-semibold tracking-wide uppercase text-sm">Welcome to Xstore</span>
+                    <span className="text-orange-500 font-semibold tracking-wide uppercase text-sm">{data?.subtitle || "Welcome to kFS24x7"}</span>
                     <h1 className="text-4xl lg:text-6xl font-bold text-gray-900 leading-tight">
-                        Fresh Grocery <br />
-                        <span className="text-green-600">Delivered</span> to Your Door
+                        {data?.title || "Fresh Grocery Delivered to Your Door"}
                     </h1>
-                    <p className="text-gray-600 text-lg max-w-lg">
-                        The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 1.10.32 and 1.10.33.
+                    <p className="text-gray-600 text-lg max-w-lg whitespace-pre-wrap">
+                        {data?.description || "The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested."}
                     </p>
 
                     <div className="flex flex-col sm:flex-row gap-4 pt-4">
@@ -28,9 +28,9 @@ export default function Hero() {
                         </div>
                     </div>
 
-                    <button className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-full font-semibold transition-colors mt-6 shadow-lg shadow-green-200">
-                        Shop Now
-                    </button>
+                    <Link href={data?.buttonLink || "/shop"} className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-full font-semibold transition-colors mt-6 shadow-lg shadow-green-200 inline-block">
+                        {data?.buttonText || "Shop Now"}
+                    </Link>
                 </div>
 
                 {/* Image Content */}
@@ -38,11 +38,11 @@ export default function Hero() {
                     {/* Placeholder for Hero Image */}
                     <div className="absolute inset-0 bg-gradient-to-tr from-green-50 to-orange-50 overflow-hidden">
                         <Image
-                            src="/aboutus/aboutsideimage.webp"
-                            alt="Fresh Vegetables"
+                            src={data?.image ? `${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '')}/uploads/aboutus/${data.image}` : "/aboutus/aboutsideimage.webp"}
+                            alt="Hero Image"
                             className="w-full h-full object-cover mix-blend-multiply opacity-90"
-                            width={250}
-                            height={250}
+                            width={500}
+                            height={500}
                         />
                     </div>
                     {/* Decorative Elements */}

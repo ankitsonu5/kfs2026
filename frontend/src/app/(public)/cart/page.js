@@ -265,16 +265,16 @@ export default function Cart() {
     );
   }
 
-  const subtotal = cart.items.reduce((sum, item) => sum + (Number(item.price) * item.quantity), 0);
-  const totalMrp = cart.items.reduce((sum, item) => {
+  const subtotal = parseFloat(cart.items.reduce((sum, item) => sum + (Number(item.price) * item.quantity), 0).toFixed(2));
+  const totalMrp = parseFloat(cart.items.reduce((sum, item) => {
     const p = Number(item.price);
     const dp = Number(item.discountPrice);
     const mrp = (dp && dp > p) ? dp : p;
     return sum + (mrp * item.quantity);
-  }, 0);
-  const totalSavings = totalMrp - subtotal;
-  const deliveryCharge = subtotal > 1000 || subtotal === 0 ? 0 : 50;
-  const grandTotal = subtotal + deliveryCharge;
+  }, 0).toFixed(2));
+  const totalSavings = parseFloat((totalMrp - subtotal).toFixed(2));
+  const deliveryCharge = subtotal >= 500 || subtotal === 0 ? 0 : 50;
+  const grandTotal = parseFloat((subtotal + deliveryCharge).toFixed(2));
 
   return (
     <>
@@ -367,7 +367,7 @@ export default function Cart() {
 
                   <div className="text-right flex-shrink-0">
                     <p className="font-bold text-gray-800 text-lg">
-                      ₹{item.price * item.quantity}
+                      ₹{parseFloat((item.price * item.quantity).toFixed(2))}
                     </p>
                     <button
                       onClick={() => handleRemove(productId)}
@@ -402,7 +402,7 @@ export default function Cart() {
                     </div>
                   )}
                   <div className="flex justify-between text-gray-600">
-                    <span>Delivery Charges <span className="text-xs text-gray-400">(Free above ₹1000)</span></span>
+                    <span>Delivery Charges <span className="text-xs text-gray-400">(Free above ₹500)</span></span>
                     {deliveryCharge === 0 ? (
                       <span className="text-green-600 font-semibold">FREE</span>
                     ) : (

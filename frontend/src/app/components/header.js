@@ -38,7 +38,18 @@ export default function Header({ cartCount }) {
     const fetchUser = async () => {
       try {
         const token = localStorage.getItem("token");
+        const role = localStorage.getItem("role");
+        
         if (!token) return;
+        
+        const hasSessionCookie = document.cookie.split('; ').some(row => row.startsWith('token='));
+        if (role === 'admin' && !hasSessionCookie) {
+          localStorage.removeItem('token');
+          localStorage.removeItem('role');
+          setUser(null);
+          return;
+        }
+
         const res = await axios.get(
           `${process.env.NEXT_PUBLIC_API_URL}/profile`,
           {
@@ -249,7 +260,7 @@ export default function Header({ cartCount }) {
             ) : (
               <div className="flex items-center gap-4">
                 <span className="text-sm font-medium text-gray-700 hidden lg:inline">
-                  Hi, {user.fullName}
+                  Hi, {user.role === 'admin' ? 'Admin' : user.fullName}
                 </span>
 
                 <div className="relative">
@@ -263,42 +274,56 @@ export default function Header({ cartCount }) {
 
                   {profileOpen && (
                     <div className="absolute right-0 top-12 w-44 bg-white border border-gray-200 rounded-lg shadow-xl z-[70] overflow-hidden">
-                      <button
-                        onClick={() => {
-                          router.push("/user-profile");
-                          setProfileOpen(false);
-                        }}
-                        className="w-full flex items-center gap-3 px-4 py-3 hover:bg-green-50 text-gray-700 text-sm font-medium border-b border-gray-100 transition-colors">
-                        <Pencil className="w-4 h-4 text-green-600" />
-                        Edit Profile
-                      </button>
-                      <button
-                        onClick={() => {
-                          router.push("/user-settings");
-                          setProfileOpen(false);
-                        }}
-                        className="w-full flex items-center gap-3 px-4 py-3 hover:bg-green-50 text-gray-700 text-sm font-medium border-b border-gray-100 transition-colors">
-                        <Settings className="w-4 h-4 text-green-600" />
-                        Settings
-                      </button>
-                      <button
-                        onClick={() => {
-                          router.push("/my-orders");
-                          setProfileOpen(false);
-                        }}
-                        className="w-full flex items-center gap-3 px-4 py-3 hover:bg-green-50 text-gray-700 text-sm font-medium border-b border-gray-100 transition-colors">
-                        <ShoppingBag className="w-4 h-4 text-green-600" />
-                        My Orders
-                      </button>
-                      <button
-                        onClick={() => {
-                          router.push("/wishlist");
-                          setProfileOpen(false);
-                        }}
-                        className="w-full flex items-center gap-3 px-4 py-3 hover:bg-green-50 text-gray-700 text-sm font-medium border-b border-gray-100 transition-colors">
-                        <Heart className="w-4 h-4 text-green-600" />
-                        My Wishlist
-                      </button>
+                      {user.role === "admin" ? (
+                        <button
+                          onClick={() => {
+                            router.push("/admindashboard");
+                            setProfileOpen(false);
+                          }}
+                          className="w-full flex items-center gap-3 px-4 py-3 hover:bg-green-50 text-gray-700 text-sm font-medium border-b border-gray-100 transition-colors">
+                          <Settings className="w-4 h-4 text-green-600" />
+                          Admin Dashboard
+                        </button>
+                      ) : (
+                        <>
+                          <button
+                            onClick={() => {
+                              router.push("/user-profile");
+                              setProfileOpen(false);
+                            }}
+                            className="w-full flex items-center gap-3 px-4 py-3 hover:bg-green-50 text-gray-700 text-sm font-medium border-b border-gray-100 transition-colors">
+                            <Pencil className="w-4 h-4 text-green-600" />
+                            Edit Profile
+                          </button>
+                          <button
+                            onClick={() => {
+                              router.push("/user-settings");
+                              setProfileOpen(false);
+                            }}
+                            className="w-full flex items-center gap-3 px-4 py-3 hover:bg-green-50 text-gray-700 text-sm font-medium border-b border-gray-100 transition-colors">
+                            <Settings className="w-4 h-4 text-green-600" />
+                            Settings
+                          </button>
+                          <button
+                            onClick={() => {
+                              router.push("/my-orders");
+                              setProfileOpen(false);
+                            }}
+                            className="w-full flex items-center gap-3 px-4 py-3 hover:bg-green-50 text-gray-700 text-sm font-medium border-b border-gray-100 transition-colors">
+                            <ShoppingBag className="w-4 h-4 text-green-600" />
+                            My Orders
+                          </button>
+                          <button
+                            onClick={() => {
+                              router.push("/wishlist");
+                              setProfileOpen(false);
+                            }}
+                            className="w-full flex items-center gap-3 px-4 py-3 hover:bg-green-50 text-gray-700 text-sm font-medium border-b border-gray-100 transition-colors">
+                            <Heart className="w-4 h-4 text-green-600" />
+                            My Wishlist
+                          </button>
+                        </>
+                      )}
                       <button
                         onClick={handleLogout}
                         className="w-full flex items-center gap-3 px-4 py-3 hover:bg-red-50 text-red-500 text-sm font-medium transition-colors">

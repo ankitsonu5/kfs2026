@@ -3,12 +3,12 @@
 import Image from "next/image";
 import { Mail } from 'lucide-react';
 
-export default function FarmerCard({ name, role, email }) {
+export default function FarmerCard({ name, role, email, image }) {
     return (
         <div className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100">
             <div className="aspect-[4/3] bg-gray-200 relative overflow-hidden">
                 <Image
-                    src="/aboutus/team-01.webp"
+                    src={image ? `${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '')}/uploads/aboutus/${image}` : "/aboutus/team-01.webp"}
                     alt={name}
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-500"

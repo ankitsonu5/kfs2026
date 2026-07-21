@@ -24,22 +24,33 @@ export default function Footer() {
             </Link>
             <p
               style={{ paddingTop: "20px" }}
-              className="text-gray-500 leading-relaxed"
-            >
+              className="text-gray-500 leading-relaxed">
               Fresh quality products delivered directly to your doorstep with
               love and care.
             </p>
             <div className="flex gap-4">
               {/* Social Placeholder */}
-              <div className="w-10 h-10 rounded-full bg-gray-100 hover:bg-green-100 flex items-center justify-center text-gray-600 hover:text-green-600 transition-colors cursor-pointer">
+              <a
+                href="https://www.facebook.com/kfs24x7/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-10 h-10 rounded-full bg-gray-100 hover:bg-green-100 flex items-center justify-center text-gray-600 hover:text-green-600 transition-colors cursor-pointer">
                 <FaFacebookF />
-              </div>
-              <div className="w-10 h-10 rounded-full bg-gray-100 hover:bg-green-100 flex items-center justify-center text-gray-600 hover:text-green-600 transition-colors cursor-pointer">
+              </a>
+              <a
+                href="https://twitter.com/kfs24x7"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-10 h-10 rounded-full bg-gray-100 hover:bg-green-100 flex items-center justify-center text-gray-600 hover:text-green-600 transition-colors cursor-pointer">
                 <FaXTwitter />
-              </div>
-              <div className="w-10 h-10 rounded-full bg-gray-100 hover:bg-green-100 flex items-center justify-center text-gray-600 hover:text-green-600 transition-colors cursor-pointer">
+              </a>
+              <a
+                href="https://instagram.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-10 h-10 rounded-full bg-gray-100 hover:bg-green-100 flex items-center justify-center text-gray-600 hover:text-green-600 transition-colors cursor-pointer">
                 <FaInstagram />
-              </div>
+              </a>
             </div>
           </div>
 
@@ -50,32 +61,28 @@ export default function Footer() {
               <li>
                 <Link
                   href="#"
-                  className="hover:text-green-600 transition-colors"
-                >
+                  className="hover:text-green-600 transition-colors">
                   Privacy Policy
                 </Link>
               </li>
               <li>
                 <Link
                   href="#"
-                  className="hover:text-green-600 transition-colors"
-                >
+                  className="hover:text-green-600 transition-colors">
                   Term of Use
                 </Link>
               </li>
               <li>
                 <Link
                   href="#"
-                  className="hover:text-green-600 transition-colors"
-                >
+                  className="hover:text-green-600 transition-colors">
                   Refund Policy
                 </Link>
               </li>
               <li>
                 <Link
                   href="#"
-                  className="hover:text-green-600 transition-colors"
-                >
+                  className="hover:text-green-600 transition-colors">
                   Support
                 </Link>
               </li>
@@ -89,35 +96,31 @@ export default function Footer() {
               <li>
                 <Link
                   href="/aboutus"
-                  className="hover:text-green-600 transition-colors"
-                >
+                  className="hover:text-green-600 transition-colors">
                   About Us
                 </Link>
               </li>
               <li>
                 <Link
                   href="contact"
-                  className="hover:text-green-600 transition-colors"
-                >
+                  className="hover:text-green-600 transition-colors">
                   Contact Us
                 </Link>
               </li>
               <li>
                 <Link
                   href="#"
-                  className="hover:text-green-600 transition-colors"
-                >
+                  className="hover:text-green-600 transition-colors">
                   Career
                 </Link>
               </li>
-              <li>
+              {/* <li>
                 <Link
                   href="#"
-                  className="hover:text-green-600 transition-colors"
-                >
+                  className="hover:text-green-600 transition-colors">
                   Affiliates
                 </Link>
-              </li>
+              </li> */}
             </ul>
           </div>
 
@@ -131,12 +134,12 @@ export default function Footer() {
               </li>
               <li className="flex gap-3 items-center">
                 <Mail className="w-4 h-4 text-green-600" />
-                <span>infokfs24x7@gmail.com</span>
+                <span>kfs24x7@gmail.com</span>
               </li>
-              {/* <li className="flex gap-3 items-center">
+              <li className="flex gap-3 items-center">
                 <MapPin className="w-4 h-4 text-green-600" />
-                <span>123 Market St, San Francisco, CA</span>
-              </li> */}
+                <span>Varanasi, Uttar Pradesh, India</span>
+              </li>
             </ul>
           </div>
         </div>

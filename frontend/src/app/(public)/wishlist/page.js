@@ -15,6 +15,7 @@ import Header from "../../components/header";
 import Navbar from "../../components/redesign/Navbar";
 import Footer from "../../components/redesign/Footer";
 import Image from "next/image";
+import { safePush } from "@/lib/safe-navigation";
 
 export default function WishlistPage() {
   const router = useRouter();
@@ -27,7 +28,7 @@ export default function WishlistPage() {
       const token = localStorage.getItem("token");
       if (!token) {
         alert("Please login to view your wishlist");
-        router.push("/login");
+        safePush(router, "/login");
         return;
       }
 
@@ -157,7 +158,7 @@ export default function WishlistPage() {
               our products and save your favorites!
             </p>
             <button
-              onClick={() => router.push("/")}
+              onClick={() => safePush(router, "/")}
               className="bg-green-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-green-700 transition shadow-lg shadow-green-600/20 active:scale-95">
               Start Shopping
             </button>
@@ -169,7 +170,7 @@ export default function WishlistPage() {
                 key={item.productId}
                 className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-md transition duration-300 group flex flex-col h-full">
                 <div
-                  onClick={() => router.push(`/product/${item.productId}`)}
+                  onClick={() => safePush(router, `/product/${item.productId}`)}
                   className="h-48 bg-gray-50 relative flex items-center justify-center p-4 cursor-pointer overflow-hidden flex-shrink-0">
                   <Image
                     src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/products/${item.image}`}
@@ -189,7 +190,7 @@ export default function WishlistPage() {
                 </div>
                 <div className="p-4 flex-grow flex flex-col">
                   <h3
-                    onClick={() => router.push(`/product/${item.productId}`)}
+                    onClick={() => safePush(router, `/product/${item.productId}`)}
                     className="font-bold text-gray-800 mb-1 hover:text-green-600 cursor-pointer line-clamp-2 min-h-[3rem]">
                     {item.title}
                   </h3>

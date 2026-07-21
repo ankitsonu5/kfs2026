@@ -3,6 +3,7 @@
 import axios from "axios";
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
+import { safePush } from "@/lib/safe-navigation";
 import { X, ImageIcon, Package } from "lucide-react";
 import Image from "next/image";
 
@@ -33,7 +34,7 @@ export default function EditProduct() {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const token = localStorage.getItem("token");
+        const token = localStorage.getItem("adminToken");
         const res = await axios.get(
           `${process.env.NEXT_PUBLIC_API_URL}/products/${id}`,
           {
@@ -75,7 +76,7 @@ export default function EditProduct() {
     };
     const fetchCategories = async () => {
       try {
-        const token = localStorage.getItem("token");
+        const token = localStorage.getItem("adminToken");
         const res = await axios.get(
           `${process.env.NEXT_PUBLIC_API_URL}/categories`,
           {
@@ -119,7 +120,7 @@ export default function EditProduct() {
     e.preventDefault();
 
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("adminToken");
 
       const formData = new FormData();
       formData.append("title", form.title);
@@ -155,7 +156,7 @@ export default function EditProduct() {
       );
 
       if (res.data.success) {
-        router.push("/admindashboard");
+        safePush(router, "/admindashboard");
       } else {
         console.error("Update error:", error);
       }
@@ -178,7 +179,7 @@ export default function EditProduct() {
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl md:text-3xl font-bold">Edit Product</h1>
           <button
-            onClick={() => router.push("/admindashboard")}
+            onClick={() => safePush(router, "/admindashboard")}
             className="text-blue-400 hover:text-blue-300 font-semibold text-sm flex items-center gap-1 transition-colors cursor-pointer">
             ← Back to Dashboard
           </button>

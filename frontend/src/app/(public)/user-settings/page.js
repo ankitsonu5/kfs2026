@@ -15,6 +15,7 @@ import axios from "axios";
 import Header from "../../components/header";
 import Navbar from "../../components/redesign/Navbar";
 import Footer from "../../components/redesign/Footer";
+import { safePush } from "@/lib/safe-navigation";
 
 export default function UserSettings() {
   const router = useRouter();
@@ -36,7 +37,7 @@ export default function UserSettings() {
       try {
         const token = localStorage.getItem("token");
         if (!token) {
-          router.push("/login");
+          safePush(router, "/login");
           return;
         }
         const res = await axios.get(
@@ -106,7 +107,7 @@ export default function UserSettings() {
         headers: { Authorization: token },
       });
       localStorage.removeItem("token");
-      router.push("/");
+      safePush(router, "/");
     } catch (error) {
     }
   };

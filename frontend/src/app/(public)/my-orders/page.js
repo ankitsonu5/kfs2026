@@ -191,7 +191,7 @@ export default function MyOrders() {
                           </p>
                         </div>
                         <p className="font-bold text-gray-900">
-                          ₹{item.price * item.quantity}
+                          ₹{parseFloat((item.price * item.quantity).toFixed(2))}
                         </p>
                       </div>
                     ))}
@@ -227,7 +227,7 @@ export default function MyOrders() {
                     <div className="text-right">
                       <p className="text-sm text-gray-400">Grand Total</p>
                       <p className="text-2xl font-bold text-green-600">
-                        ₹{o.totalAmount}
+                        ₹{parseFloat(Number(o.totalAmount).toFixed(2))}
                       </p>
                     </div>
                   </div>

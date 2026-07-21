@@ -25,9 +25,9 @@ export default function AdminOrders() {
 
   const fetchOrders = async () => {
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("adminToken");
       if (!token) {
-        router.push("/login");
+        router.push("/admin-login");
         return;
       }
 
@@ -52,7 +52,7 @@ export default function AdminOrders() {
 
   const updateStatus = async (id, status) => {
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("adminToken");
       const res = await axios.put(
         `${process.env.NEXT_PUBLIC_API_URL}/orders/${id}`,
         { status },
@@ -72,7 +72,7 @@ export default function AdminOrders() {
 
   const handleDelete = async (id) => {
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("adminToken");
       const res = await axios.delete(
         `${process.env.NEXT_PUBLIC_API_URL}/orders/${id}`,
         { headers: { Authorization: `Bearer ${token}` } },
@@ -297,7 +297,7 @@ export default function AdminOrders() {
                               </div>
                             </div>
                             <p className="font-black text-gray-100 pr-2">
-                              ₹{item.price * item.quantity}
+                              ₹{parseFloat((item.price * item.quantity).toFixed(2))}
                             </p>
                           </div>
                         ))}
@@ -320,7 +320,7 @@ export default function AdminOrders() {
                           Total Order Value
                         </p>
                         <p className="text-xl md:text-3xl font-black text-emerald-400">
-                          ₹{o.totalAmount?.toLocaleString("en-IN")}
+                          ₹{parseFloat(Number(o.totalAmount).toFixed(2)).toLocaleString("en-IN")}
                         </p>
                       </div>
                     </div>

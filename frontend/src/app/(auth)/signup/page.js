@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import axios from "axios";
 import Image from "next/image";
 import Link from "next/link";
+import { safePush } from "@/lib/safe-navigation";
 
 export default function Signup() {
   const router = useRouter();
@@ -45,7 +46,7 @@ export default function Signup() {
           password: "",
           confirmPassword: "",
         });
-        router.push("/login");
+        safePush(router, "/login");
       }
     } catch (err) {
       setError(err.response?.data?.message || err.message);
