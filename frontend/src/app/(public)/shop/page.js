@@ -16,6 +16,7 @@ import {
   ArrowUpDown,
   Check,
   LayoutGrid,
+  ChevronLeft,
 } from "lucide-react";
 import Image from "next/image";
 import Header from "../../components/header";
@@ -45,7 +46,9 @@ const SidebarContent = ({ categories, categoryFilter, flagFilter, router, setIsS
           ${isMobileSidebar ? 'w-full py-2 px-1 rounded-lg' : 'text-sm hover:bg-green-50 px-3 py-2.5 rounded-xl'}
           ${!categoryFilter && !flagFilter ? "bg-green-50 text-green-600 font-bold" : "text-gray-600 font-medium"}`}
         onClick={() => {
-          safePush(router, "/shop");
+          let url = "/shop";
+          if (flagFilter) url += `?flag=${flagFilter}`;
+          safePush(router, url);
           if(setIsSidebarOpen) setIsSidebarOpen(false);
         }}>
         <div className={`bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-1 shadow-sm
@@ -59,12 +62,14 @@ const SidebarContent = ({ categories, categoryFilter, flagFilter, router, setIsS
           key={cat._id}
           className={`cursor-pointer transition-all flex flex-col items-center justify-center text-center
             ${isMobileSidebar ? 'w-full py-2 px-1 rounded-lg' : 'text-sm hover:bg-green-50 px-3 py-2.5 rounded-xl'}
-            ${categoryFilter === cat.name ? "text-green-600 font-bold" : "text-gray-600 font-medium"}`}
+            ${categoryFilter?.trim() === cat.name.trim() ? "text-green-600 font-bold" : "text-gray-600 font-medium"}`}
           onClick={() => {
-            safePush(router, `/shop?category=${encodeURIComponent(cat.name)}`);
+            let url = `/shop?category=${encodeURIComponent(cat.name.trim())}`;
+            if (flagFilter) url += `&flag=${flagFilter}`;
+            safePush(router, url);
             if(setIsSidebarOpen) setIsSidebarOpen(false);
           }}>
-          <div className={`${isMobileSidebar ? 'w-12 h-12' : 'hidden'} rounded-full overflow-hidden mb-1 border-2 ${categoryFilter === cat.name ? 'border-green-500 shadow-md' : 'border-gray-100'} bg-white flex items-center justify-center flex-shrink-0 transition-all`}>
+          <div className={`${isMobileSidebar ? 'w-12 h-12' : 'hidden'} rounded-full overflow-hidden mb-1 border-2 ${categoryFilter?.trim() === cat.name.trim() ? 'border-green-500 shadow-md' : 'border-gray-100'} bg-white flex items-center justify-center flex-shrink-0 transition-all`}>
              {cat.image ? (
                 <Image
                   src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/categories/${cat.image}`}
@@ -100,6 +105,8 @@ function ShopContent() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isSortOpen, setIsSortOpen] = useState(false);
   const [sortOption, setSortOption] = useState("newest");
+  const [currentPage, setCurrentPage] = useState(1);
+  const productsPerPage = 40;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -161,10 +168,15 @@ function ShopContent() {
     // Category Filter
     if (categoryFilter) {
       const category = categories.find(
-        (c) => c.name.toLowerCase() === categoryFilter.toLowerCase(),
+        (c) => c.name.trim().toLowerCase() === categoryFilter.trim().toLowerCase(),
       );
       if (category) {
-        filtered = filtered.filter((p) => p.category.includes(category._id));
+        filtered = filtered.filter((p) => {
+          if (Array.isArray(p.category)) {
+            return p.category.some((id) => id === category._id || id?._id === category._id);
+          }
+          return p.category === category._id || p.category?._id === category._id;
+        });
       } else {
         filtered = [];
       }
@@ -199,6 +211,17 @@ function ShopContent() {
   };
 
   const filteredProducts = getFilteredAndSortedProducts();
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
+  const indexOfLastProduct = currentPage * productsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+  const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [categoryFilter, flagFilter, searchQuery, sortOption]);
+
 
   const getPageTitle = () => {
     if (searchQuery) return `Search Results for "${searchQuery}"`;
@@ -375,76 +398,122 @@ function ShopContent() {
             </div>
 
             {filteredProducts.length > 0 ? (
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
-                {filteredProducts.map((product) => (
-                  <div
-                    key={product._id}
-                    className="bg-white border border-gray-100 rounded-3xl p-3 md:p-4 hover:shadow-xl transition-all group relative animate-in fade-in zoom-in duration-300 flex flex-col h-full">
+              <>
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
+                  {currentProducts.map((product) => (
                     <div
-                      onClick={() => safePush(router, `/product/${product._id}`)}
-                      className="aspect-square flex items-center justify-center bg-gray-50 rounded-2xl mb-4 overflow-hidden cursor-pointer relative flex-shrink-0">
-                      {product.images && product.images.length > 0 ? (
-                        <Image
-                          src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/products/${product.images[0]}`}
-                          alt={product.title}
-                          className="w-full h-full object-contain p-2 group-hover:scale-110 transition duration-500"
-                          width={300}
-                          height={300}
-                        />
-                      ) : (
-                        <Package className="w-10 h-10 text-gray-300" />
-                      )}
-                      {product.discountPrice > product.price && (
-                        <div className="absolute top-2 left-2 z-10">
-                          <span className="bg-red-500/10 backdrop-blur-md border border-red-500/20 text-red-600 text-[10px] font-black px-2 py-1 rounded-lg uppercase tracking-wider shadow-sm">
-                            SAVE ₹{Number((product.discountPrice - product.price).toFixed(2))}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex-grow">
-                      <h3
+                      key={product._id}
+                      className="bg-white border border-gray-100 rounded-3xl p-3 md:p-4 hover:shadow-xl transition-all group relative animate-in fade-in zoom-in duration-300 flex flex-col h-full">
+                      <div
                         onClick={() => safePush(router, `/product/${product._id}`)}
-                        className="text-xs md:text-base font-semibold md:font-bold text-gray-800 mb-1 hover:text-green-600 cursor-pointer line-clamp-2 min-h-[3rem] leading-tight break-words">
-                        {product.title}
-                      </h3>
-                    </div>
-                    <div className="mt-auto pt-3">
-                      <div className="flex flex-col gap-2">
-                        <div className="flex items-baseline gap-1">
-                          <span className="font-extrabold text-base md:text-lg text-gray-900">
-                            ₹{product.price}
-                          </span>
-                          {product.discountPrice > product.price && (
-                            <span className="text-gray-400 line-through text-[10px] font-semibold">
-                              ₹{product.discountPrice}
+                        className="aspect-square flex items-center justify-center bg-gray-50 rounded-2xl mb-4 overflow-hidden cursor-pointer relative flex-shrink-0">
+                        {product.images && product.images.length > 0 ? (
+                          <Image
+                            src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/products/${product.images[0]}`}
+                            alt={product.title}
+                            className="w-full h-full object-contain p-2 group-hover:scale-110 transition duration-500"
+                            width={300}
+                            height={300}
+                          />
+                        ) : (
+                          <Package className="w-10 h-10 text-gray-300" />
+                        )}
+                        {product.discountPrice > product.price && (
+                          <div className="absolute top-2 left-2 z-10">
+                            <span className="bg-red-500/10 backdrop-blur-md border border-red-500/20 text-red-600 text-[10px] font-black px-2 py-1 rounded-lg uppercase tracking-wider shadow-sm">
+                              SAVE ₹{Number((product.discountPrice - product.price).toFixed(2))}
                             </span>
-                          )}
-                        </div>
-                        <button
-                          onClick={() => openMiniCart(product)}
-                          className={`w-full py-2 border-2 text-[11px] md:text-sm font-bold rounded-xl transition flex items-center justify-center gap-1 ${
-                            cartItems[product._id]
-                              ? "bg-green-600 border-green-600 text-white shadow-md shadow-green-100"
-                              : "border-green-600 text-green-600 bg-white hover:bg-green-600 hover:text-white"
-                          }`}
-                          style={{ cursor: "pointer" }}>
-                          {cartItems[product._id] ? (
-                            <>
-                              <span>Added</span>
-                              <span className="bg-white text-green-600 px-1.5 py-0.5 rounded-full text-[9px] font-black">
-                                {cartItems[product._id]}
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex-grow">
+                        <h3
+                          onClick={() => safePush(router, `/product/${product._id}`)}
+                          className="text-xs md:text-base font-semibold md:font-bold text-gray-800 mb-1 hover:text-green-600 cursor-pointer line-clamp-2 min-h-[3rem] leading-tight break-words">
+                          {product.title}
+                        </h3>
+                      </div>
+                      <div className="mt-auto pt-3">
+                        <div className="flex flex-col gap-2">
+                          <div className="flex items-baseline gap-1">
+                            <span className="font-extrabold text-base md:text-lg text-gray-900">
+                              ₹{product.price}
+                            </span>
+                            {product.discountPrice > product.price && (
+                              <span className="text-gray-400 line-through text-[10px] font-semibold">
+                                ₹{product.discountPrice}
                               </span>
-                            </>
-                          ) : (
-                            "Add to Cart"
-                          )}
-                        </button>
+                            )}
+                          </div>
+                          <button
+                            onClick={() => openMiniCart(product)}
+                            className={`w-full py-2 border-2 text-[11px] md:text-sm font-bold rounded-xl transition flex items-center justify-center gap-1 ${
+                              cartItems[product._id]
+                                ? "bg-green-600 border-green-600 text-white shadow-md shadow-green-100"
+                                : "border-green-600 text-green-600 bg-white hover:bg-green-600 hover:text-white"
+                            }`}
+                            style={{ cursor: "pointer" }}>
+                            {cartItems[product._id] ? (
+                              <>
+                                <span>Added</span>
+                                <span className="bg-white text-green-600 px-1.5 py-0.5 rounded-full text-[9px] font-black">
+                                  {cartItems[product._id]}
+                                </span>
+                              </>
+                            ) : (
+                              "Add to Cart"
+                            )}
+                          </button>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+                
+                {/* Pagination Controls */}
+                {totalPages > 1 && (
+                <div className="flex justify-center items-center mt-8 gap-2 pb-8">
+                  <button
+                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                    disabled={currentPage === 1}
+                    className="p-2 border rounded-lg bg-white text-gray-700 disabled:opacity-50 hover:bg-green-50 hover:text-green-600 transition-colors"
+                  >
+                    <ChevronLeft size={20} />
+                  </button>
+                  <span className="flex items-center gap-1 flex-wrap">
+                    {(() => {
+                      let start = Math.max(currentPage - 1, 1);
+                      let end = start + 2;
+                      if (end > totalPages) {
+                        end = totalPages;
+                        start = Math.max(end - 2, 1);
+                      }
+                      const pages = Array.from({ length: end - start + 1 }, (_, idx) => start + idx);
+                      return pages.map((page) => (
+                        <button
+                          key={page}
+                          onClick={() => setCurrentPage(page)}
+                          className={`w-9 h-9 flex items-center justify-center rounded-lg text-sm font-bold transition-colors ${
+                            currentPage === page
+                              ? "bg-green-600 text-white shadow-md shadow-green-100"
+                              : "bg-white text-gray-600 border border-gray-200 hover:bg-green-50 hover:text-green-600"
+                          }`}
+                        >
+                          {page}
+                        </button>
+                      ));
+                    })()}
+                  </span>
+                  <button
+                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                    disabled={currentPage === totalPages}
+                    className="p-2 border rounded-lg bg-white text-gray-700 disabled:opacity-50 hover:bg-green-50 hover:text-green-600 transition-colors"
+                  >
+                    <ChevronRight size={20} />
+                  </button>
+                </div>
+              )}
+              </>
             ) : (
               <div className="flex flex-col items-center justify-center py-20 bg-white rounded-[2rem] border border-dashed border-gray-200">
                 <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-4">

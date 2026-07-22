@@ -244,7 +244,6 @@ export default function EditProduct() {
               name="description"
               value={form.description}
               onChange={handleChange}
-              required
               placeholder="Product description..."
               className="w-full px-3 py-2 bg-[#1f2937] border border-gray-600 rounded-md 
               text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>

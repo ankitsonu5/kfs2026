@@ -339,7 +339,6 @@ export default function AddProducts() {
                   name="description"
                   value={form.description}
                   onChange={handleChange}
-                  required
                   placeholder="Describe the product features and specifications..."
                   className="w-full px-4 py-3 bg-[#1f2937]/50 border border-gray-600/50 rounded-xl focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 outline-none transition-all placeholder:text-gray-600 resize-none"></textarea>
               </div>

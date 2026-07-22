@@ -341,14 +341,18 @@ export default function GroceryRedesign() {
     return products.filter((p) => p[flag] === true);
   };
 
+  const heroBanners = banners.filter((b) => b.type === "hero" || !b.type);
+  const secondaryBanners = banners.filter((b) => b.type === "secondary");
+  const secondaryBanner = secondaryBanners.length > 0 ? secondaryBanners[secondaryBanners.length - 1] : null;
+
   // Simple auto-slider for banners
   useEffect(() => {
-    if (banners.length <= 1) return;
+    if (heroBanners.length <= 1) return;
     const interval = setInterval(() => {
-      setCurrentBannerIndex((prev) => (prev + 1) % banners.length);
+      setCurrentBannerIndex((prev) => (prev + 1) % heroBanners.length);
     }, 5000);
     return () => clearInterval(interval);
-  }, [banners]);
+  }, [heroBanners.length]);
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans">
@@ -357,13 +361,13 @@ export default function GroceryRedesign() {
 
       {/* Hero Section */}
       <section className="relative w-full h-[250px] md:h-[calc(100vh-128px)] overflow-hidden bg-gray-100">
-        {banners.length > 0 ? (
+        {heroBanners.length > 0 ? (
           <div className="w-full h-full relative flex items-center transition-all duration-700">
             {/* Background Image with Overlay */}
             <div className="absolute inset-0 z-0">
               <Image
-                src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/banners/${banners[currentBannerIndex].image}`}
-                alt={banners[currentBannerIndex].title}
+                src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/banners/${heroBanners[currentBannerIndex]?.image}`}
+                alt={heroBanners[currentBannerIndex]?.title || "Banner"}
                 width={1920}
                 height={1080}
                 className="w-full h-full object-cover object-center animate-in fade-in zoom-in duration-1000"
@@ -378,27 +382,27 @@ export default function GroceryRedesign() {
                   Special Offer
                 </span>
                 <h1 className="text-xl md:text-6xl font-black text-gray-900 mb-1 md:mb-4 leading-tight">
-                  {banners[currentBannerIndex].title}
+                  {heroBanners[currentBannerIndex]?.title}
                 </h1>
                 <p className="text-[10px] md:text-xl text-gray-700 mb-3 md:mb-8 opacity-90 font-medium max-w-[180px] md:max-w-md line-clamp-2 md:line-clamp-none">
-                  {banners[currentBannerIndex].subtitle}
+                  {heroBanners[currentBannerIndex]?.subtitle}
                 </p>
-                {banners[currentBannerIndex].link && (
+                {heroBanners[currentBannerIndex]?.link && (
                   <button
                     onClick={() =>
-                      safePush(router, banners[currentBannerIndex].link)
+                      safePush(router, heroBanners[currentBannerIndex].link)
                     }
                     className="bg-green-600 text-white px-4 py-2 md:px-10 md:py-4 rounded-lg md:rounded-xl text-[10px] md:text-lg font-extrabold hover:bg-green-700 transition shadow-xl shadow-green-600/20 active:scale-95 cursor-pointer">
-                    Shop Now
+                    {heroBanners[currentBannerIndex]?.buttonText || "Shop Now"}
                   </button>
                 )}
               </div>
             </div>
 
             {/* Banner Dots */}
-            {banners.length > 1 && (
+            {heroBanners.length > 1 && (
               <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-3 z-20">
-                {banners.map((_, idx) => (
+                {heroBanners.map((_, idx) => (
                   <button
                     key={idx}
                     onClick={() => setCurrentBannerIndex(idx)}
@@ -406,6 +410,24 @@ export default function GroceryRedesign() {
                   />
                 ))}
               </div>
+            )}
+
+            {/* Navigation Arrows */}
+            {heroBanners.length > 1 && (
+              <>
+                <button
+                  onClick={() => setCurrentBannerIndex((prev) => (prev === 0 ? heroBanners.length - 1 : prev - 1))}
+                  className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 z-20 p-2 md:p-3 bg-white/30 hover:bg-white/50 text-gray-900 backdrop-blur-sm rounded-full transition-all cursor-pointer pointer-events-auto shadow-lg"
+                >
+                  <ChevronLeft className="w-5 h-5 md:w-8 md:h-8" />
+                </button>
+                <button
+                  onClick={() => setCurrentBannerIndex((prev) => (prev + 1) % heroBanners.length)}
+                  className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 z-20 p-2 md:p-3 bg-white/30 hover:bg-white/50 text-gray-900 backdrop-blur-sm rounded-full transition-all cursor-pointer pointer-events-auto shadow-lg"
+                >
+                  <ChevronRight className="w-5 h-5 md:w-8 md:h-8" />
+                </button>
+              </>
             )}
 
             {/* Scroll Indicator */}
@@ -475,7 +497,7 @@ export default function GroceryRedesign() {
               return (
                 <div
                   key={category._id}
-                  onClick={() => safePush(router, `/shop?category=${category.name}`)}
+                  onClick={() => safePush(router, `/shop?category=${encodeURIComponent(category.name.trim())}`)}
                   className="min-w-[130px] md:min-w-[200px] p-4 md:p-6 rounded-2xl bg-white border border-gray-50 flex flex-col items-center justify-center cursor-pointer hover:shadow-xl hover:border-green-100 transition transform hover:-translate-y-1 gap-2 md:gap-3 snap-start">
                   <div className="w-20 h-20 md:w-24 md:h-24 flex items-center justify-center overflow-hidden mb-1 md:mb-2">
                     {category.image ? (
@@ -602,37 +624,71 @@ export default function GroceryRedesign() {
       </section>
 
       {/* Discount Banner */}
-      <section className="container mx-auto px-4 py-8">
-        <div className="rounded-2xl p-6 md:p-12 text-center text-white relative overflow-hidden min-h-[250px] flex flex-col items-center justify-center">
-          <Image
-            src="/herobanner.webp"
-            alt="Banner"
-            fill
-            className="object-cover"
-          />
-          <div className="relative z-10">
-            <h2 className="text-2xl md:text-4xl font-bold mb-4">
-              Start your day with tasty organic veggies
-            </h2>
-            <p className="text-base md:text-xl mb-8 opacity-90">
-              Get 10% off on your first order
-            </p>
-            <button
-              className="bg-white text-orange-600 px-8 py-3 rounded-full font-bold hover:bg-gray-100 transition shadow-lg"
-              style={{ cursor: "pointer" }}>
-              Shop Now
-            </button>
+      {secondaryBanner ? (
+        <section className="container mx-auto px-4 py-8">
+          <div className="rounded-2xl p-6 md:p-12 text-center text-white relative overflow-hidden min-h-[250px] flex flex-col items-center justify-center">
+            <Image
+              src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/banners/${secondaryBanner.image}`}
+              alt={secondaryBanner.title}
+              fill
+              className="object-cover"
+            />
+            <div className="relative z-10">
+              <h2 className="text-2xl md:text-4xl font-bold mb-4 drop-shadow-lg">
+                {secondaryBanner.title}
+              </h2>
+              {secondaryBanner.subtitle && (
+                <p className="text-base md:text-xl mb-8 opacity-90 drop-shadow-lg font-medium">
+                  {secondaryBanner.subtitle}
+                </p>
+              )}
+              {secondaryBanner.link && (
+                <button
+                  onClick={() => safePush(router, secondaryBanner.link)}
+                  className="bg-white text-orange-600 px-8 py-3 rounded-full font-bold hover:bg-gray-100 transition shadow-lg"
+                  style={{ cursor: "pointer" }}>
+                  {secondaryBanner.buttonText || "Shop Now"}
+                </button>
+              )}
+            </div>
+            {/* Decorative Circles */}
+            <div className="absolute top-0 left-0 w-64 h-64 bg-white opacity-10 rounded-full -translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
+            <div className="absolute bottom-0 right-0 w-96 h-96 bg-white opacity-10 rounded-full translate-x-1/3 translate-y-1/3 pointer-events-none"></div>
           </div>
-          {/* Decorative Circles */}
-          <div className="absolute top-0 left-0 w-64 h-64 bg-white opacity-10 rounded-full -translate-x-1/2 -translate-y-1/2"></div>
-          <div className="absolute bottom-0 right-0 w-96 h-96 bg-white opacity-10 rounded-full translate-x-1/3 translate-y-1/3"></div>
-        </div>
-      </section>
+        </section>
+      ) : (
+        <section className="container mx-auto px-4 py-8">
+          <div className="rounded-2xl p-6 md:p-12 text-center text-white relative overflow-hidden min-h-[250px] flex flex-col items-center justify-center">
+            <Image
+              src="/herobanner.webp"
+              alt="Banner"
+              fill
+              className="object-cover"
+            />
+            <div className="relative z-10">
+              <h2 className="text-2xl md:text-4xl font-bold mb-4 drop-shadow-lg">
+                Start your day with tasty organic veggies
+              </h2>
+              <p className="text-base md:text-xl mb-8 opacity-90 drop-shadow-lg font-medium">
+                Get 10% off on your first order
+              </p>
+              <button
+                className="bg-white text-orange-600 px-8 py-3 rounded-full font-bold hover:bg-gray-100 transition shadow-lg"
+                style={{ cursor: "pointer" }}>
+                Shop Now
+              </button>
+            </div>
+            {/* Decorative Circles */}
+            <div className="absolute top-0 left-0 w-64 h-64 bg-white opacity-10 rounded-full -translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
+            <div className="absolute bottom-0 right-0 w-96 h-96 bg-white opacity-10 rounded-full translate-x-1/3 translate-y-1/3 pointer-events-none"></div>
+          </div>
+        </section>
+      )}
 
       {/* Features / Trust Badges */}
       <section className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-6 bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
-          {[
+        {(() => {
+          const features = [
             {
               icon: Tag,
               title: "Best Prices",
@@ -641,13 +697,13 @@ export default function GroceryRedesign() {
             {
               icon: Truck,
               title: "Free Delivery",
-              desc: "On orders ₹1000+",
+              desc: "On orders ₹500+",
             },
-            {
-              icon: RotateCcw,
-              title: "Easy Returns",
-              desc: "7 days policy",
-            },
+            // {
+            //   icon: RotateCcw,
+            //   title: "Easy Returns",
+            //   desc: "7 days policy",
+            // },
             {
               icon: ShieldCheck,
               title: "100% Quality",
@@ -656,22 +712,29 @@ export default function GroceryRedesign() {
             {
               icon: Soup,
               title: "Great Choice",
-              desc: "5000+ products",
+              desc: `${products.length}+ products`,
             },
-          ].map((feature, idx) => (
-            <div
-              key={idx}
-              className="flex flex-col items-center text-center gap-2 group cursor-default">
-              <div className="w-16 h-16 bg-green-50 text-green-600 flex items-center justify-center rounded-full mb-2 group-hover:bg-green-100 transition">
-                <feature.icon className="w-8 h-8" />
-              </div>
-              <h3 className="font-bold text-gray-800 text-sm">
-                {feature.title}
-              </h3>
-              <p className="text-xs text-gray-500">{feature.desc}</p>
+          ];
+          const gridColsClass = features.length === 5 ? "md:grid-cols-5" : "md:grid-cols-4";
+          
+          return (
+            <div className={`grid grid-cols-2 ${gridColsClass} gap-6 bg-white p-8 rounded-2xl shadow-sm border border-gray-100`}>
+              {features.map((feature, idx) => (
+                <div
+                  key={idx}
+                  className="flex flex-col items-center text-center gap-2 group cursor-default">
+                  <div className="w-16 h-16 bg-green-50 text-green-600 flex items-center justify-center rounded-full mb-2 group-hover:bg-green-100 transition">
+                    <feature.icon className="w-8 h-8" />
+                  </div>
+                  <h3 className="font-bold text-gray-800 text-sm">
+                    {feature.title}
+                  </h3>
+                  <p className="text-xs text-gray-500">{feature.desc}</p>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+          );
+        })()}
       </section>
 
       {/* Deals of Day Section */}

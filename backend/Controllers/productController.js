@@ -65,11 +65,21 @@ exports.addProductsCSV = async (req, res) => {
           const productsToInsert = [];
           
           for (let row of results) {
-             const title = row.title;
-             const price = Number(row.price) || 0;
-             const discountPrice = Number(row.discountPrice) || 0;
-             const description = row.description || "";
-             const stock = Number(row.stock) || 0;
+             // Support both custom headers and raw WooCommerce headers
+             const title = row.title || row.Name;
+             
+             // In this app, 'price' = Selling Price, 'discountPrice' = MRP
+             const customSellingPrice = Number(row.price);
+             const customMRP = Number(row.discountPrice);
+             const wooSalePrice = Number(row["Sale price"]);
+             const wooRegularPrice = Number(row["Regular price"]);
+             
+             const discountPrice = customMRP || wooRegularPrice || 0; // MRP
+             const price = customSellingPrice || wooSalePrice || discountPrice || 0; // Selling Price
+
+             const description = row.description || row.Description || "";
+             const stock = Number(row.stock) || Number(row.Stock) || 0;
+             const categoryName = row.categoryName || row.Categories;
              
              const isTopSellingProducts = row.isTopSellingProducts === "true" || row.isTopSellingProducts === "1";
              const isDealsOfDay = row.isDealsOfDay === "true" || row.isDealsOfDay === "1";
@@ -81,10 +91,10 @@ exports.addProductsCSV = async (req, res) => {
              const isNamkeenAndSnacks = row.isNamkeenAndSnacks === "true" || row.isNamkeenAndSnacks === "1";
 
              let categoryIds = [];
-             if (row.categoryName) {
-               let cat = await Category.findOne({ name: { $regex: new RegExp(`^${row.categoryName}$`, "i") } });
+             if (categoryName) {
+               let cat = await Category.findOne({ name: { $regex: new RegExp(`^${categoryName}$`, "i") } });
                if (!cat) {
-                 cat = new Category({ name: row.categoryName, image: "default-category.png" });
+                 cat = new Category({ name: categoryName, image: "default-category.png" });
                  await cat.save();
                }
                categoryIds.push(cat._id);

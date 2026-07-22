@@ -14,6 +14,8 @@ import {
   Package,
   Plus,
   Minus,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -24,7 +26,8 @@ export default function BulkOrder() {
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [sortOption, setSortOption] = useState("default");
-  const [resultsPerPage, setResultsPerPage] = useState(15);
+  const [resultsPerPage, setResultsPerPage] = useState(40);
+  const [currentPage, setCurrentPage] = useState(1);
   const [cartCount, setCartCount] = useState(0);
   const [cartItems, setCartItems] = useState({});
   const [viewMode, setViewMode] = useState("grid"); // 'grid' or 'list'
@@ -121,10 +124,15 @@ export default function BulkOrder() {
     filteredProducts.sort((a, b) => b.price - a.price);
   }
 
-  // Pagination
-  if (resultsPerPage !== "all") {
-    filteredProducts = filteredProducts.slice(0, resultsPerPage);
-  }
+  // Pagination logic
+  const totalPages = Math.ceil(filteredProducts.length / resultsPerPage);
+  const indexOfLastProduct = currentPage * resultsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - resultsPerPage;
+  const currentProducts = resultsPerPage === "all" ? filteredProducts : filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
+  
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedCategory, sortOption]);
 
   const handleAddToCart = async (product) => {
     try {
@@ -275,8 +283,8 @@ export default function BulkOrder() {
             {/* PRODUCT GRID */}
             <div
               className={`grid ${viewMode === "grid" ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5" : "grid-cols-1"} gap-6`}>
-              {filteredProducts.length > 0 ? (
-                filteredProducts.map((p) => (
+              {currentProducts.length > 0 ? (
+                currentProducts.map((p) => (
                   <div
                     key={p._id}
                     className={`bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 group flex ${viewMode === "list" ? "flex-row p-4" : "flex-col"}`}>
@@ -372,6 +380,49 @@ export default function BulkOrder() {
                 </div>
               )}
             </div>
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+              <div className="flex justify-center items-center mt-8 gap-2 pb-8">
+                <button
+                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                  className="p-2 border rounded-lg bg-white text-gray-700 disabled:opacity-50 hover:bg-green-50 hover:text-green-600 transition-colors"
+                >
+                  <ChevronLeft size={20} />
+                </button>
+                <span className="flex items-center gap-1 flex-wrap">
+                  {(() => {
+                    let start = Math.max(currentPage - 1, 1);
+                    let end = start + 2;
+                    if (end > totalPages) {
+                      end = totalPages;
+                      start = Math.max(end - 2, 1);
+                    }
+                    const pages = Array.from({ length: end - start + 1 }, (_, idx) => start + idx);
+                    return pages.map((page) => (
+                      <button
+                        key={page}
+                        onClick={() => setCurrentPage(page)}
+                        className={`w-9 h-9 flex items-center justify-center rounded-lg text-sm font-bold transition-colors ${
+                          currentPage === page
+                            ? "bg-green-600 text-white shadow-md shadow-green-100"
+                            : "bg-white text-gray-600 border border-gray-200 hover:bg-green-50 hover:text-green-600"
+                        }`}
+                      >
+                        {page}
+                      </button>
+                    ));
+                  })()}
+                </span>
+                <button
+                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                  className="p-2 border rounded-lg bg-white text-gray-700 disabled:opacity-50 hover:bg-green-50 hover:text-green-600 transition-colors"
+                >
+                  <ChevronRight size={20} />
+                </button>
+              </div>
+            )}
           </main>
         </div>
       </div>

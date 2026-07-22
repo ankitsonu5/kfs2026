@@ -19,17 +19,74 @@ import {
   Plus,
   ArrowRight,
   MapPin,
-  Image as ImageIcon,
+  ImageIcon,
   MessageSquare,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { AreaChart, Area, ResponsiveContainer, Tooltip, XAxis } from "recharts";
 
 import axios from "axios";
 import Image from "next/image";
 
+const PaginationControls = ({ currentPage, totalPages, onPageChange }) => {
+  if (totalPages <= 1) return null;
+  return (
+    <div className="flex justify-end items-center mt-6 gap-2 pb-2 px-6">
+      <button
+        onClick={() => onPageChange(Math.max(currentPage - 1, 1))}
+        disabled={currentPage === 1}
+        className="p-2 border border-gray-600 rounded-lg bg-transparent text-gray-400 disabled:opacity-50 hover:bg-gray-800 hover:text-white transition-colors"
+      >
+        <ChevronLeft size={16} />
+      </button>
+      <span className="flex items-center gap-1 flex-wrap">
+        {(() => {
+          let start = Math.max(currentPage - 1, 1);
+          let end = start + 2;
+          if (end > totalPages) {
+            end = totalPages;
+            start = Math.max(end - 2, 1);
+          }
+          const pages = Array.from({ length: end - start + 1 }, (_, idx) => start + idx);
+          return pages.map((page) => (
+            <button
+              key={page}
+              onClick={() => onPageChange(page)}
+              className={`w-8 h-8 flex items-center justify-center rounded-lg text-sm font-bold transition-colors ${
+                currentPage === page
+                  ? "bg-blue-600 text-white shadow-md"
+                  : "bg-transparent text-gray-400 border border-gray-600 hover:bg-gray-800 hover:text-white"
+              }`}
+            >
+              {page}
+            </button>
+          ));
+        })()}
+      </span>
+      <button
+        onClick={() => onPageChange(Math.min(currentPage + 1, totalPages))}
+        disabled={currentPage === totalPages}
+        className="p-2 border border-gray-600 rounded-lg bg-transparent text-gray-400 disabled:opacity-50 hover:bg-gray-800 hover:text-white transition-colors"
+      >
+        <ChevronRight size={16} />
+      </button>
+    </div>
+  );
+};
+
 export default function AdminDashboard() {
   const router = useRouter();
   const [active, setActive] = useState("dashboard");
+  const ITEMS_PER_PAGE = 15;
+  const [productsPage, setProductsPage] = useState(1);
+  const [productSort, setProductSort] = useState("newest");
+  const [ordersPage, setOrdersPage] = useState(1);
+  const [orderSort, setOrderSort] = useState("newest");
+  const [usersPage, setUsersPage] = useState(1);
+  const [userSort, setUserSort] = useState("newest");
+  const [categoriesPage, setCategoriesPage] = useState(1);
+  const [categorySort, setCategorySort] = useState("newest");
   const [open, setOpen] = useState(false);
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -48,11 +105,17 @@ export default function AdminDashboard() {
   });
   const [allUsers, setAllUsers] = useState([]);
   const [userSearchTerm, setUserSearchTerm] = useState("");
+  const [orderSearchTerm, setOrderSearchTerm] = useState("");
+  const [categorySearchTerm, setCategorySearchTerm] = useState("");
+  const [productSearchTerm, setProductSearchTerm] = useState("");
+  const [productCategoryFilter, setProductCategoryFilter] = useState("all");
   const [banners, setBanners] = useState([]);
   const [bannerForm, setBannerForm] = useState({
     title: "",
     subtitle: "",
+    buttonText: "",
     link: "",
+    type: "hero",
     order: 0,
     image: null,
   });
@@ -216,9 +279,11 @@ export default function AdminDashboard() {
     const formData = new FormData();
     formData.append("title", bannerForm.title);
     formData.append("subtitle", bannerForm.subtitle);
+    formData.append("buttonText", bannerForm.buttonText);
     formData.append("link", bannerForm.link);
+    formData.append("type", bannerForm.type);
     formData.append("order", bannerForm.order);
-    if (bannerForm.image) {
+    if (bannerForm.image && typeof bannerForm.image !== 'string') {
       formData.append("image", bannerForm.image);
     }
 
@@ -251,7 +316,9 @@ export default function AdminDashboard() {
       setBannerForm({
         title: "",
         subtitle: "",
+        buttonText: "",
         link: "",
+        type: "hero",
         order: 0,
         image: null,
       });
@@ -368,6 +435,73 @@ export default function AdminDashboard() {
     }
   };
 
+  // Pagination & Sorting Logic
+  
+  // Products
+  let sortedProducts = [...products];
+  if (productSearchTerm) {
+    sortedProducts = sortedProducts.filter(p => (p.title || "").toLowerCase().includes(productSearchTerm.toLowerCase()));
+  }
+  if (productCategoryFilter !== "all") {
+    sortedProducts = sortedProducts.filter(p => {
+      if (Array.isArray(p.category) && p.category.length > 0 && typeof p.category[0] === 'object') {
+        return p.category.some(c => c._id === productCategoryFilter);
+      }
+      if (Array.isArray(p.category)) {
+        return p.category.includes(productCategoryFilter);
+      }
+      return p.category === productCategoryFilter || p.category?._id === productCategoryFilter;
+    });
+  }
+
+  if (productSort === "price-low") sortedProducts.sort((a, b) => a.price - b.price);
+  else if (productSort === "price-high") sortedProducts.sort((a, b) => b.price - a.price);
+  else if (productSort === "name-az") sortedProducts.sort((a, b) => a.title.localeCompare(b.title));
+  else sortedProducts.reverse(); // newest
+  
+  const totalProductPages = Math.ceil(sortedProducts.length / ITEMS_PER_PAGE);
+  const paginatedProducts = sortedProducts.slice((productsPage - 1) * ITEMS_PER_PAGE, productsPage * ITEMS_PER_PAGE);
+
+  // Orders
+  let sortedOrders = dashStats.recentOrders ? [...dashStats.recentOrders] : [];
+  if (orderSearchTerm) {
+    sortedOrders = sortedOrders.filter(o => 
+      (o._id || "").toLowerCase().includes(orderSearchTerm.toLowerCase()) || 
+      (o.userId?.fullName || "").toLowerCase().includes(orderSearchTerm.toLowerCase()) ||
+      (o.userId?.email || "").toLowerCase().includes(orderSearchTerm.toLowerCase())
+    );
+  }
+  if (orderSort === "amount-high") sortedOrders.sort((a, b) => b.totalAmount - a.totalAmount);
+  else if (orderSort === "amount-low") sortedOrders.sort((a, b) => a.totalAmount - b.totalAmount);
+  else if (orderSort === "status") sortedOrders.sort((a, b) => a.status.localeCompare(b.status));
+  else sortedOrders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  
+  const totalOrderPages = Math.ceil(sortedOrders.length / ITEMS_PER_PAGE);
+  const paginatedOrders = sortedOrders.slice((ordersPage - 1) * ITEMS_PER_PAGE, ordersPage * ITEMS_PER_PAGE);
+
+  // Users
+  let sortedUsers = allUsers ? [...allUsers] : [];
+  if (userSearchTerm) {
+    sortedUsers = sortedUsers.filter(u => (u.fullName || u.name || "")?.toLowerCase().includes(userSearchTerm.toLowerCase()) || u.email?.toLowerCase().includes(userSearchTerm.toLowerCase()));
+  }
+  if (userSort === "name-az") sortedUsers.sort((a, b) => (a.fullName || a.name || "").localeCompare(b.fullName || b.name || ""));
+  else sortedUsers.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  
+  const totalUserPages = Math.ceil(sortedUsers.length / ITEMS_PER_PAGE);
+  const paginatedUsers = sortedUsers.slice((usersPage - 1) * ITEMS_PER_PAGE, usersPage * ITEMS_PER_PAGE);
+
+  // Categories
+  let sortedCategories = [...categories];
+  if (categorySearchTerm) {
+    sortedCategories = sortedCategories.filter(c => (c.name || "").toLowerCase().includes(categorySearchTerm.toLowerCase()));
+  }
+  if (categorySort === "newest") sortedCategories.reverse();
+  else sortedCategories.sort((a, b) => a.name.localeCompare(b.name));
+  
+  const totalCategoryPages = Math.ceil(sortedCategories.length / ITEMS_PER_PAGE);
+  const paginatedCategories = sortedCategories.slice((categoriesPage - 1) * ITEMS_PER_PAGE, categoriesPage * ITEMS_PER_PAGE);
+
+
   return (
     <div className="min-h-screen flex bg-[#0b1a2b] text-white overflow-x-hidden">
       <style
@@ -379,7 +513,7 @@ export default function AdminDashboard() {
         }}
       />
       <div
-        className={`fixed md:static top-0 left-0 min-h-screen w-64 bg-[#111827] p-5 border-r border-gray-700 z-50 flex flex-col justify-between transform transition-transform duration-300
+        className={`fixed top-0 left-0 h-screen w-64 bg-[#111827] p-5 border-r border-gray-700 z-50 flex flex-col justify-between transform transition-transform duration-300 overflow-y-auto no-scrollbar
       ${open ? "translate-x-0" : "-translate-x-full"} md:translate-x-0`}>
         <div className="flex flex-col h-full">
           <div className="flex items-center gap-3 mb-8 pb-4 border-b border-gray-700/50">
@@ -558,7 +692,7 @@ export default function AdminDashboard() {
           onClick={() => setOpen(false)}></div>
       )}
 
-      <div className="flex-1 md:ml-0 p-4 md:p-8 w-full">
+      <div className="flex-1 md:ml-64 p-4 md:p-8 w-full">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
           <div className="flex items-center gap-3 bg-[#111827]/80 backdrop-blur-md px-4 py-2 rounded-2xl border border-gray-700 shadow-2xl self-start">
             <button
@@ -706,16 +840,15 @@ export default function AdminDashboard() {
                   ))}
                 </tbody>
               </table>
+              <PaginationControls currentPage={ordersPage} totalPages={totalOrderPages} onPageChange={setOrdersPage} />
             </div>
           </>
         )}
 
         {active === "products" && (
-          <Section title="Product Management">
-            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
-              <p className="text-gray-400 text-xs md:text-sm">
-                Manage your store&apos;s inventory and products
-              </p>
+          <Section 
+            title="Product Management"
+            action={
               <button
                 onClick={() => {
                   router.push("/add-products");
@@ -724,6 +857,37 @@ export default function AdminDashboard() {
                 className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 md:px-5 md:py-2.5 rounded-lg flex items-center justify-center gap-2 font-semibold shadow-lg shadow-blue-600/20 transition-all active:scale-95 cursor-pointer text-sm">
                 <Plus size={18} /> Add Product
               </button>
+            }
+          >
+            <div className="mb-6">
+              <p className="text-gray-400 text-xs md:text-sm mb-4">
+                Manage your store&apos;s inventory and products
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <input 
+                  type="text" 
+                  placeholder="Search products..." 
+                  value={productSearchTerm} 
+                  onChange={(e) => setProductSearchTerm(e.target.value)} 
+                  className="bg-[#1f2937] border border-gray-700 rounded-lg px-3 py-1.5 text-sm font-semibold text-gray-300 w-full sm:w-48 focus:outline-none focus:border-blue-500 transition-colors"
+                />
+                <select 
+                  value={productCategoryFilter} 
+                  onChange={(e) => setProductCategoryFilter(e.target.value)} 
+                  className="bg-[#1f2937] border border-gray-700 rounded-lg px-3 py-1.5 text-sm font-semibold text-gray-300 w-fit focus:outline-none focus:border-blue-500 transition-colors cursor-pointer"
+                >
+                  <option value="all">All Categories</option>
+                  {categories.map((cat) => (
+                    <option key={cat._id} value={cat._id}>{cat.name}</option>
+                  ))}
+                </select>
+                <select value={productSort} onChange={(e) => setProductSort(e.target.value)} className="bg-[#1f2937] border border-gray-700 rounded-lg px-3 py-1.5 text-sm font-semibold text-gray-300 w-fit focus:outline-none focus:border-blue-500 transition-colors cursor-pointer">
+                  <option value="newest">Newest</option>
+                  <option value="price-low">Price (Low to High)</option>
+                  <option value="price-high">Price (High to Low)</option>
+                  <option value="name-az">Name (A-Z)</option>
+                </select>
+              </div>
             </div>
 
             <div className="bg-[#111827] rounded-xl border border-gray-700 overflow-hidden shadow-2xl">
@@ -752,7 +916,7 @@ export default function AdminDashboard() {
                         </td>
                       </tr>
                     ) : (
-                      products.map((product) => (
+                      paginatedProducts.map((product) => (
                         <tr
                           key={product._id}
                           className="hover:bg-white/[0.03] transition-colors group">
@@ -837,6 +1001,7 @@ export default function AdminDashboard() {
                   </tbody>
                 </table>
               </div>
+              <PaginationControls currentPage={productsPage} totalPages={totalProductPages} onPageChange={setProductsPage} />
             </div>
           </Section>
         )}
@@ -844,9 +1009,24 @@ export default function AdminDashboard() {
         {active === "category" && (
           <Section title="Category Management">
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
-              <p className="text-gray-400 text-xs md:text-sm">
-                Organize products into distinct collections
-              </p>
+              <div className="flex flex-col gap-3">
+                <p className="text-gray-400 text-xs md:text-sm">
+                  Organize products into distinct collections
+                </p>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <input 
+                    type="text" 
+                    placeholder="Search categories..." 
+                    value={categorySearchTerm} 
+                    onChange={(e) => { setCategorySearchTerm(e.target.value); setCategoriesPage(1); }} 
+                    className="bg-[#1f2937] border border-gray-700 rounded-lg px-3 py-1.5 text-sm font-semibold text-gray-300 w-full sm:w-48 focus:outline-none focus:border-emerald-500 transition-colors"
+                  />
+                  <select value={categorySort} onChange={(e) => setCategorySort(e.target.value)} className="bg-[#1f2937] border border-gray-700 rounded-lg px-3 py-1.5 text-sm font-semibold text-gray-300 w-fit focus:outline-none focus:border-emerald-500 transition-colors cursor-pointer">
+                    <option value="newest">Newest</option>
+                    <option value="name-az">Name (A-Z)</option>
+                  </select>
+                </div>
+              </div>
               <button
                 onClick={() => {
                   router.push("/add-category");
@@ -879,7 +1059,7 @@ export default function AdminDashboard() {
                         </td>
                       </tr>
                     ) : (
-                      categories.map((category) => (
+                      paginatedCategories.map((category) => (
                          <tr
                           key={category._id}
                           className="hover:bg-white/[0.03] transition-colors group">
@@ -959,12 +1139,28 @@ export default function AdminDashboard() {
                   </tbody>
                 </table>
               </div>
+              <PaginationControls currentPage={categoriesPage} totalPages={totalCategoryPages} onPageChange={setCategoriesPage} />
             </div>
           </Section>
         )}
 
         {active === "orders" && (
           <Section title="All Orders">
+            <div className="flex flex-col sm:flex-row gap-3">
+              <input 
+                type="text" 
+                placeholder="Search orders..." 
+                value={orderSearchTerm} 
+                onChange={(e) => { setOrderSearchTerm(e.target.value); setOrdersPage(1); }} 
+                className="bg-[#1f2937] border border-gray-700 rounded-lg px-3 py-1.5 text-sm font-semibold text-gray-300 w-full sm:w-64 focus:outline-none focus:border-blue-500 transition-colors"
+              />
+              <select value={orderSort} onChange={(e) => setOrderSort(e.target.value)} className="bg-[#1f2937] border border-gray-700 rounded-lg px-3 py-1.5 text-sm font-semibold text-gray-300 w-fit focus:outline-none focus:border-blue-500 transition-colors cursor-pointer">
+                <option value="newest">Newest</option>
+                <option value="amount-high">Amount (High to Low)</option>
+                <option value="amount-low">Amount (Low to High)</option>
+                <option value="status">Status</option>
+              </select>
+            </div>
             <div className="bg-[#111827] rounded-xl overflow-x-auto mt-4 border border-gray-700 no-scrollbar">
               <table className="w-full text-sm">
                 <thead className="text-gray-400">
@@ -987,7 +1183,7 @@ export default function AdminDashboard() {
                       </td>
                     </tr>
                   ) : (
-                    dashStats.recentOrders.map((o) => (
+                    paginatedOrders.map((o) => (
                       <tr
                         key={o._id}
                         className="border-t border-gray-800 hover:bg-white/5 transition">
@@ -1023,8 +1219,9 @@ export default function AdminDashboard() {
                       </tr>
                     ))
                   )}
-                </tbody>
-              </table>
+                  </tbody>
+                </table>
+                <PaginationControls currentPage={ordersPage} totalPages={totalOrderPages} onPageChange={setOrdersPage} />
               <div className="p-4 text-center border-t border-gray-800 bg-white/5">
                 <button
                   onClick={() => router.push("/admin-orders")}
@@ -1048,7 +1245,9 @@ export default function AdminDashboard() {
                   setBannerForm({
                     title: "",
                     subtitle: "",
+                    buttonText: "",
                     link: "",
+                    type: "hero",
                     order: 0,
                     image: null,
                   });
@@ -1101,6 +1300,23 @@ export default function AdminDashboard() {
                   </div>
                   <div className="space-y-1">
                     <label className="text-xs font-bold text-gray-500 uppercase">
+                      Button Text
+                    </label>
+                    <input
+                      type="text"
+                      value={bannerForm.buttonText || ""}
+                      onChange={(e) =>
+                        setBannerForm({
+                          ...bannerForm,
+                          buttonText: e.target.value,
+                        })
+                      }
+                      className="w-full bg-[#111827] border border-gray-700 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="e.g. Shop Now"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-gray-500 uppercase">
                       Target Link
                     </label>
                     <input
@@ -1112,6 +1328,21 @@ export default function AdminDashboard() {
                       className="w-full bg-[#111827] border border-gray-700 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                       placeholder="e.g. /shop"
                     />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-gray-500 uppercase">
+                      Banner Type
+                    </label>
+                    <select
+                      value={bannerForm.type}
+                      onChange={(e) =>
+                        setBannerForm({ ...bannerForm, type: e.target.value })
+                      }
+                      className="w-full bg-[#111827] border border-gray-700 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+                    >
+                      <option value="hero">Hero Slider (Top)</option>
+                      <option value="secondary">Secondary Banner (Middle)</option>
+                    </select>
                   </div>
                   <div className="space-y-1">
                     <label className="text-xs font-bold text-gray-500 uppercase">
@@ -1141,6 +1372,15 @@ export default function AdminDashboard() {
                       }
                       className="w-full bg-[#111827] border border-gray-700 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 file:bg-blue-600 file:border-none file:px-3 file:py-1 file:rounded file:text-white file:text-xs file:font-bold file:mr-4 file:cursor-pointer"
                     />
+                    {bannerForm.image && (
+                      <div className="mt-2">
+                        <img 
+                          src={typeof bannerForm.image === 'string' ? `${process.env.NEXT_PUBLIC_API_URL}/uploads/${bannerForm.image}` : URL.createObjectURL(bannerForm.image)} 
+                          alt="Banner Preview" 
+                          className="h-24 w-auto object-cover rounded-lg border border-gray-700 shadow-md"
+                        />
+                      </div>
+                    )}
                   </div>
                   <div className="md:col-span-2 flex justify-end gap-3 mt-4">
                     <button
@@ -1204,9 +1444,11 @@ export default function AdminDashboard() {
                               setBannerForm({
                                 title: banner.title,
                                 subtitle: banner.subtitle || "",
+                                buttonText: banner.buttonText || "",
                                 link: banner.link || "",
+                                type: banner.type || "hero",
                                 order: banner.order,
-                                image: null,
+                                image: banner.image || null,
                               });
                               setShowBannerForm(true);
                             }}
@@ -1240,26 +1482,22 @@ export default function AdminDashboard() {
         {active === "users" && (
           <Section title="User Management">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
-              <input
-                type="text"
-                placeholder="Search by Name or Email..."
-                value={userSearchTerm}
-                onChange={(e) => setUserSearchTerm(e.target.value)}
-                className="bg-[#1f2937] border border-gray-700 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 w-full md:w-80"
-              />
+              <div className="flex flex-col md:flex-row gap-2 w-full md:w-auto">
+                <input
+                  type="text"
+                  placeholder="Search by Name or Email..."
+                  value={userSearchTerm}
+                  onChange={(e) => setUserSearchTerm(e.target.value)}
+                  className="bg-[#1f2937] border border-gray-700 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 w-full md:w-80"
+                />
+                <select value={userSort} onChange={(e) => setUserSort(e.target.value)} className="bg-[#1f2937] border border-gray-700 rounded-lg px-3 py-2 text-sm font-semibold text-gray-300 w-full md:w-fit focus:outline-none focus:border-blue-500 transition-colors cursor-pointer">
+                  <option value="newest">Newest</option>
+                  <option value="name-az">Name (A-Z)</option>
+                </select>
+              </div>
               <p className="text-gray-500 text-xs font-medium uppercase tracking-widest">
                 Total:{" "}
-                {
-                  allUsers.filter(
-                    (u) =>
-                      u.fullName
-                        ?.toLowerCase()
-                        .includes(userSearchTerm.toLowerCase()) ||
-                      u.email
-                        ?.toLowerCase()
-                        .includes(userSearchTerm.toLowerCase()),
-                  ).length
-                }{" "}
+                {sortedUsers.length}{" "}
                 Users Found
               </p>
             </div>
@@ -1285,17 +1523,7 @@ export default function AdminDashboard() {
                       </td>
                     </tr>
                   ) : (
-                    allUsers
-                      .filter(
-                        (u) =>
-                          (u.fullName || u.name || "")
-                            .toLowerCase()
-                            .includes(userSearchTerm.toLowerCase()) ||
-                          u.email
-                            .toLowerCase()
-                            .includes(userSearchTerm.toLowerCase()),
-                      )
-                      .map((u) => (
+                    paginatedUsers.map((u) => (
                         <tr
                           key={u._id}
                           className="border-t border-gray-800 hover:bg-white/5 transition">
@@ -1331,10 +1559,11 @@ export default function AdminDashboard() {
                         </tr>
                       ))
                   )}
-                </tbody>
-              </table>
-            </div>
-          </Section>
+                  </tbody>
+                </table>
+              </div>
+              <PaginationControls currentPage={usersPage} totalPages={totalUserPages} onPageChange={setUsersPage} />
+            </Section>
         )}
 
         {active === "areas" && (
@@ -1486,10 +1715,13 @@ export default function AdminDashboard() {
   );
 }
 
-function Section({ title, children }) {
+function Section({ title, action, children }) {
   return (
     <div className="bg-[#111827] p-4 md:p-6 rounded-xl border border-gray-700">
-      <h3 className="text-lg md:text-xl mb-4 font-semibold">{title}</h3>
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start sm:items-center gap-4 mb-4">
+        {title && <h3 className="text-lg md:text-xl font-semibold m-0">{title}</h3>}
+        {action && <div>{action}</div>}
+      </div>
       {children}
     </div>
   );

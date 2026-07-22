@@ -5,7 +5,7 @@ const path = require("path");
 // Create a new banner
 exports.createBanner = async (req, res) => {
   try {
-    const { title, subtitle, link, status, order } = req.body;
+    const { title, subtitle, buttonText, link, status, order, type } = req.body;
     const image = req.file ? req.file.filename : "";
 
     if (!image) {
@@ -15,10 +15,12 @@ exports.createBanner = async (req, res) => {
     const newBanner = new Banner({
       title,
       subtitle,
+      buttonText,
       image,
       link,
       status,
       order,
+      type: type || "hero",
     });
 
     await newBanner.save();
@@ -56,7 +58,7 @@ exports.getActiveBanners = async (req, res) => {
 // Update a banner
 exports.updateBanner = async (req, res) => {
   try {
-    const { title, subtitle, link, status, order } = req.body;
+    const { title, subtitle, buttonText, link, status, order, type } = req.body;
     const banner = await Banner.findById(req.params.id);
 
     if (!banner) {
@@ -74,9 +76,11 @@ exports.updateBanner = async (req, res) => {
 
     banner.title = title || banner.title;
     banner.subtitle = subtitle || banner.subtitle;
+    if (buttonText !== undefined) banner.buttonText = buttonText;
     banner.link = link || banner.link;
     banner.status = status || banner.status;
     banner.order = order !== undefined ? order : banner.order;
+    banner.type = type || banner.type;
 
     await banner.save();
     res.status(200).json({ message: "Banner updated successfully", banner });

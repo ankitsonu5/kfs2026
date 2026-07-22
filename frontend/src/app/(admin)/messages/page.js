@@ -11,6 +11,10 @@ export default function Messages() {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const ITEMS_PER_PAGE = 15;
+  const [messagesPage, setMessagesPage] = useState(1);
+  const [messageSort, setMessageSort] = useState("newest");
+
   useEffect(() => {
     const fetchMessages = async () => {
       try {
@@ -51,6 +55,39 @@ export default function Messages() {
     }
   };
 
+  // Pagination & Sorting Logic
+  let sortedMessages = [...messages];
+  if (messageSort === "newest") sortedMessages.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  else if (messageSort === "name-az") sortedMessages.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+  
+  const totalMessagePages = Math.ceil(sortedMessages.length / ITEMS_PER_PAGE);
+  const paginatedMessages = sortedMessages.slice((messagesPage - 1) * ITEMS_PER_PAGE, messagesPage * ITEMS_PER_PAGE);
+
+  const PaginationControls = ({ currentPage, totalPages, onPageChange }) => {
+    if (totalPages <= 1) return null;
+    return (
+      <div className="flex justify-center items-center mt-6 gap-2 pb-6">
+        <button
+          onClick={() => onPageChange(Math.max(currentPage - 1, 1))}
+          disabled={currentPage === 1}
+          className="px-4 py-2 border border-gray-600 rounded-lg bg-[#1f2937] text-white disabled:opacity-50 hover:bg-gray-700 transition-colors"
+        >
+          Previous
+        </button>
+        <span className="px-4 py-2 text-gray-400 font-medium">
+          Page {currentPage} of {totalPages}
+        </span>
+        <button
+          onClick={() => onPageChange(Math.min(currentPage + 1, totalPages))}
+          disabled={currentPage === totalPages}
+          className="px-4 py-2 border border-gray-600 rounded-lg bg-[#1f2937] text-white disabled:opacity-50 hover:bg-gray-700 transition-colors"
+        >
+          Next
+        </button>
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-[#0b1a2b] text-white p-4 md:p-10 flex items-center justify-center">
       <div className="max-w-6xl w-full bg-[#111827]/80 backdrop-blur-xl border border-gray-700/50 rounded-3xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)] min-h-[80vh] flex flex-col md:flex-row">
@@ -87,20 +124,24 @@ export default function Messages() {
         <div className="md:w-2/3 lg:w-3/4 p-5 md:p-8 overflow-y-auto">
           <div className="mb-6 flex justify-between items-center border-b border-gray-700 pb-4">
             <h2 className="text-xl font-bold">Inbox ({messages.length})</h2>
+            <select value={messageSort} onChange={(e) => setMessageSort(e.target.value)} className="bg-[#1f2937] border border-gray-600 rounded px-3 py-1 text-sm font-semibold text-white">
+              <option value="newest">Newest</option>
+              <option value="name-az">Name (A-Z)</option>
+            </select>
           </div>
 
           {loading ? (
             <div className="flex justify-center items-center py-20">
               <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
             </div>
-          ) : messages.length === 0 ? (
+          ) : paginatedMessages.length === 0 ? (
             <div className="text-center py-20 text-gray-400 bg-white/5 rounded-xl border border-gray-700/50">
               <MessageSquare size={48} className="mx-auto mb-4 opacity-50" />
               <p>No messages found.</p>
             </div>
           ) : (
             <div className="space-y-4">
-              {messages.map((msg) => (
+              {paginatedMessages.map((msg) => (
                 <div key={msg._id} className="bg-[#1f2937]/50 border border-gray-700/50 rounded-xl p-5 hover:bg-[#1f2937] transition-colors relative group">
                   <button 
                     onClick={() => handleDelete(msg._id)}
@@ -126,6 +167,7 @@ export default function Messages() {
               ))}
             </div>
           )}
+          <PaginationControls currentPage={messagesPage} totalPages={totalMessagePages} onPageChange={setMessagesPage} />
         </div>
       </div>
     </div>
