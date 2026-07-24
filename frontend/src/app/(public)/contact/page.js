@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Header from "../../components/header";
 import Navbar from "../../components/redesign/Navbar";
 import Footer from "../../components/redesign/Footer";
@@ -35,6 +35,33 @@ export default function Contact() {
     error: null,
   });
 
+  const [settings, setSettings] = useState({
+    supportEmail: "kfs24x7@gmail.com",
+    supportEmail2: "",
+    primaryPhone: "+91 8800145844",
+    secondaryPhone: "",
+  });
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/adminsettings`);
+        if (res.data && res.data.settings) {
+          const data = res.data.settings;
+          setSettings({
+            supportEmail: data.supportEmail || "kfs24x7@gmail.com",
+            supportEmail2: data.supportEmail2 || "",
+            primaryPhone: data.primaryPhone || "+91 8800145844",
+            secondaryPhone: data.secondaryPhone || "",
+          });
+        }
+      } catch (err) {
+        console.error("Error fetching contact settings:", err);
+      }
+    };
+    fetchSettings();
+  }, []);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -62,17 +89,27 @@ export default function Contact() {
     }
   };
 
+  const phoneDetails = [settings.primaryPhone];
+  if (settings.secondaryPhone) {
+    phoneDetails.push(settings.secondaryPhone);
+  }
+
+  const emailDetails = [settings.supportEmail];
+  if (settings.supportEmail2) {
+    emailDetails.push(settings.supportEmail2);
+  }
+
   const contactInfo = [
     {
       icon: <Phone size={24} className="text-green-600" />,
       title: "Phone Number",
-      details: ["+91 8800145844"],
+      details: phoneDetails,
       bg: "bg-green-50",
     },
     {
       icon: <Mail size={24} className="text-blue-600" />,
       title: "Email Address",
-      details: ["kfs24x7@gmail.com"],
+      details: emailDetails,
       bg: "bg-blue-50",
     },
     {

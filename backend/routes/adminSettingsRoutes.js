@@ -8,6 +8,6 @@ const {
 } = require("../Controllers/adminSettingsController");
 
 router.post("/adminsettings", auth, saveSettings);
-router.get("/adminsettings", auth, getSettings);
+router.get("/adminsettings", getSettings);
 
 module.exports = router;

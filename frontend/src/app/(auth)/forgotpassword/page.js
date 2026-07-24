@@ -9,7 +9,6 @@ export default function ForgotPassword() {
   const [email, setEmail] = useState("");
   const [emailSent, setEmailSent] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [resetToken, setResetToken] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -23,7 +22,6 @@ export default function ForgotPassword() {
       );
       if (res.data.success) {
         setEmailSent(true);
-        setResetToken(res.data.resetToken);
       }
     } catch (error) {
       alert(error.response?.data?.message || "Failed to send reset link");
@@ -62,14 +60,14 @@ export default function ForgotPassword() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
-                      className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-green-600 focus:border-green-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-green-500 dark:focus:border-green-500"
                     />
                   </div>
 
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition duration-200 disabled:bg-blue-400"
+                    className="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700 transition duration-200 disabled:bg-blue-400"
                     style={{ cursor: loading ? "not-allowed" : "pointer" }}>
                     {loading ? "Sending..." : "Send Reset Link"}
                   </button>
@@ -80,21 +78,12 @@ export default function ForgotPassword() {
                     Email Sent!
                   </h3>
                   <p className="text-gray-500 dark:text-gray-400 text-sm mb-4 leading-relaxed">
-                    Reset link email par bhej diya hai.
-                    <br />
-                    <span className="text-xs text-yellow-600 font-bold block mt-2">
-                      Development Mode:{" "}
-                      <Link
-                        href={`/resetpassword/${resetToken}`}
-                        className="underline">
-                        Click here to reset password
-                      </Link>
-                    </span>
+                    Check your inbox for the reset link.
                   </p>
 
                   <button
                     onClick={() => setEmailSent(false)}
-                    className="text-blue-600 hover:underline text-sm">
+                    className="text-green-600 hover:underline text-sm">
                     Resend Email
                   </button>
                 </div>
@@ -103,7 +92,7 @@ export default function ForgotPassword() {
               <div className="text-center mt-4">
                 <Link
                   href="/login"
-                  className="text-sm text-blue-600 hover:underline">
+                  className="text-sm text-green-600 hover:underline">
                   ← Back to Login
                 </Link>
               </div>

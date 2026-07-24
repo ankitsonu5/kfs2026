@@ -85,6 +85,14 @@ exports.placeOrder = async (req, res) => {
     // Send Email Notification in the background
     (async () => {
       try {
+        const AdminSettings = require("../models/AdminSettings");
+        const settings = await AdminSettings.findOne() || {};
+
+        const supportEmail = settings.supportEmail || "kfs24x7@gmail.com";
+        const supportEmail2 = settings.supportEmail2 || "";
+        const primaryPhone = settings.primaryPhone || "+91 8800145844";
+        const secondaryPhone = settings.secondaryPhone || "";
+
         const adminEmail = process.env.ADMIN_EMAIL;
         const smtpUser = process.env.SMTP_USER;
         const smtpPass = process.env.SMTP_PASS;
@@ -155,6 +163,11 @@ exports.placeOrder = async (req, res) => {
                 </table>
                 
                 ${isCustomer ? `<p style="text-align: center; color: #6b7280; font-size: 14px; margin-top: 32px;">Thanks for shopping with KFS!</p>` : ''}
+                <div style="border-top: 1px solid #e5e7eb; padding-top: 16px; margin-top: 24px; text-align: center; font-size: 12px; color: #6b7280;">
+                  <p style="margin: 0 0 4px 0;">If you have any questions, contact us:</p>
+                  <p style="margin: 0 0 4px 0;">📞 ${primaryPhone}${secondaryPhone ? ` / ${secondaryPhone}` : ''}</p>
+                  <p style="margin: 0;">✉️ ${supportEmail}${supportEmail2 ? ` / ${supportEmail2}` : ''}</p>
+                </div>
               </div>
             </div>
           `;

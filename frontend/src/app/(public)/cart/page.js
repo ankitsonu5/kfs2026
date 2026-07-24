@@ -22,9 +22,24 @@ export default function Cart() {
   const router = useRouter();
   const [cart, setCart] = useState({ items: [], totalAmount: 0 });
   const [loading, setLoading] = useState(true);
+  const [deliveryConfig, setDeliveryConfig] = useState({ deliveryCharge: 50, minOrderForFreeDelivery: 500 });
 
   useEffect(() => {
     fetchCart();
+    const fetchSettings = async () => {
+      try {
+        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/adminsettings`);
+        if (res.data && res.data.settings) {
+          setDeliveryConfig({
+            deliveryCharge: res.data.settings.deliveryCharge !== undefined ? Number(res.data.settings.deliveryCharge) : 50,
+            minOrderForFreeDelivery: res.data.settings.minOrderForFreeDelivery !== undefined ? Number(res.data.settings.minOrderForFreeDelivery) : 500,
+          });
+        }
+      } catch (err) {
+        console.error("Error fetching delivery settings:", err);
+      }
+    };
+    fetchSettings();
   }, []);
 
   const fetchCart = async () => {
@@ -273,7 +288,7 @@ export default function Cart() {
     return sum + (mrp * item.quantity);
   }, 0).toFixed(2));
   const totalSavings = parseFloat((totalMrp - subtotal).toFixed(2));
-  const deliveryCharge = subtotal >= 500 || subtotal === 0 ? 0 : 50;
+  const deliveryCharge = subtotal >= deliveryConfig.minOrderForFreeDelivery || subtotal === 0 ? 0 : deliveryConfig.deliveryCharge;
   const grandTotal = parseFloat((subtotal + deliveryCharge).toFixed(2));
 
   return (
@@ -402,7 +417,7 @@ export default function Cart() {
                     </div>
                   )}
                   <div className="flex justify-between text-gray-600">
-                    <span>Delivery Charges <span className="text-xs text-gray-400">(Free above ₹500)</span></span>
+                    <span>Delivery Charges <span className="text-xs text-gray-400">(Free above ₹{deliveryConfig.minOrderForFreeDelivery})</span></span>
                     {deliveryCharge === 0 ? (
                       <span className="text-green-600 font-semibold">FREE</span>
                     ) : (

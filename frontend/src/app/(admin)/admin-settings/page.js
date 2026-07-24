@@ -4,14 +4,17 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { safePush } from "@/lib/safe-navigation";
 import axios from "axios";
-import { ArrowLeft, Globe, Headset, Truck, Save } from "lucide-react";
+import { ArrowLeft, Globe, Headset, Truck, Save, Package, Phone } from "lucide-react";
 
 export default function Settings() {
   const router = useRouter();
   const [settings, setSettings] = useState({
-    siteName: "",
     supportEmail: "",
+    supportEmail2: "",
+    primaryPhone: "",
+    secondaryPhone: "",
     deliveryCharge: "",
+    minOrderForFreeDelivery: "",
   });
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
@@ -29,9 +32,12 @@ export default function Settings() {
       );
       const data = res.data.settings || {};
       setSettings({
-        siteName: data.siteName || "",
         supportEmail: data.supportEmail || "",
+        supportEmail2: data.supportEmail2 || "",
+        primaryPhone: data.primaryPhone || "",
+        secondaryPhone: data.secondaryPhone || "",
         deliveryCharge: data.deliveryCharge || "",
+        minOrderForFreeDelivery: data.minOrderForFreeDelivery || "",
       });
     } catch (err) {
       console.error("Settings fetch error:", err);
@@ -105,26 +111,8 @@ export default function Settings() {
           <form onSubmit={saveSettings} className="space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <label className="text-[10px] font-black text-emerald-400 uppercase tracking-[0.2em] ml-1">
-                  Site Title
-                </label>
-                <div className="relative group">
-                  <Globe className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 transition-colors group-focus-within:text-emerald-400 w-5 h-5" />
-                  <input
-                    type="text"
-                    placeholder="KFS Grocery"
-                    value={settings.siteName}
-                    onChange={(e) =>
-                      setSettings({ ...settings, siteName: e.target.value })
-                    }
-                    className="w-full pl-12 pr-4 py-4 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 transition-all"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
                 <label className="text-[10px] font-black text-blue-400 uppercase tracking-[0.2em] ml-1">
-                  Support Email
+                  Primary Support Email
                 </label>
                 <div className="relative group">
                   <Headset className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 transition-colors group-focus-within:text-blue-400 w-5 h-5" />
@@ -136,30 +124,111 @@ export default function Settings() {
                       setSettings({ ...settings, supportEmail: e.target.value })
                     }
                     className="w-full pl-12 pr-4 py-4 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-purple-400 uppercase tracking-[0.2em] ml-1">
+                  Secondary Support Email (Optional)
+                </label>
+                <div className="relative group">
+                  <Headset className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 transition-colors group-focus-within:text-purple-400 w-5 h-5" />
+                  <input
+                    type="email"
+                    placeholder="backup-support@kfs.com"
+                    value={settings.supportEmail2}
+                    onChange={(e) =>
+                      setSettings({ ...settings, supportEmail2: e.target.value })
+                    }
+                    className="w-full pl-12 pr-4 py-4 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500/30 transition-all"
                   />
                 </div>
               </div>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-orange-400 uppercase tracking-[0.2em] ml-1">
-                Default Delivery Charge (₹)
-              </label>
-              <div className="relative group max-w-xs">
-                <Truck className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 transition-colors group-focus-within:text-orange-400 w-5 h-5" />
-                <input
-                  type="number"
-                  placeholder="0"
-                  value={settings.deliveryCharge}
-                  onChange={(e) =>
-                    setSettings({ ...settings, deliveryCharge: e.target.value })
-                  }
-                  className="w-full pl-12 pr-4 py-4 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-orange-500/30 transition-all font-bold"
-                />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-teal-400 uppercase tracking-[0.2em] ml-1">
+                  Primary Phone
+                </label>
+                <div className="relative group">
+                  <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 transition-colors group-focus-within:text-teal-400 w-5 h-5" />
+                  <input
+                    type="text"
+                    placeholder="+91 8800145844"
+                    value={settings.primaryPhone}
+                    onChange={(e) =>
+                      setSettings({ ...settings, primaryPhone: e.target.value })
+                    }
+                    className="w-full pl-12 pr-4 py-4 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-teal-500/30 transition-all"
+                    required
+                  />
+                </div>
               </div>
-              <p className="text-[10px] text-gray-500 ml-1">
-                This amount will be added to every order during checkout.
-              </p>
+
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-cyan-400 uppercase tracking-[0.2em] ml-1">
+                  Secondary Phone (Optional)
+                </label>
+                <div className="relative group">
+                  <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 transition-colors group-focus-within:text-cyan-400 w-5 h-5" />
+                  <input
+                    type="text"
+                    placeholder="+91 9999999999"
+                    value={settings.secondaryPhone}
+                    onChange={(e) =>
+                      setSettings({ ...settings, secondaryPhone: e.target.value })
+                    }
+                    className="w-full pl-12 pr-4 py-4 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-cyan-500/30 transition-all"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-orange-400 uppercase tracking-[0.2em] ml-1">
+                  Default Delivery Charge (₹)
+                </label>
+                <div className="relative group">
+                  <Truck className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 transition-colors group-focus-within:text-orange-400 w-5 h-5" />
+                  <input
+                    type="number"
+                    placeholder="0"
+                    value={settings.deliveryCharge}
+                    onChange={(e) =>
+                      setSettings({ ...settings, deliveryCharge: e.target.value })
+                    }
+                    className="w-full pl-12 pr-4 py-4 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-orange-500/30 transition-all font-bold"
+                  />
+                </div>
+                <p className="text-[10px] text-gray-500 ml-1">
+                  This amount is charged if order subtotal is below the threshold.
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-emerald-400 uppercase tracking-[0.2em] ml-1">
+                  Free Delivery Min Order (₹)
+                </label>
+                <div className="relative group">
+                  <Package className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 transition-colors group-focus-within:text-emerald-400 w-5 h-5" />
+                  <input
+                    type="number"
+                    placeholder="500"
+                    value={settings.minOrderForFreeDelivery}
+                    onChange={(e) =>
+                      setSettings({ ...settings, minOrderForFreeDelivery: e.target.value })
+                    }
+                    className="w-full pl-12 pr-4 py-4 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 transition-all font-bold"
+                  />
+                </div>
+                <p className="text-[10px] text-gray-500 ml-1">
+                  Orders equal to or above this amount will get free delivery.
+                </p>
+              </div>
             </div>
 
             <div className="pt-4">

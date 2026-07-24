@@ -1,12 +1,40 @@
 "use client";
 
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { Phone, Mail, MapPin } from "lucide-react";
 import Image from "next/image";
 import { FaInstagram, FaFacebookF } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
+import axios from "axios";
 
 export default function Footer() {
+  const [settings, setSettings] = useState({
+    supportEmail: "kfs24x7@gmail.com",
+    supportEmail2: "",
+    primaryPhone: "+91 8800145844",
+    secondaryPhone: "",
+  });
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/adminsettings`);
+        if (res.data && res.data.settings) {
+          const data = res.data.settings;
+          setSettings({
+            supportEmail: data.supportEmail || "kfs24x7@gmail.com",
+            supportEmail2: data.supportEmail2 || "",
+            primaryPhone: data.primaryPhone || "+91 8800145844",
+            secondaryPhone: data.secondaryPhone || "",
+          });
+        }
+      } catch (err) {
+        console.error("Error fetching footer settings:", err);
+      }
+    };
+    fetchSettings();
+  }, []);
   return (
     <footer className="bg-white pt-16 pb-10 border-t border-gray-100">
       <div className="container mx-auto px-4">
@@ -128,13 +156,19 @@ export default function Footer() {
           <div>
             <h4 className="text-lg font-bold text-gray-900 mb-6">Contact</h4>
             <ul className="space-y-4 text-gray-600">
-              <li className="flex gap-3 items-center">
-                <Phone className="w-4 h-4 text-green-600" />
-                <span>+91 8800145844</span>
+              <li className="flex gap-3 items-start">
+                <Phone className="w-4 h-4 text-green-600 mt-1" />
+                <div className="flex flex-col">
+                  <span>{settings.primaryPhone}</span>
+                  {settings.secondaryPhone && <span>{settings.secondaryPhone}</span>}
+                </div>
               </li>
-              <li className="flex gap-3 items-center">
-                <Mail className="w-4 h-4 text-green-600" />
-                <span>kfs24x7@gmail.com</span>
+              <li className="flex gap-3 items-start">
+                <Mail className="w-4 h-4 text-green-600 mt-1" />
+                <div className="flex flex-col">
+                  <span>{settings.supportEmail}</span>
+                  {settings.supportEmail2 && <span>{settings.supportEmail2}</span>}
+                </div>
               </li>
               <li className="flex gap-3 items-center">
                 <MapPin className="w-4 h-4 text-green-600" />

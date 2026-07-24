@@ -23,6 +23,7 @@ export default function Checkout() {
   const [cart, setCart] = useState({ items: [], totalAmount: 0 });
   const [loading, setLoading] = useState(true);
   const [placing, setPlacing] = useState(false);
+  const [deliveryConfig, setDeliveryConfig] = useState({ deliveryCharge: 50, minOrderForFreeDelivery: 500 });
   const [form, setForm] = useState({
     fullName: "",
     phone: "",
@@ -56,6 +57,21 @@ export default function Checkout() {
       }
     };
     fetchCart();
+
+    const fetchSettings = async () => {
+      try {
+        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/adminsettings`);
+        if (res.data && res.data.settings) {
+          setDeliveryConfig({
+            deliveryCharge: res.data.settings.deliveryCharge !== undefined ? Number(res.data.settings.deliveryCharge) : 50,
+            minOrderForFreeDelivery: res.data.settings.minOrderForFreeDelivery !== undefined ? Number(res.data.settings.minOrderForFreeDelivery) : 500,
+          });
+        }
+      } catch (err) {
+        console.error("Error fetching delivery settings:", err);
+      }
+    };
+    fetchSettings();
   }, [router]);
 
   // Auto-fill saved address from settings + profile
@@ -202,7 +218,7 @@ export default function Checkout() {
   }, 0).toFixed(2));
   const totalSavings = parseFloat((totalMrp - subtotal).toFixed(2));
   
-  const deliveryCharge = subtotal >= 500 || subtotal === 0 ? 0 : 50;
+  const deliveryCharge = subtotal >= deliveryConfig.minOrderForFreeDelivery || subtotal === 0 ? 0 : deliveryConfig.deliveryCharge;
   const grandTotal = parseFloat((subtotal + deliveryCharge).toFixed(2));
 
   return (
@@ -477,7 +493,7 @@ export default function Checkout() {
                   </div>
                 )}
                 <div className="flex justify-between text-gray-600 text-sm">
-                  <span>Delivery Charges <span className="text-[10px] text-gray-400 font-normal ml-1">(Free above ₹500)</span></span>
+                  <span>Delivery Charges <span className="text-[10px] text-gray-400 font-normal ml-1">(Free above ₹{deliveryConfig.minOrderForFreeDelivery})</span></span>
                   {!isServiceAvailable && form.pincode.length >= 6 ? (
                     <span className="text-red-500 font-semibold tracking-tighter text-xs">Service Unavailable</span>
                   ) : deliveryCharge === 0 ? (
