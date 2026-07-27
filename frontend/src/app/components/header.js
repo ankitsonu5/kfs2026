@@ -21,6 +21,15 @@ import {
 import Link from "next/link";
 import MobileBottomNav from "./MobileBottomNav";
 
+// Helper function to clear user auth cookies and localStorage dynamically
+const clearUserSession = () => {
+  const keysToClear = ["token", "role"];
+  keysToClear.forEach((key) => localStorage.removeItem(key));
+  keysToClear.forEach((name) => {
+    document.cookie = `${name}=; max-age=-1; path=/;`;
+  });
+};
+
 export default function Header({ cartCount }) {
   const router = useRouter();
   const [user, setUser] = useState(null);
@@ -59,6 +68,8 @@ export default function Header({ cartCount }) {
         setUser(res.data.user);
       } catch (error) {
         console.log("User fetch error:", error);
+        clearUserSession();
+        setUser(null);
       }
     };
     fetchUser();
@@ -102,7 +113,7 @@ export default function Header({ cartCount }) {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    clearUserSession();
     setUser(null);
     setProfileOpen(false);
     router.push("/");

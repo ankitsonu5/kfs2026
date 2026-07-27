@@ -20,7 +20,7 @@ export default function Login() {
     const token = localStorage.getItem("token");
     const role = localStorage.getItem("role");
 
-    if (token && role === "user") {
+    if (token && token !== "undefined" && token !== "null" && role === "user") {
       safePush(router, "/");
     }
   }, [router]);
