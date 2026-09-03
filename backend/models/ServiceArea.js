@@ -7,8 +7,8 @@ const serviceAreaSchema = new mongoose.Schema({
   },
   pincode: {
     type: String,
-    required: true,
-    unique: true,
+    trim: true,
+    default: "",
   },
   deliveryCharge: {
     type: Number,

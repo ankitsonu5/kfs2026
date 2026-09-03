@@ -8,6 +8,8 @@ const productSchema = new mongoose.Schema(
     description: { type: String },
     category: [{ type: mongoose.Schema.Types.ObjectId, ref: "Category" }],
     stock: { type: Number, default: 0 },
+    bulkPrice: { type: Number, default: 0 },
+    bulkMinQty: { type: Number, default: 1 },
     images: [{ type: String }],
     isTopSellingProducts: { type: Boolean, default: false },
     isDealsOfDay: { type: Boolean, default: false },

@@ -33,13 +33,28 @@ exports.placeOrder = async (req, res) => {
       }
     }
 
+    const userPincode = req.body.shippingAddress?.pincode ? req.body.shippingAddress.pincode.toString().trim() : "";
+    const userCity = req.body.shippingAddress?.city ? req.body.shippingAddress.city.toString().trim() : "";
+
+    if (!userCity || !userPincode) {
+      return res.status(400).json({ success: false, message: "City and Pincode are required" });
+    }
+
+    const cityRegex = new RegExp(`^${userCity.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, "i");
+
     const service = await ServiceArea.findOne({
-      pincode: req.body.shippingAddress.pincode,
+      city: cityRegex,
       isActive: true,
+      $or: [
+        { pincode: userPincode },
+        { pincode: "" },
+        { pincode: null },
+        { pincode: { $exists: false } }
+      ]
     });
 
     if (!service) {
-      return res.status(400).json({ success: false, message: "Delivery not available for this pincode" });
+      return res.status(400).json({ success: false, message: "Delivery not available for this city / pincode combination" });
     }
 
     // Actually decrement stock

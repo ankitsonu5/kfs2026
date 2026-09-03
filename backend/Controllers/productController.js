@@ -12,6 +12,8 @@ exports.addProducts = async (req, res) => {
       description,
       category,
       stock,
+      bulkPrice,
+      bulkMinQty,
       isTopSellingProducts,
       isDealsOfDay,
       isRice,
@@ -32,6 +34,8 @@ exports.addProducts = async (req, res) => {
       images,
       category,
       stock: Number(stock) || 0,
+      bulkPrice: Number(bulkPrice) || 0,
+      bulkMinQty: Number(bulkMinQty) > 0 ? Number(bulkMinQty) : 1,
       isTopSellingProducts,
       isDealsOfDay,
       isRice,
@@ -79,6 +83,8 @@ exports.addProductsCSV = async (req, res) => {
 
              const description = row.description || row.Description || "";
              const stock = Number(row.stock) || Number(row.Stock) || 0;
+             const bulkPrice = Number(row.bulkPrice) || Number(row["Bulk Price"]) || 0;
+             const bulkMinQty = Number(row.bulkMinQty) || Number(row["Bulk Min Qty"]) || 1;
              const categoryName = row.categoryName || row.Categories;
              
              const isTopSellingProducts = row.isTopSellingProducts === "true" || row.isTopSellingProducts === "1";
@@ -102,7 +108,7 @@ exports.addProductsCSV = async (req, res) => {
              
              if (title && price > 0) {
                productsToInsert.push({
-                 title, price, discountPrice, description, stock,
+                 title, price, discountPrice, description, stock, bulkPrice, bulkMinQty,
                  category: categoryIds,
                  isTopSellingProducts, isDealsOfDay, isRice, isAttaAndFlour,
                  isDryFruites, isDalAndPulses, isMasala, isNamkeenAndSnacks,
@@ -176,6 +182,8 @@ exports.updateProduct = async (req, res) => {
       description,
       category,
       stock,
+      bulkPrice,
+      bulkMinQty,
       isTopSellingProducts,
       isDealsOfDay,
       isRice,
@@ -192,6 +200,8 @@ exports.updateProduct = async (req, res) => {
       description,
       category,
       stock: Number(stock) || 0,
+      bulkPrice: Number(bulkPrice) || 0,
+      bulkMinQty: Number(bulkMinQty) > 0 ? Number(bulkMinQty) : 1,
       isTopSellingProducts,
       isDealsOfDay,
       isRice,

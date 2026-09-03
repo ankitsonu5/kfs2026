@@ -13,15 +13,19 @@ exports.addToCart = async (req, res) => {
       return res.status(404).json({ success: false, message: "Product not found" });
     }
 
+    const effectiveQuantity = Number(quantity) || 1;
+    const isBulkEligible = product.bulkPrice > 0 && effectiveQuantity >= (product.bulkMinQty || 1);
+    const itemUnitPrice = isBulkEligible ? product.bulkPrice : (price !== undefined && price !== null && Number(price) > 0 ? Number(price) : product.price);
+
     let cart = await Cart.findOne({ user: userId });
 
     if (!cart) {
-      if (quantity > product.stock) {
+      if (effectiveQuantity > product.stock) {
         return res.status(400).json({ success: false, message: `Only ${product.stock} items in stock` });
       }
       cart = new Cart({
         user: userId,
-        items: [{ productId, title, price, discountPrice, image, quantity }],
+        items: [{ productId, title: title || product.title, price: itemUnitPrice, discountPrice: discountPrice || product.discountPrice, image: image || product.images?.[0] || "", quantity: effectiveQuantity }],
       });
     } else {
       const index = cart.items.findIndex(
@@ -29,16 +33,20 @@ exports.addToCart = async (req, res) => {
       );
 
       if (index > -1) {
-        const newQuantity = cart.items[index].quantity + quantity;
+        const newQuantity = cart.items[index].quantity + effectiveQuantity;
         if (newQuantity > product.stock) {
           return res.status(400).json({ success: false, message: `Only ${product.stock} items in stock. You already have ${cart.items[index].quantity} in cart.` });
         }
         cart.items[index].quantity = newQuantity;
+        // Update price if bulk threshold is now reached
+        if (product.bulkPrice > 0 && newQuantity >= (product.bulkMinQty || 1)) {
+          cart.items[index].price = product.bulkPrice;
+        }
       } else {
-        if (quantity > product.stock) {
+        if (effectiveQuantity > product.stock) {
           return res.status(400).json({ success: false, message: `Only ${product.stock} items in stock` });
         }
-        cart.items.push({ productId, title, price, discountPrice, image, quantity });
+        cart.items.push({ productId, title: title || product.title, price: itemUnitPrice, discountPrice: discountPrice || product.discountPrice, image: image || product.images?.[0] || "", quantity: effectiveQuantity });
       }
     }
 
@@ -160,14 +168,16 @@ exports.mergeCart = async (req, res) => {
         if (!mongoose.Types.ObjectId.isValid(item.productId)) continue;
         const product = await Product.findById(item.productId);
         if (product) {
-          const quantityToAdd = Math.min(item.quantity || 1, product.stock);
+          const quantityToAdd = Math.min(Number(item.quantity) || 1, product.stock);
           if (quantityToAdd > 0) {
+            const isBulk = product.bulkPrice > 0 && quantityToAdd >= (product.bulkMinQty || 1);
+            const unitPrice = isBulk ? product.bulkPrice : (item.price || product.price);
             validItems.push({
               productId: item.productId,
-              title: item.title,
-              price: item.price,
-              discountPrice: item.discountPrice,
-              image: item.image,
+              title: item.title || product.title,
+              price: unitPrice,
+              discountPrice: item.discountPrice || product.discountPrice,
+              image: item.image || product.images?.[0] || "",
               quantity: quantityToAdd,
             });
           }
@@ -188,17 +198,23 @@ exports.mergeCart = async (req, res) => {
         );
 
         if (index > -1) {
-          const totalNewQty = cart.items[index].quantity + (newItem.quantity || 1);
-          cart.items[index].quantity = Math.min(totalNewQty, product.stock);
+          const totalNewQty = cart.items[index].quantity + (Number(newItem.quantity) || 1);
+          const finalQty = Math.min(totalNewQty, product.stock);
+          cart.items[index].quantity = finalQty;
+          if (product.bulkPrice > 0 && finalQty >= (product.bulkMinQty || 1)) {
+            cart.items[index].price = product.bulkPrice;
+          }
         } else {
-          const quantityToAdd = Math.min(newItem.quantity || 1, product.stock);
+          const quantityToAdd = Math.min(Number(newItem.quantity) || 1, product.stock);
           if (quantityToAdd > 0) {
+            const isBulk = product.bulkPrice > 0 && quantityToAdd >= (product.bulkMinQty || 1);
+            const unitPrice = isBulk ? product.bulkPrice : (newItem.price || product.price);
             cart.items.push({
               productId: newItem.productId,
-              title: newItem.title,
-              price: newItem.price,
-              discountPrice: newItem.discountPrice,
-              image: newItem.image,
+              title: newItem.title || product.title,
+              price: unitPrice,
+              discountPrice: newItem.discountPrice || product.discountPrice,
+              image: newItem.image || product.images?.[0] || "",
               quantity: quantityToAdd,
             });
           }

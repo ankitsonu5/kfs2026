@@ -21,6 +21,8 @@ export default function EditProduct() {
     category: "",
     stock: "",
     discountPrice: "",
+    bulkPrice: "",
+    bulkMinQty: "1",
     isTopSellingProducts: false,
     isDealsOfDay: false,
     isRice: false,
@@ -50,6 +52,8 @@ export default function EditProduct() {
             category: p.category?.[0] || "",
             stock: p.stock,
             discountPrice: p.discountPrice || "",
+            bulkPrice: p.bulkPrice !== undefined && p.bulkPrice !== null ? p.bulkPrice : "",
+            bulkMinQty: p.bulkMinQty || 1,
             isTopSellingProducts: p.isTopSellingProducts || false,
             isDealsOfDay: p.isDealsOfDay || false,
             isRice: p.isRice || false,
@@ -129,6 +133,8 @@ export default function EditProduct() {
       formData.append("category", form.category);
       formData.append("stock", form.stock);
       formData.append("discountPrice", form.discountPrice);
+      formData.append("bulkPrice", form.bulkPrice || "0");
+      formData.append("bulkMinQty", form.bulkMinQty || "1");
 
       // Append Boolean Flags
       formData.append("isTopSellingProducts", form.isTopSellingProducts);
@@ -232,6 +238,45 @@ export default function EditProduct() {
                 className="w-full px-3 py-2 bg-[#1f2937] border border-gray-600 rounded-md 
                 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
+            </div>
+          </div>
+
+          {/* Bulk / Wholesale Pricing Section */}
+          <div className="p-4 bg-emerald-950/20 border border-emerald-500/30 rounded-xl space-y-4">
+            <div className="flex items-center gap-2 text-emerald-400 font-bold text-sm">
+              Bulk / Wholesale Pricing (Optional)
+            </div>
+            <p className="text-xs text-gray-400">
+              Set wholesale rate for bulk buyers. If left empty, regular selling price will be used. Max quantity is automatically capped at available stock.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-semibold text-gray-300 mb-1">
+                  Bulk Price per Unit (₹)
+                </label>
+                <input
+                  type="number"
+                  name="bulkPrice"
+                  value={form.bulkPrice}
+                  onChange={handleChange}
+                  placeholder="e.g. 85 (Leave empty for regular price)"
+                  className="w-full px-3 py-2 bg-[#1f2937] border border-gray-600 rounded-md text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-300 mb-1">
+                  Min Bulk Quantity (MOQ)
+                </label>
+                <input
+                  type="number"
+                  name="bulkMinQty"
+                  value={form.bulkMinQty}
+                  onChange={handleChange}
+                  min="1"
+                  placeholder="e.g. 10 (Default: 1)"
+                  className="w-full px-3 py-2 bg-[#1f2937] border border-gray-600 rounded-md text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                />
+              </div>
             </div>
           </div>
 

@@ -1570,7 +1570,7 @@ export default function AdminDashboard() {
           <Section title="Service Area Management">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
               <p className="text-gray-400 text-sm">
-                Control delivery availability by Pincode (Fixed ₹50 charge for orders under ₹1000)
+                Control delivery availability by City or specific Pincode. (Leave pincode blank to enable entire city)
               </p>
               <button
                 onClick={() => {
@@ -1590,23 +1590,23 @@ export default function AdminDashboard() {
                 </h4>
                 <form onSubmit={handleAreaSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <label className="text-xs font-bold text-gray-500 uppercase">City Name</label>
+                    <label className="text-xs font-bold text-gray-500 uppercase">City Name *</label>
                     <input
                       type="text" required
                       value={areaForm.city}
                       onChange={(e) => setAreaForm({ ...areaForm, city: e.target.value })}
                       className="w-full bg-[#111827] border border-gray-700 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="e.g. New Delhi"
+                      placeholder="e.g. New Delhi or Patna"
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="text-xs font-bold text-gray-500 uppercase">Pincode</label>
+                    <label className="text-xs font-bold text-gray-500 uppercase">Pincode (Optional)</label>
                     <input
-                      type="text" required
+                      type="text"
                       value={areaForm.pincode}
                       onChange={(e) => setAreaForm({ ...areaForm, pincode: e.target.value })}
                       className="w-full bg-[#111827] border border-gray-700 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="e.g. 110001"
+                      placeholder="e.g. 110001 (Leave empty for entire city)"
                     />
                   </div>
                   <div className="md:col-span-2 flex justify-end gap-3 mt-4">
@@ -1650,8 +1650,10 @@ export default function AdminDashboard() {
                                 <MapPin size={16} className="md:w-5 md:h-5" />
                               </div>
                               <div className="min-w-0">
-                                <p className="font-bold text-gray-100 text-xs md:text-sm">{area.pincode}</p>
-                                <p className="text-[10px] md:text-xs text-gray-500 truncate">{area.city}</p>
+                                <p className="font-bold text-gray-100 text-xs md:text-sm">
+                                  {area.pincode ? area.pincode : <span className="text-emerald-400 font-normal">Entire City (All Pincodes)</span>}
+                                </p>
+                                <p className="text-[10px] md:text-xs text-gray-400 font-medium truncate">{area.city}</p>
                               </div>
                             </div>
                           </td>

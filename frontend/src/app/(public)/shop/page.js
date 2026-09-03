@@ -42,9 +42,11 @@ const SidebarContent = ({ categories, categoryFilter, flagFilter, router, setIsS
     )}
     <ul className={`space-y-4 ${isMobileSidebar ? 'flex flex-col items-center pt-2' : ''}`}>
       <li
-        className={`cursor-pointer transition-all flex flex-col items-center justify-center text-center
-          ${isMobileSidebar ? 'w-full py-2 px-1 rounded-lg' : 'text-sm hover:bg-green-50 px-3 py-2.5 rounded-xl'}
-          ${!categoryFilter && !flagFilter ? "bg-green-50 text-green-600 font-bold" : "text-gray-600 font-medium"}`}
+        className={`cursor-pointer transition-all ${
+          isMobileSidebar 
+            ? 'flex flex-col items-center justify-center text-center w-full py-2 px-1 rounded-lg' 
+            : 'flex items-center text-left text-sm hover:bg-green-50 px-3 py-2.5 rounded-xl w-full'
+        } ${!categoryFilter && !flagFilter ? "bg-green-50 text-green-600 font-bold" : "text-gray-600 font-medium"}`}
         onClick={() => {
           let url = "/shop";
           if (flagFilter) url += `?flag=${flagFilter}`;
@@ -55,21 +57,23 @@ const SidebarContent = ({ categories, categoryFilter, flagFilter, router, setIsS
           ${isMobileSidebar ? 'w-12 h-12' : 'hidden'}`}>
           <LayoutGrid className="w-6 h-6" />
         </div>
-        <span className={isMobileSidebar ? "text-[10px] font-bold leading-tight" : ""}>{isMobileSidebar ? "All" : "All Categories"}</span>
+        <span className={isMobileSidebar ? "text-[10px] font-bold leading-tight" : "text-left"}>{isMobileSidebar ? "All" : "All Categories"}</span>
       </li>
       {categories.map((cat) => (
         <li
           key={cat._id}
-          className={`cursor-pointer transition-all flex flex-col items-center justify-center text-center
-            ${isMobileSidebar ? 'w-full py-2 px-1 rounded-lg' : 'text-sm hover:bg-green-50 px-3 py-2.5 rounded-xl'}
-            ${categoryFilter?.trim() === cat.name.trim() ? "text-green-600 font-bold" : "text-gray-600 font-medium"}`}
+          className={`cursor-pointer transition-all ${
+            isMobileSidebar 
+              ? 'flex flex-col items-center justify-center text-center w-full py-2 px-1 rounded-lg' 
+              : 'flex items-center text-left text-sm hover:bg-green-50 px-3 py-2.5 rounded-xl w-full'
+          } ${categoryFilter?.trim() === cat.name.trim() ? "bg-green-50 text-green-600 font-bold" : "text-gray-600 font-medium"}`}
           onClick={() => {
             let url = `/shop?category=${encodeURIComponent(cat.name.trim())}`;
             if (flagFilter) url += `&flag=${flagFilter}`;
             safePush(router, url);
             if(setIsSidebarOpen) setIsSidebarOpen(false);
           }}>
-          <div className={`${isMobileSidebar ? 'w-12 h-12' : 'hidden'} rounded-full overflow-hidden mb-1 border-2 ${categoryFilter?.trim() === cat.name.trim() ? 'border-green-500 shadow-md' : 'border-gray-100'} bg-white flex items-center justify-center flex-shrink-0 transition-all`}>
+          <div className={`${isMobileSidebar ? 'w-12 h-12 rounded-full overflow-hidden mb-1 border-2 bg-white flex items-center justify-center flex-shrink-0 transition-all' : 'hidden'} ${categoryFilter?.trim() === cat.name.trim() ? 'border-green-500 shadow-md' : 'border-gray-100'}`}>
              {cat.image ? (
                 <Image
                   src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/categories/${cat.image}`}
@@ -82,7 +86,7 @@ const SidebarContent = ({ categories, categoryFilter, flagFilter, router, setIsS
                 <LayoutGrid className="w-6 h-6 text-gray-300" />
               )}
           </div>
-          <span className={isMobileSidebar ? "text-[10px] font-bold leading-tight line-clamp-2 px-0.5" : ""}>{cat.name}</span>
+          <span className={isMobileSidebar ? "text-[10px] font-bold leading-tight line-clamp-2 px-0.5" : "text-left"}>{cat.name}</span>
         </li>
       ))}
     </ul>
@@ -106,6 +110,9 @@ function ShopContent() {
   const [isSortOpen, setIsSortOpen] = useState(false);
   const [sortOption, setSortOption] = useState("newest");
   const [currentPage, setCurrentPage] = useState(1);
+  const [prevFilterKey, setPrevFilterKey] = useState(
+    `${categoryFilter || ""}-${flagFilter || ""}-${searchQuery || ""}-${sortOption}`
+  );
   const productsPerPage = 40;
 
   useEffect(() => {
@@ -212,15 +219,18 @@ function ShopContent() {
 
   const filteredProducts = getFilteredAndSortedProducts();
 
+  // Reset to page 1 when filters, search query, or sorting change without cascading renders
+  const currentFilterKey = `${categoryFilter || ""}-${flagFilter || ""}-${searchQuery || ""}-${sortOption}`;
+  if (prevFilterKey !== currentFilterKey) {
+    setPrevFilterKey(currentFilterKey);
+    setCurrentPage(1);
+  }
+
   // Pagination logic
   const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
   const indexOfLastProduct = currentPage * productsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
   const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
-
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [categoryFilter, flagFilter, searchQuery, sortOption]);
 
 
   const getPageTitle = () => {

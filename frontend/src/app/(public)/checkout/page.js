@@ -108,20 +108,24 @@ export default function Checkout() {
     fetchSavedAddress();
   }, []);
 
-  // Fetch service area info when pincode changes
+  // Fetch service area info when pincode or city changes
   useEffect(() => {
     const checkService = async () => {
-      if (form.pincode.length >= 6) {
+      const trimmedPincode = form.pincode ? form.pincode.trim() : "";
+      const trimmedCity = form.city ? form.city.trim() : "";
+
+      if (trimmedPincode.length >= 6 || trimmedCity.length >= 2) {
         setServiceLoading(true);
         try {
-          const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/service-areas/${form.pincode}`);
-          if (res.data.success) {
+          const res = await axios.get(
+            `${process.env.NEXT_PUBLIC_API_URL}/service-areas-check?pincode=${encodeURIComponent(trimmedPincode)}&city=${encodeURIComponent(trimmedCity)}`
+          );
+          if (res.data.success && res.data.area) {
             setService(res.data.area);
           } else {
             setService(null);
           }
         } catch (error) {
-          console.log("Service check error:", error);
           setService(null);
         } finally {
           setServiceLoading(false);
@@ -130,13 +134,11 @@ export default function Checkout() {
         setService(null);
       }
     };
-    const timer = setTimeout(checkService, 500);
+    const timer = setTimeout(checkService, 400);
     return () => clearTimeout(timer);
-  }, [form.pincode]);
+  }, [form.pincode, form.city]);
   
-  // Validate city matches service area city
-  const isCityValid = !service || (form.city.trim().toLowerCase() === service.city?.trim().toLowerCase());
-  const isServiceAvailable = !!service && isCityValid;
+  const isServiceAvailable = !!service;
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -146,9 +148,7 @@ export default function Checkout() {
     e.preventDefault();
 
     if (!isServiceAvailable) {
-      alert(service && !isCityValid 
-        ? `Sorry, we only provide service in ${service.city} for this pincode.` 
-        : "Sorry, we do not provide delivery service in this area yet.");
+      alert("Sorry, we do not provide delivery service in this area/city yet.");
       return;
     }
 
@@ -298,24 +298,22 @@ export default function Checkout() {
                       value={form.city}
                       onChange={handleChange}
                       placeholder="Enter city"
-                      className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-black ${
-                        form.city.length >= 3 
+                      className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-black ${
+                        form.city.trim().length >= 2 
                           ? (isServiceAvailable ? "border-green-500" : "border-red-500") 
                           : "border-gray-300"
                       }`}
                     />
                     {serviceLoading && (
-                        <div className="absolute right-3 top-3.5 w-5 h-5 border-2 border-green-600 border-t-transparent rounded-full animate-spin"></div>
-                      )}
-                      {form.city.length >= 3 && !serviceLoading && (
-                        <p className={`text-[10px] mt-1 font-bold ${isServiceAvailable ? "text-green-600" : "text-red-500"}`}>
-                          {isServiceAvailable 
-                            ? `✓ Service available in ${service.city}` 
-                            : service && !isCityValid 
-                              ? `✗ City must be ${service.city} for this pincode`
-                              : "✗ Service not available in this area"}
-                        </p>
-                      )}
+                      <div className="absolute right-3 top-3.5 w-5 h-5 border-2 border-green-600 border-t-transparent rounded-full animate-spin"></div>
+                    )}
+                    {form.city.trim().length >= 2 && !serviceLoading && (
+                      <p className={`text-[10px] mt-1 font-bold ${isServiceAvailable ? "text-green-600" : "text-red-500"}`}>
+                        {isServiceAvailable 
+                          ? `✓ Delivery available in ${service.city}` 
+                          : "✗ Delivery not available in this city"}
+                      </p>
+                    )}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -329,21 +327,19 @@ export default function Checkout() {
                         onChange={handleChange}
                         placeholder="Enter pincode"
                         className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-black ${
-                          form.pincode.length >= 6 
-                            ? (service ? "border-green-500" : "border-red-500") 
+                          form.pincode.trim().length >= 6 
+                            ? (isServiceAvailable ? "border-green-500" : "border-red-500") 
                             : "border-gray-300"
                         }`}
                       />
                       {serviceLoading && (
                         <div className="absolute right-3 top-3.5 w-5 h-5 border-2 border-green-600 border-t-transparent rounded-full animate-spin"></div>
                       )}
-                      {form.pincode.length >= 6 && !serviceLoading && (
+                      {form.pincode.trim().length >= 6 && !serviceLoading && (
                         <p className={`text-[10px] mt-1 font-bold ${isServiceAvailable ? "text-green-600" : "text-red-500"}`}>
                           {isServiceAvailable 
-                            ? `✓ Service available in ${service.city}` 
-                            : service && !isCityValid 
-                              ? `✗ City must be ${service.city} for this pincode`
-                              : "✗ Service not available in this area"}
+                            ? `✓ Delivery available in ${service.city} ${service.pincode ? `(${service.pincode})` : "(All areas)"}` 
+                            : "✗ Delivery not available for this area"}
                         </p>
                       )}
                     </div>
